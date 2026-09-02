@@ -91,17 +91,39 @@ c = (\mathrm{id}(\pi),\ k,\ \alpha)
 
 Узел capability **уникально** задаётся парой \( (\mathrm{id}(\pi), k) \).
 
-### 2.3 Рёбра
+### 2.3 Рёбра (два уровня)
 
-Четыре бинарных отношения на \( V \times V \) (v0: три семантических + policy overlay):
+**Уровень project** — связи между \( \pi \):
 
 \[
-E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}} \subseteq V \times V
+E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P}
 \]
 
-\( E_{\mathsf{gov}} \) — **policy governs**: «этот узел/политика **управляет** поведением того» (session → capability, catalog → project, …). Может быть пустым, если всё задано атрибутами.
+`ProjectReference`, slnx membership, restore/build order. Кросс-project **только здесь**, не через capability-рёбра.
 
-Каждое ребро несёт метку \( \lambda(e) \in \mathcal{A}^* \) (словарь строк — v0); policy-ключи — подмножество ключей в \( \lambda \).
+**Уровень capability** — внутри \( \mathrm{subgraph}(\pi) \):
+
+\[
+\mathrm{subgraph}(\pi) = \{\pi\} \cup \{ c \in \mathbb{C} : c \text{ принадлежит } \pi \}
+\]
+
+\[
+E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}} \subseteq \mathrm{subgraph}(\pi) \times \mathrm{subgraph}(\pi)
+\]
+
+для **каждого** \( \pi \) (локальные рёбра; **запрещены** \( u \in \mathrm{subgraph}(\pi_1), v \in \mathrm{subgraph}(\pi_2), \pi_1 \neq \pi_2 \)).
+
+**Policy overlay** (может быть кросс-\( \pi \)):
+
+\[
+E_{\mathsf{gov}} \subseteq V \times V
+\]
+
+\( E_{\mathsf{gov}} \) — session/catalog → project/capability; не substitute для \( E_{\mathsf{proj}} \) или \( E_{\mathsf{feed}} \).
+
+Solution-wide capability (`Scope=Solution`, shared analyzer) — **атрибут** на узле + policy, **не** глобальное \( E_{\mathsf{feed}} \) между чужими \( \pi \).
+
+Каждое ребро несёт метку \( \lambda(e) \in \mathcal{A}^* \) (v0).
 
 ### 2.4 Владение файлами
 
@@ -114,7 +136,7 @@ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}} \subs
 ### 2.5 Статический граф решения
 
 \[
-G = (\mathbb{P},\ \mathbb{C},\ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}},\ \omega,\ \kappa,\ \psi)
+G = (\mathbb{P},\ \mathbb{C},\ E_{\mathsf{proj}},\ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}},\ \omega,\ \kappa,\ \psi)
 \]
 
 где \( \psi : V \rightharpoonup \mathcal{A}^* \) — **policy-атрибуты на узлах** (в т.ч. на \( \pi \) и \( c \)); дублируют/уточняют поля в \( \kappa \).
@@ -211,12 +233,14 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 |----|----------------|
 | **WF1** | \( \mathrm{id} \) инъективен на \( \mathbb{P} \) |
 | **WF2** | \( \forall \pi.\ |\mathrm{dom}(\kappa_\pi)| = |\{k : \kappa_\pi(k)\ \text{defined}\}| \) и каждый \( k \) встречается **не более одного раза** |
-| **WF3** | \( \forall e \in E_{\mathsf{req}} \cup E_{\mathsf{inv}} \cup E_{\mathsf{feed}} \cup E_{\mathsf{gov}}.\ e = (u,v) \Rightarrow u \in V \land v \in V \) |
-| **WF4** | Граф \( (V, E_{\mathsf{req}}) \) — **ацикличен** (DAG на \( \mathsf{requires} \)) |
+| **WF3** | \( \forall e \in E_{\mathsf{req}} \cup E_{\mathsf{inv}} \cup E_{\mathsf{feed}} \cup E_{\mathsf{gov}}.\ e=(u,v) \Rightarrow u,v \in V \); \( \forall e \in E_{\mathsf{proj}}.\ e=(\pi_1,\pi_2) \Rightarrow \pi_1,\pi_2 \in \mathbb{P} \) |
+| **WF4** | Для каждого \( \pi \): граф \( (\mathrm{subgraph}(\pi), E_{\mathsf{req}}|_{\pi}) \) — **ацикличен** (local DAG на \( \mathsf{requires} \)) |
 | **WF5** | \( \forall f \in \mathrm{dom}(\omega).\ \omega(f) \in \mathbb{P} \) |
 | **WF6** | Если \( \alpha = \kappa_\pi(k) \) и \( \alpha.\mathsf{topology} = \mathsf{Adaptive} \), то \( \alpha.\mathsf{rules} \neq \emptyset \) |
+| **WF7** | \( \forall e \in E_{\mathsf{req}} \cup E_{\mathsf{inv}} \cup E_{\mathsf{feed}}.\ \exists \pi.\ u,v \in \mathrm{subgraph}(\pi) \) для \( e=(u,v) \) — capability-рёбра **локальны** |
+| **WF8** | \( E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P} \); граф \( (\mathbb{P}, E_{\mathsf{proj}}) \) ацикличен (v0) |
 
-**Замечание:** WF4 — именно про \( E_{\mathsf{req}} \). Циклы в \( E_{\mathsf{inv}} \) или \( E_{\mathsf{feed}} \) в v0 **не запрещены** (обсуждаемо).
+**Замечание:** WF4 — \( E_{\mathsf{req}} \) ацикличен **внутри каждого** \( \mathrm{subgraph}(\pi) \) (эквивалентно WF7 + union). WF8 — project DAG отдельно.
 
 ---
 
@@ -504,9 +528,16 @@ MSBuild / `dotnet` — port (`buildDriver`), не SSOT (§7.3). Свой build D
 
 §7.4: diff snapshot'ов → minimal \( U' \) on compile DAG; IL as open interchange (ECMA-335).
 
-### 9.8 Глобальные vs локальные рёбра
+### 9.8 Capability vs project edges — **решено**
 
-Сейчас \( E_* \subseteq V \times V \) **глобально** на solution. Альтернатива: рёбра только внутри \( \mathrm{subgraph}(\pi) \). v0: **глобальные** (кросс-project requires возможен, напр. shared analyzer).
+**Вариант local + \( E_{\mathsf{proj}} \)** (§2.3):
+
+- \( E_{\mathsf{req}}, E_{\mathsf{inv}}, E_{\mathsf{feed}} \) — **только внутри** \( \mathrm{subgraph}(\pi) \) (WF7).
+- Кросс-project — \( E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P} \) (WF8): `ProjectReference`, slnx, restore order.
+- \( E_{\mathsf{gov}} \) — policy overlay; может быть кросс-\( \pi \), не build dependency.
+- Solution-wide analyzer / scan — `Scope=Solution` + policy, **не** глобальное capability-ребро между \( \pi_1 \) и \( \pi_2 \).
+
+Отвергнуто: глобальные \( E_* \subseteq V \times V \) на capability-слое (ломает blast radius §5.2, дублирует \( E_{\mathsf{proj}} \)).
 
 ### 9.9 Идентичность project
 
@@ -521,12 +552,13 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \mathbb{P} \) | `ProjectNode` list |
 | \( \kappa_\pi \) | `ProjectNode.Capabilities` |
 | \( V \) | `GraphNodeId` = `ProjectNode` \| `CapabilityNode` |
-| \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires` |
+| \( E_{\mathsf{proj}} \) | **ещё нет** (ports slnx/csproj) |
+| \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires` (v0: validate WF7 pending) |
 | \( \omega \) | `SolutionGraph.FileOwnership` |
 | \( \mathcal{S} \) | `SolutionSession` |
 | \( \rho_0 \) | `SessionPolicy` (v0 face; → merge в graph) |
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
-| WF1–WF6 | `GraphValidation.validate` |
+| WF1–WF8 | `GraphValidation.validate` (WF7–WF8 Phase 1b) |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
 | \( \varphi_r \), `freeze` | **ещё нет** → Phase 2 job substrate |
 
@@ -553,9 +585,11 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 3. ~~Snapshot jobs + build substrate~~ — §2.9, §7.3, OD6, BS1–BS4.  
 4. ~~Policy as attributes / governs edges~~ — §2.6, §7.2, P1–P4.  
 5. ~~Incremental build/compile + IL cache~~ — §7.4, IB1–IC3.  
-6. Код: `InvalidationScope`, `FrozenSnapshot`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`.  
-7. Порт slnx: \( G \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
-8. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
+6. ~~Capability edges local + \( E_{\mathsf{proj}} \)~~ — §2.3, §9.8, WF7–WF8.  
+7. Код: `InvalidationScope`, `FrozenSnapshot`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
+8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
+9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
+10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
 
 ### Будущие ветки (не v0, не блокируют Dash Studio)
 
