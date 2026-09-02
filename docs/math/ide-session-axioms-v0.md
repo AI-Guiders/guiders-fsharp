@@ -418,7 +418,7 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 | **RF5** | Semantic work на \( \varphi \), не на dirty live (v0 default); sniper scope из \( \theta.\mathsf{anchor} \) (§7.4) |
 | **RF6** | **Hoare (Refactor):** для \( \theta \in \Theta_{\mathsf{ref}} \): \( \mathsf{Sat}(P,G,Q) \Rightarrow \mathsf{Sat}(P,G',Q) \); preview **отклоняет** \( \Delta \), если \( Q \) не установим |
 | **RF7** | **Hoare (Fix):** \( Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{diag}} \); \( Q_{\mathsf{obs}} \) **не** требуется |
-| **RF8** | **Hoare (Style):** semantic path (§2.11) — может требовать \( Q_{\mathsf{types}} \); text-only path — без guarantee compile |
+| **RF8** | **Hoare (Style):** proven path — \( Q_{\mathsf{types}} \) обязателен в preview; vendor/text без check — не auto-apply |
 
 ### 2.11 Code Style & EditorConfig в графе
 
@@ -439,16 +439,19 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 \mathsf{plan}_{\mathsf{style}}(\theta, \varphi) \to \Delta
 \]
 
-**Два пути** (критично для Hoare):
+**Три пути** (не путать «Roslyn formatter» с гарантией):
 
 | Path | Механизм | Гарантии |
 |------|----------|----------|
-| **text** | whitespace / regex / line-based | \( Q_{\mathsf{style}} \) только; **может** сломать \( Q_{\mathsf{types}} \) |
-| **semantic** | через \( \mathsf{CompilerServices} \) / syntax+semantic tree | можно требовать \( Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{style}} \); часто \( Q_{\mathsf{obs}} \) |
+| **text** | whitespace / regex / line-based | только \( Q_{\mathsf{style}} \); **может** сломать parse/types |
+| **vendor** | Roslyn/VS formatter, code fixes, «Apply» в IDE | **не гарантирует** \( Q_{\mathsf{types}} \) — синтаксический/эвристический; известные прод-фейлы: `file-scoped namespace`, `scoped using` ↔ block `using`, лишние `}` / EOF errors |
+| **proven** | наш semantic path + **обязательный** \( Q_{\mathsf{types}} \) check в preview (Hoare) | \( Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{style}} \); иначе **reject** \( \Delta \) |
 
 \[
 Q_{\mathsf{style}} : \mathsf{rules}(G') \models \mathsf{EffectiveStyle}(G, \psi)
 \]
+
+**Vendor path — port, не SSOT:** делегируем Roslyn/VS как `styleDriver`, но **не** доверяем apply без \( \mathsf{typecheck}(G') \) @ \( \varphi \). «Semantic» в их маркетинге ≠ доказуемый semantic path в нашей модели.
 
 **EditorConfig CRUD** (\( \Theta_{\mathsf{cfg}} \)): меняет правила и \( \psi \), не обязан трогать program sources; после apply — optional \( \mathsf{StyleApply} \) (on-demand).
 
@@ -456,8 +459,9 @@ Q_{\mathsf{style}} : \mathsf{rules}(G') \models \mathsf{EffectiveStyle}(G, \psi)
 |----|----------------|
 | **ST1** | Effective style = merge по иерархии путей (как EditorConfig), результат в \( \psi \) или derived view — **не** отдельный конфиг в обход \( G \) |
 | **ST2** | Default format-on-save в IDE = \( \mathsf{FileChange} \) + refine; **explicit** format solution = \( \mathsf{job}(\mathsf{CodeStyle}, \ldots) \) |
-| **ST3** | Semantic style **предпочтителен** для guaranteed path; text-only — с явным warn в preview |
-| **ST4** | \( \mathsf{CodeStyle} \) \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) при semantic path (как CodeTransform) |
+| **ST3** | **Proven** path — default для commit apply; **vendor** / text — preview-only или с warn, пока \( Q_{\mathsf{types}} \) не прошёл checker |
+| **ST4** | \( \mathsf{CodeStyle} \) \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) на proven path |
+| **ST5** | После \( \mathsf{plan}_{\mathsf{style}} \): \( \mathsf{typecheck}(G') \) @ \( \varphi \) **обязателен** перед apply; vendor output без check — **запрещён** для auto-apply (v0) |
 
 ---
 
