@@ -202,6 +202,47 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 - Job \( \mathsf{Build}(\pi)@\varphi_r \) **не читает** dirty live-state, пока политика не разрешит `BuildWithDirty` (v0: **запрещено** по умолчанию).
 - Несколько job'ов на одном \( \pi \) с разными \( r \) допустимы; оркестратор может **коалесцировать** (оставить только последний \( r \)).
 
+### 2.8b Frozen Tree Composition (FTC)
+
+Локальный \( \mathsf{freeze}(\pi) \) — **лист** композиции. Кросс-project job'ы (build с refs, solution-wide analyzer) собирают **дерево** из нескольких замороженных поддеревьев — **без** глобальных capability-рёбер (§2.3, §9.8).
+
+**Замыкание по project-графу:**
+
+\[
+\mathrm{closure}_{\mathsf{proj}}(\Pi) = \Pi \cup \{ \pi' : \exists \pi \in \Pi.\ (\pi, \pi') \in E_{\mathsf{proj}}^* \}
+\]
+
+(транзитивные **зависимости** — edges «consumer → dependency»; направление порта задаёт \( E_{\mathsf{proj}} \).)
+
+**Режимы композиции** \( \mathsf{FreezeMode} \):
+
+| Mode | Множество \( T \subseteq \mathbb{P} \) | Типичный job |
+|------|----------------------------------|--------------|
+| \( \mathsf{Local}(\pi) \) | \( \{\pi\} \) | CodeTransform, per-project preview |
+| \( \mathsf{ProjClosure}(\pi_0) \) | \( \mathrm{closure}_{\mathsf{proj}}(\{\pi_0\}) \) | Build, TestRun, incremental \( \Gamma_\pi \) |
+| \( \mathsf{Solution} \) | \( \mathbb{P} \) (или policy-subset) | `Scope=Solution` shared analyzer |
+| \( \mathsf{Custom}(\Pi) \) | явное \( \Pi \) | CI slice, selective scan |
+
+**Составной snapshot:**
+
+\[
+\varphi_r(T) = \bigoplus_{\pi \in T} \varphi_r(\pi)
+\]
+
+дизъюнктное объединение: \( \omega_r \), \( \mathrm{contents}_r \), \( \kappa_{\pi,r} \) на узлах \( T \); **иммутабельность** наследуется от листьев.
+
+\[
+\mathsf{freeze\_tree}(m, \Pi_0) \to \varphi_r(T)
+\]
+
+где \( T \) выводится из mode \( m \) и корней \( \Pi_0 \).
+
+**Ревизия:** \( r \) — монотонный счётчик сессии **или** вектор \( (r_\pi)_{\pi \in T} \); job помечен `atRevision = r`. При изменении одного \( \pi \) — перекомпоновать с новым \( \varphi_{r'}(\pi) \), остальные листья **reuse** (IB2).
+
+**Shared analyzer** (`Scope=Solution`): capability на **session/solution** узле (не ребро между \( \pi_1 \) и \( \pi_2 \)); materialize → \( \mathsf{job}(\mathsf{StaticAnalysis}, \_, \mathsf{freeze\_tree}(\mathsf{Solution}, \emptyset), \theta) \).
+
+**Принцип:** FTC — **эфемерный вход job lane**, не статическое \( E_{\mathsf{feed}} \) / \( E_{\mathsf{req}} \) между чужими \( \mathrm{subgraph}(\pi) \).
+
 ### 2.9 Snapshot job (общий шаблон)
 
 Любая on-demand операция над \( \varphi \):
@@ -350,7 +391,7 @@ CompileTime / TestTime / transform capability **не привязаны** к inv
 |----|----------------|
 | **OD1** | \( \mathsf{FileChange} \), \( \mathsf{ProjectFileCrud} \) **не** materialize \( \mathsf{Build} \), \( \mathsf{TestRun} \), \( \mathsf{CodeTransform} \) |
 | **OD2** | Materialize on-demand только по явному запросу (user, `cdp_build`, refactor preview, LUT, CI) |
-| **OD3** | Запрос → \( \varphi \leftarrow \mathsf{freeze}(\pi) \) → \( \mathsf{job}(k,\pi,\varphi,\theta) \); live \( M \) не трогаем до `apply` |
+| **OD3** | Запрос → \( \varphi \leftarrow \mathsf{freeze\_tree}(m, \Pi_0) \) (§2.8b) → \( \mathsf{job}(k,\pi,\varphi,\theta) \); live \( M \) не трогаем до `apply` |
 | **OD4** | Job @ \( \varphi_r \) **не invalidate** при последующих \( \mathsf{FileChange} \); результат помечен `atRevision = r` |
 | **OD5** | **LUT:** `freeze → Build → TestDiscovery → TestRun` (debounced) |
 | **OD6** | **Refactor / fix:** semantic work на \( \varphi \); `apply(\Delta)` порождает \( \mathsf{FileChange} \) / \( \mathsf{ProjectFileCrud} \) — invalidation **после** apply, не до |
@@ -358,8 +399,8 @@ CompileTime / TestTime / transform capability **не привязаны** к inv
 ```text
 Live session (DesignTime)          Snapshot job lane
 ─────────────────────────          ──────────────────
-FileChange → per-file stale        freeze(subtree) → φ_r
-CompilerServices(π) ∈ M            job(k, π, φ_r, θ):
+FileChange → per-file stale        freeze_tree(m, Π₀) → φ_r(T)
+CompilerServices(π) ∈ M            job(k, π, φ_r(T), θ):
   (continues uninterrupted)          Build      → artifacts
                                    TestRun    → report
                                    CodeTransform → Δ (preview or apply)
@@ -535,7 +576,11 @@ MSBuild / `dotnet` — port (`buildDriver`), не SSOT (§7.3). Свой build D
 - \( E_{\mathsf{req}}, E_{\mathsf{inv}}, E_{\mathsf{feed}} \) — **только внутри** \( \mathrm{subgraph}(\pi) \) (WF7).
 - Кросс-project — \( E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P} \) (WF8): `ProjectReference`, slnx, restore order.
 - \( E_{\mathsf{gov}} \) — policy overlay; может быть кросс-\( \pi \), не build dependency.
-- Solution-wide analyzer / scan — `Scope=Solution` + policy, **не** глобальное capability-ребро между \( \pi_1 \) и \( \pi_2 \).
+- Solution-wide analyzer / scan — `Scope=Solution` + **FTC** \( \mathsf{Solution} \) (§2.8b), **не** глобальное capability-ребро между \( \pi_1 \) и \( \pi_2 \).
+
+### 9.10 Frozen Tree Composition — **решено**
+
+Кросс-project работа (build closure, shared analyzer, CI slice) — через \( \mathsf{freeze\_tree} \) и \( \varphi_r(T) = \bigoplus_{\pi \in T} \varphi_r(\pi) \), не через capability-рёбра между \( \mathrm{subgraph}(\pi) \).
 
 Отвергнуто: глобальные \( E_* \subseteq V \times V \) на capability-слое (ломает blast radius §5.2, дублирует \( E_{\mathsf{proj}} \)).
 
@@ -560,7 +605,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
 | WF1–WF8 | `GraphValidation.validate` (WF7–WF8 Phase 1b) |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
-| \( \varphi_r \), `freeze` | **ещё нет** → Phase 2 job substrate |
+| \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 
 ---
 
@@ -586,7 +631,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 4. ~~Policy as attributes / governs edges~~ — §2.6, §7.2, P1–P4.  
 5. ~~Incremental build/compile + IL cache~~ — §7.4, IB1–IC3.  
 6. ~~Capability edges local + \( E_{\mathsf{proj}} \)~~ — §2.3, §9.8, WF7–WF8.  
-7. Код: `InvalidationScope`, `FrozenSnapshot`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
+6b. ~~Frozen Tree Composition~~ — §2.8b, §9.10 (shared analyzer, build closure).  
+7. Код: `InvalidationScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
 10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
