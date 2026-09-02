@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Core</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Core</AssemblyName>
+    <Description>Cross-product intent envelope shapes — IntentOutcome, RoutedIntent, pulse rules.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Core</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="IntentTypes.fs" />
+    <Compile Include="PulseFormat.fs" />
+  </ItemGroup>
+</Project>

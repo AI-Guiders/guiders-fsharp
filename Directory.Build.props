@@ -9,6 +9,6 @@
     <Version>0.1.0</Version>
     <RepositoryUrl>https://github.com/AI-Guiders/guiders-fsharp</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Deterministic>true</Deterministic>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>

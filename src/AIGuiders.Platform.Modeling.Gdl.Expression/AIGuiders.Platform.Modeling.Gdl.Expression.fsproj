@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Expression</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Expression</AssemblyName>
+    <Description>Shared GDL expression IR — literals, compares, boolean ops, fact refs.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Expression</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ExprTypes.fs" />
+  </ItemGroup>
+</Project>

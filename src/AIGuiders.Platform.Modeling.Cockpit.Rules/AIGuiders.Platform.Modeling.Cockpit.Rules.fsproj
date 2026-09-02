@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Rules</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Rules</AssemblyName>
+    <Description>Headless cockpit rule evaluation — traceable rule id + matched when.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Cockpit.Rules</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Expression\AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic\AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RulesEval.fs" />
+  </ItemGroup>
+</Project>

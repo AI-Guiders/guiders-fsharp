@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Paths</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Paths</AssemblyName>
+    <Description>Logical repo paths and physical path boundary (GUIDERS-ADR-0050).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Paths</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TruePath" Version="1.12.0" />
+    <PackageReference Include="TruePath.SystemIo" Version="1.12.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LogicalPath.fs" />
+    <Compile Include="PathBoundary.fs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Routing</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Routing</AssemblyName>
+    <Description>Route refusal algebra — shared helpers for intent organs.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Routing</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RouteRefusal.fs" />
+  </ItemGroup>
+</Project>

@@ -6,6 +6,16 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Presentation/AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Deck/AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.DataBus/AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Cds/AIGuiders.Platform.Modeling.Cockpit.Cds.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Rules/AIGuiders.Platform.Modeling.Cockpit.Rules.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Core/AIGuiders.Platform.Modeling.Core.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Paths/AIGuiders.Platform.Modeling.Paths.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Routing/AIGuiders.Platform.Modeling.Routing.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Catalog/AIGuiders.Platform.Modeling.Catalog.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Expression/AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Notations.Bracket/AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Notations.Keyboard/AIGuiders.Platform.Modeling.Notations.Keyboard.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />

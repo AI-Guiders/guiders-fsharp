@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Catalog</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Catalog</AssemblyName>
+    <Description>Profile-driven catalog index algebra — collision policies, layer merge.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Catalog</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CatalogTypes.fs" />
+    <Compile Include="CatalogIndex.fs" />
+    <Compile Include="CatalogLayerComposer.fs" />
+  </ItemGroup>
+</Project>

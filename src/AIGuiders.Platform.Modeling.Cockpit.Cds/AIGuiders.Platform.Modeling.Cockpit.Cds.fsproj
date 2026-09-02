@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Cds</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Cds</AssemblyName>
+    <Description>CDS routing decision shapes — attention, desk detail, go-map (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Cockpit.Cds</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CdsTypes.fs" />
+  </ItemGroup>
+</Project>

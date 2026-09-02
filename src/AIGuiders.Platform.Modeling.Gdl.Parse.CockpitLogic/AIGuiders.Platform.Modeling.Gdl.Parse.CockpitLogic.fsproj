@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic</AssemblyName>
+    <Description>Cockpit logic quarry IR — annunciation rules, projectors, principles.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Expression\AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CockpitRuleGraph.fs" />
+  </ItemGroup>
+</Project>
