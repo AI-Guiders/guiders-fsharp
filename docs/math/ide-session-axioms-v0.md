@@ -272,7 +272,88 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 
 **Requires:** \( \mathsf{CodeTransform} \) обычно \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) на **том же** \( \varphi \) (transient semantic model), не обязательно live \( M \).
 
----
+### 2.10 Refactor как морфизм графа
+
+\[
+\mathsf{Refactor} : \mathcal{S} \times \Theta \to \mathcal{S}'
+\qquad\text{где}\qquad
+\mathcal{S} = (G,\ \sigma,\ \rho_0),\quad
+\mathcal{S}' = (G',\ \sigma,\ \rho_0)
+\]
+
+**План** — чистая функция на frozen snapshot (preview = apply отсутствует):
+
+\[
+\mathsf{plan}(\theta,\ \varphi_r) \to \Delta
+\qquad
+\Delta = (\Delta_{\mathsf{fs}},\ \Delta_G)
+\]
+
+| Компонент | Носитель | Примеры |
+|-----------|----------|---------|
+| \( \Delta_{\mathsf{fs}} \) | текст + symbols @ paths | rename, extract method, fix, codegen |
+| \( \Delta_G \) | патч **структуры** \( G \) | \( \omega \) (move file), \( E_{\mathsf{proj}} \), \( \mathbb{P} \) (редко) |
+
+**Apply** (живёт сессия):
+
+\[
+G' = G \oplus \Delta_G
+\qquad
+\mathrm{contents}' = \mathrm{contents} \oplus \Delta_{\mathsf{fs}}
+\]
+
+\[
+\mathsf{apply}(\mathcal{S},\ \Delta) = (G',\ \sigma,\ \rho_0)
+\quad\text{+}\quad
+\mathrm{invalidate}(\mathsf{scope}(\Delta))
+\]
+
+**Сокращённая запись** (то, что ты имел в виду):
+
+\[
+\mathsf{Refactor}(G,\ \theta) = G'
+\]
+
+**где**
+
+\[
+G' = G \oplus \pi_G(\mathsf{plan}(\theta,\ \mathsf{freeze\_tree}(m,\Pi_0)))
+\]
+
+\[
+\pi_G(\Delta) = \Delta_G
+\qquad
+\text{(проекция на } \mathbb{P},\ \omega,\ E_{\mathsf{proj}},\ \kappa,\ \ldots\text{)}
+\]
+
+\[
+\mathsf{validate}(G') = \mathsf{ok}
+\qquad
+\mathsf{scope}(\Delta) \in \{\mathsf{FileChange},\ \mathsf{ProjectFileCrud},\ \ldots\}
+\]
+
+\[
+\theta \text{ содержит anchor (ADR-0063)} \Rightarrow \mathsf{resolve}(\theta.\mathsf{anchor},\ \varphi) \in N_{\mathsf{sem}} \cup N_{\mathsf{syn}}
+\]
+
+**Частые случаи:**
+
+| Transform | \( \Delta_{\mathsf{fs}} \) | \( \Delta_G \) | \( G' \) |
+|-----------|-------------------|-------------|--------|
+| rename local | spans in one \( f \) | \( \emptyset \) | \( G' = G \) |
+| rename symbol (solution) | multi-file | \( \emptyset \) | \( G' = G \) |
+| move type → new file | edits + new contents | \( \omega \) update | \( G' \neq G \) |
+| add `ProjectReference` | csproj text | \( E_{\mathsf{proj}} \) | \( G' \neq G \) |
+
+**Preview / dryRun:** \( \mathsf{plan}(\theta, \varphi_r) \) без \( \mathsf{apply} \); \( G \) не меняется.
+
+| ID | Формулировка |
+|----|----------------|
+| **RF1** | \( \mathsf{plan}(\theta, \varphi) \) **детерминирован** при фиксированном \( \varphi \) |
+| **RF2** | \( \mathsf{apply}(\Delta) \) только после явного commit; live \( M \) не трогаем до apply (OD3) |
+| **RF3** | \( \mathsf{validate}(G') \) обязателен; WF1–WF8 после \( \oplus \) |
+| **RF4** | \( \Delta_G = \emptyset \) — норма; promotion \( \mathsf{scope} \) по \( \Delta \), не по имени transform |
+| **RF5** | Semantic work на \( \varphi \), не на dirty live (v0 default); sniper scope из \( \theta.\mathsf{anchor} \) (§7.4) |
 
 ## 3. Аксиомы структурной корректности (static WF)
 
@@ -454,7 +535,7 @@ CompileTime / TestTime / transform capability **не привязаны** к inv
 | **OD3** | Запрос → \( \varphi \leftarrow \mathsf{freeze\_tree}(m, \Pi_0) \) (§2.8b) → \( \mathsf{job}(k,\pi,\varphi,\theta) \); live \( M \) не трогаем до `apply` |
 | **OD4** | Job @ \( \varphi_r \) **не invalidate** при последующих \( \mathsf{FileChange} \); результат помечен `atRevision = r` |
 | **OD5** | **LUT:** `freeze → Build → TestDiscovery → TestRun` (debounced) |
-| **OD6** | **Refactor / fix:** semantic work на \( \varphi \); `apply(\Delta)` порождает \( \mathsf{FileChange} \) / \( \mathsf{ProjectFileCrud} \) — invalidation **после** apply, не до |
+| **OD6** | **Refactor / fix:** \( \mathsf{plan}(\theta, \varphi) \to \Delta \); \( \mathsf{apply} \) → \( G' = G \oplus \Delta_G \) (§2.10); invalidation **после** apply по \( \mathsf{scope}(\Delta) \) |
 
 ```text
 Live session (DesignTime)          Snapshot job lane
@@ -699,6 +780,8 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \Sigma_\pi \), `refine` | **ещё нет** → port `CompilerServices` / semantic substrate (Phase 2) |
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
+| \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
+| RF1–RF5 | **ещё нет** → orchestrator + `CodeTransform` port |
 
 ---
 
@@ -726,7 +809,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6. ~~Capability edges local + \( E_{\mathsf{proj}} \)~~ — §2.3, §9.8, WF7–WF8.  
 6b. ~~Frozen Tree Composition~~ — §2.8b, §9.10 (shared analyzer, build closure).  
 6c. ~~Sub-file refinement (Σ_π, syntax/semantic nodes)~~ — §5.2a, I6–I8.  
-6d. ~~Sniper-scoped emit (semantic node → minimal U')~~ — §7.4, SN1–SN5.  
+6d. ~~Sniper-scoped emit (semantic node → minimal U')~~ — §7.4, SN1–SN6.  
+6e. ~~Refactor as G → G' (plan/apply, Δ_fs + Δ_G)~~ — §2.10, RF1–RF5.  
 7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
