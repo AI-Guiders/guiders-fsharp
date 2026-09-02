@@ -171,14 +171,52 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 | **R1** | \( E_{\mathsf{req}} \) ацикличен (дубль WF4) |
 | **R2** | Materialize orchestrator соблюдает топологический порядок \( E_{\mathsf{req}} \) на \( M \) |
 
-### 5.2 Invalidates
+### 5.2 Invalidates — **решено: scope-indexed (вариант D)**
 
-\( (u,v) \in E_{\mathsf{inv}} \) означает: **при событии на \( u \) сбросить materialization \( v \)**.
+\( (u,v) \in E_{\mathsf{inv}} \) в **статическом** графе — структурные зависимости (каталог / явные рёбра).
+
+**Runtime invalidation** — отдельно: событие \( \delta \) с **областью** \( \mathsf{scope}(\delta) \); сбрасывается **минимальный** \( \Delta \subseteq M \), а не вся сессия.
+
+#### Области (от мелкой к крупной)
+
+| Scope | CRUD / change | Примеры | Что трогаем в \( G \) | Что invalidates в \( M \) |
+|-------|----------------|---------|------------------------|---------------------------|
+| **FileChange** | содержимое файла | edit, save, watcher | dirty-bit на пути \( f \) (не обязательно менять \( G \)) | кэш диагностик / symbols **для \( f \)**; \( M \) capability **не evict** |
+| **ProjectFileCrud** | файлы ↔ project | add/delete/rename `.fs`, glob hit | обновить \( \omega \), список sources в \( \kappa_\pi \) | \( \mathsf{CompilerServices}(\pi) \) → **stale**; evict только если stale не достаточно |
+| **ProjectCrud** | сам project | csproj/fsproj, TFM, PackageReference, restore | перечитать \( \kappa_\pi \), возможно \( \mathrm{id}(\pi) \) | \( M \cap \mathrm{subtree}(\pi) \) — evict |
+| **SolutionProjectCrud** | project ↔ solution | add/remove в slnx, rename project path | \( \mathbb{P} \), \( \omega \), рёбра на затронутых \( \pi \) | removed \( \pi \): evict subtree; added \( \pi \): lazy warm |
+
+**Иерархия scope:**  
+\(\mathsf{FileChange} \prec \mathsf{ProjectFileCrud} \prec \mathsf{ProjectCrud} \prec \mathsf{SolutionProjectCrud}\)  
+(событие крупнее — blast radius не меньше).
+
+#### Аксиомы invalidation
 
 | ID | Формулировка |
 |----|----------------|
-| **I1** | Evict\( v \) удаляет \( v \) из \( M \) и, рекурсивно по политике, зависимые capability |
-| **I2** | *(кандидат, §8)* Переход фазы \( \phi \mapsto \phi' \) на project или session **индуцирует** \( E_{\mathsf{inv}} \) автоматически |
+| **I1** | \(\mathrm{invalidate}(\delta)\) вычисляет \(\Delta \subseteq M\) по \(\mathsf{scope}(\delta)\) и затронутым узлам; **запрещён** blanket evict всей сессии, если \(\mathsf{scope} \neq \mathsf{SolutionProjectCrud}\) multi-project |
+| **I2** | Явные \( E_{\mathsf{inv}} \) **дополняют** scope-правила: если materialize Build и \( ( \mathsf{Build}, c) \in E_{\mathsf{inv}} \), успешный build может evict \( c \) даже при \(\mathsf{FileChange}\)-only политике на других файлах |
+| **I3** | \(\mathsf{FileChange}\) **никогда** не требует `dotnet build` / CompileTime advance |
+| **I4** | \(\mathsf{ProjectCrud}\) **может** потребовать re-materialize \(\mathsf{CompilerServices}(\pi)\), не трогая \(\pi' \neq \pi\) |
+| **I5** | Phase advance (\(\mathsf{DesignTime} \to \mathsf{CompileTime}\)) — **отдельный** класс событий; не подменяет file CRUD, но может union с \(\Delta\) по \( E_{\mathsf{feed}} \cup E_{\mathsf{inv}} \) |
+
+#### Операционная схема (два уровня CRUD)
+
+```text
+Solution ── Project CRUD     (slnx graph, membership)
+    │
+    └── Project ── File CRUD   (ω, sources, ownership)
+            │
+            └── File ── Changes   (dirty, per-file diag cache)
+```
+
+**Ответ на вопрос «invalidates когда?»** — когда пришло событие с известным scope; orchestrator выбирает \(\Delta\) по таблице выше + транзитивное замыкание по \( E_{\mathsf{inv}} \) **внутри** blast radius, не по всему \( V \).
+
+| ID | Формулировка |
+|----|----------------|
+| **I1′** | Evict\( v \) удаляет \( v \) из \( M \); зависимые по \( E_{\mathsf{req}} \) **от** \( v \) помечаются stale, не обязательно немедленный evict (политика) |
+
+*(Старые I1–I2 из черновика заменены I1–I5 выше.)*
 
 ### 5.3 Feeds
 
@@ -222,22 +260,16 @@ r_i : \mathsf{pred}_i(\mathcal{S}, \pi, k) \Rightarrow t_i \in \top \setminus \{
 
 ---
 
-## 8. Открытые решения (нужен твой выбор)
+## 8. Решения и открытые вопросы
 
-### 8.1 Invalidates: явные vs порождённые рёбра
+### 8.1 Invalidates — **решено**
 
-**Вариант A (явные):** только рёбра из парсера/каталога; фазовые переходы не добавляют \( E_{\mathsf{inv}} \).
+**Вариант D (scope-indexed):** см. §5.2. Runtime invalidation по \(\mathsf{scope}(\delta)\); явные \( E_{\mathsf{inv}} \) в графе — структурное дополнение.
 
-**Вариант B (порождённые):** для каждого \( \phi < \phi' \) в цепочке фаз автоматически
-
-\[
-\forall c.\ \alpha.\mathsf{phase} = \phi \land \phi' \ge \mathsf{CompileTime} \Rightarrow
-(\mathsf{phase\_node}(\phi'),\ c) \in E_{\mathsf{inv}}
-\]
-
-(формула черновая — уточним вместе.)
-
-**Вариант C (гибрид):** базовый каталог + транзитивное замыкание по таблице фаз.
+Отвергнуто для runtime:
+- **A** — только явные рёбра (слишком грубо без scope);
+- **B** — только phase-driven (смешивает lifecycle и file edit);
+- **C** — phase + каталог без file/project CRUD (неполно).
 
 ### 8.2 Глобальные vs локальные рёбра
 
@@ -280,10 +312,10 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 
 ## 11. Эволюция документа
 
-1. Зафиксировать §8 (A/B/C) по твоим ответам.  
-2. Добавить §7 \( M, \mu \) в код как `MaterializedState`.  
+1. ~~Зафиксировать §8.1 (invalidates)~~ — **D scope-indexed** (§5.2).  
+2. Добавить в код: `InvalidationScope`, `MaterializedState` \( M, \mu \), `invalidate(δ)`.  
 3. Порт slnx: \( G \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
-4. Доказуемые свойства (опционально): «при соблюдении R2 materialize не deadlock'ится на конечном DAG».
+4. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «\(\mathrm{invalidate}(\delta)\) монотонна по \(\prec\) scope».
 
 ---
 
