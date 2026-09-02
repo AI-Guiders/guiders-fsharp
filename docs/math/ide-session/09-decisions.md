@@ -54,3 +54,13 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 ### 9.11 Revision ledger & Timeline — **направление зафиксировано**
 
 §2.12: \( \Lambda \) (Δ-stream) + Git overlay \( \gamma \) @ apply; replay \( G_0 \to G_n \); Timeline = projection для UI/agent. CDP/habitat — ingress, не второй SSOT.
+
+### 9.12 Planet / Gdl как \( \tau \) — **решено**
+
+**Без special case:** \( \tau \in \{\mathsf{DotNet},\mathsf{Node},\mathsf{Gdl},\mathsf{Planet}\} \) — разный \( \mathcal{K}_\tau \) и port, **тот же** оркестратор (§1.5 T1–T3).
+
+- Declare-time GDL project = \( \pi \) с \( \tau=\mathsf{Gdl} \), не второй IDE и не параллельный SSOT.
+- Planet bundle = \( \pi \) с \( \tau=\mathsf{Planet} \); язык — метка на \( \pi \), не новый сорт графа.
+- Mixed federation: \( E_{\mathsf{proj}} \) связывает DotNet ↔ Gdl ↔ Planet в одном \( G \).
+
+Отвергнуто: отдельная «GDL session», обход invalidation/freeze/ledger для declare-time, `if (gdl)` в ядре оркестратора.

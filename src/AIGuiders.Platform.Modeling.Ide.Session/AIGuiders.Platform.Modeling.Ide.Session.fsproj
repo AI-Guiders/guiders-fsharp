@@ -12,6 +12,7 @@
     <Compile Include="Topology.fs" />
     <Compile Include="Capabilities.fs" />
     <Compile Include="Projects.fs" />
+    <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="SolutionGraph.fs" />
     <Compile Include="GraphValidation.fs" />
   </ItemGroup>

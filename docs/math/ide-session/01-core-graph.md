@@ -63,6 +63,33 @@
 
 Язык (C#, F#, …) — **метка** на \( \mathsf{DotNet} \) или \( \mathsf{Planet} \), не отдельный сорт графа.
 
+### 1.5 \( \tau \) без special case (один оркестратор)
+
+\( \tau \) меняет **каталог** \( \kappa_\pi \) и **port** materialization, не законы сессии.
+
+\[
+\pi = (\mathrm{id},\ \tau,\ \ldots,\ \kappa_\pi)
+\quad\Rightarrow\quad
+\kappa_\pi \leftarrow \mathcal{K}_\tau \ \text{(default catalog)} \ \oplus\ \psi(\pi)
+\]
+
+| \( \tau \) | Пример \( \pi.\mathsf{path} \) | \( \mathsf{CompilerServices} \) port (v0) | Второй IDE? |
+|------------|----------------------------------|-------------------------------------------|-------------|
+| \( \mathsf{DotNet} \) | `.csproj` / `.fsproj` | Roslyn / FCS | нет |
+| \( \mathsf{Node} \) | `package.json` | TS worker / LSP | нет |
+| \( \mathsf{Gdl} \) | `*.gdlproj`, declare bundle | `GdlLanguageBackend` | **нет** |
+| \( \mathsf{Planet} \) | planet anchor + `languageId` | planet language adapter | **нет** |
+
+**Declare-time GDL** — это \( \pi \) с \( \tau=\mathsf{Gdl} \) в **том же** \( G \): mixed solution (`slnx` + `gdlproj`) связывается через \( E_{\mathsf{proj}} \), не через отдельную сессию / параллельный SSOT.
+
+| ID | Формулировка |
+|----|----------------|
+| **T1** | ∀\( \tau \in \mathbb{T} \): invalidation (§5), freeze (§2.8), on-demand jobs (§7), revision ledger (§2.12) — **одни и те же** законы оркестратора |
+| **T2** | Порт (`buildDriver`, `CompilerServices` backend, quarry parser) — **implementation**; не порождает второй граф \( G' \), второй \( \mathcal{S} \) или обход \( \rho_{\mathsf{eff}} \) |
+| **T3** | Расширение экосистемы: новый \( \tau' \) = новый \( \mathcal{K}_{\tau'} \) + adapter port; WF/L/OD/RF **без** `if (gdl) { … }` в оркестраторе |
+
+Код: `ProjectCapabilityCatalog.forKind : ProjectKind → κ` — единая точка default-каталога по \( \tau \).
+
 ---
 
 ## 2. Структуры
@@ -204,7 +231,7 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 
 | ID | Формулировка |
 |----|----------------|
-| **A1** | \( \kappa_\pi(\mathsf{CompilerServices}) \) определено для каждого \( \pi \) с \( \tau \in \{\mathsf{DotNet},\mathsf{Node}\} \) **по умолчанию каталога** (не аксиома жёсткости — convention каталога) |
+| **A1** | \( \kappa_\pi \) для каждого \( \pi \) берётся из каталога \( \mathcal{K}_\tau \), \( \tau=\pi.\tau \) (convention; override через \( \psi \)). Для \( \mathsf{CompilerServices} \): \( \mathcal{K}_{\mathsf{DotNet}} \), \( \mathcal{K}_{\mathsf{Node}} \), \( \mathcal{K}_{\mathsf{Gdl}} \), \( \mathcal{K}_{\mathsf{Planet}} \) — **разные** defaults, один оркестратор (§1.5 T1–T3) |
 | **A2** | Для \( \mathsf{CompilerServices} \): \( \alpha.\mathsf{phase} = \mathsf{DesignTime} \) и \( \alpha.\mathsf{topology} \in \{\mathsf{InProcess},\ \mathsf{OutOfProcess},\ \mathsf{Adaptive}\} \) |
 | **A3** | Для \( \mathsf{Build} \): \( \alpha.\mathsf{phase} = \mathsf{CompileTime} \), \( \alpha.\mathsf{topology} = \mathsf{SubprocessTool} \) |
 | **A4** | \( \mathsf{SubprocessTool} \) допустима только при \( \alpha.\mathsf{phase} \in \{\mathsf{CompileTime},\ \mathsf{TestTime}\} \) |

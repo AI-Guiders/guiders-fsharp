@@ -65,6 +65,9 @@ module CapabilityCatalog =
     let defaultGdl () =
         [ compilerServices () ]
 
+    let defaultPlanet () =
+        [ compilerServices () ]
+
 /// <summary>Address in the unified session graph (project or capability under project).</summary>
 [<StructuralEquality; StructuralComparison>]
 type GraphNodeId =

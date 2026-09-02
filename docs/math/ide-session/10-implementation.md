@@ -57,8 +57,9 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6e. ~~Refactor as G → G' (plan/apply, Δ_fs + Δ_G)~~ — §2.10, RF1–RF8, Θ classes.  
 6f. ~~Code Style & EditorConfig in G~~ — §2.11, ST1–ST5.  
 6g. ~~Revision ledger + Git subgraph + Timeline~~ — §2.12, §9.11, LD1–LD6.  
+6h. ~~Planet / Gdl как \( \tau \) без special case~~ — §1.5, §9.12, T1–T3; `ProjectCapabilityCatalog.forKind`.  
 7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
-8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
+8. Порт slnx / gdlproj: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \leftarrow \mathcal{K}_\tau \) (`ProjectCapabilityCatalog.forKind`).  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
 10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
 

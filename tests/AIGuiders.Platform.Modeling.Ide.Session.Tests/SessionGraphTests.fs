@@ -41,6 +41,21 @@ module private Samples =
 type SessionGraphTests() =
 
     [<Fact>]
+    member _.``Gdl project uses Gdl capability catalog``() =
+        let id = ProjectId.create @"D:\repo\deck\deck.gdlproj"
+
+        let project =
+            ProjectNode.create
+                id
+                (Gdl { ProjectFile = "deck.gdlproj" })
+                (ProjectId.value id)
+                (ProjectCapabilityCatalog.forKind (Gdl { ProjectFile = "deck.gdlproj" }))
+
+        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty []
+        let result = GraphValidation.validate graph
+        Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
+
+    [<Fact>]
     member _.``Mixed solution graph validates``() =
         let result = GraphValidation.validate Samples.mixedSolution
         Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
