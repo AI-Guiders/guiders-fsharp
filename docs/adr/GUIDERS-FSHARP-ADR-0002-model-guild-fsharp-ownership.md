@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Accepted (2026-09-02; `Platform.Modeling` / `Platform.Execution` prefix same day) |
 | **Tags** | #guiders #fsharp #gdl #notations #ir #modeling #execution #federation |
-| **Related** | [GUIDERS-FSHARP-ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0057](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0057-cockpit-logic-authoring-quarry.md) · [GUIDERS-ADR-0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) · [GUIDERS-ADR-0058](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0058-presentation-topology-ir.md) · CIDE [0036](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0036-cds-channel-compositor-surface-pipeline.md) · [0067](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0067-graph-backed-surfaces-contract.md) · [0115](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0115-cds-graph-backed-shared-layer.md) |
+| **Related** | [GUIDERS-FSHARP-ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) · [GUIDERS-FSHARP-ADR-0003](./GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0057](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0057-cockpit-logic-authoring-quarry.md) · [GUIDERS-ADR-0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) · [GUIDERS-ADR-0058](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0058-presentation-topology-ir.md) · CIDE [0036](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0036-cds-channel-compositor-surface-pipeline.md) · [0067](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0067-graph-backed-surfaces-contract.md) · [0115](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0115-cds-graph-backed-shared-layer.md) |
 
 ## Context
 
@@ -316,6 +316,8 @@ Additional model pockets (same rule):
 
 ### 13. F# affinity rule (when to default to Modeling)
 
+**Execution is thin by design** — it drives, hosts, and renders. F# supplies **strict typing and expressive models**; C# Execution references them and does not redefine shapes.
+
 Default **F#** when the module is predominantly:
 
 - discriminated unions + exhaustive `match`
@@ -377,6 +379,8 @@ Platform.Execution.Cockpit.DataBus (C#)
 **Execution stays thin:** no event taxonomy in C#; no duplicate policy tables. Generated or hand-written adapter: `ProjectionGraph` → `Subscribe<T>` registrations + CCU fold order.
 
 **Link to Circuit (§10):** `feeds` (subsystem → channel) terminates on **event catalog ids**; `foldsTo` (channel → CCU step) is the projection subgraph inside `Modeling.Cockpit.DataBus`.
+
+**Full inventory:** per-package extraction matrix for all 114 `Platform.*` packages — [ADR-0003](./GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md).
 
 ## Consequences
 
