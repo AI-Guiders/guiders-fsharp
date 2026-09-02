@@ -239,9 +239,17 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 
 **Ревизия:** \( r \) — монотонный счётчик сессии **или** вектор \( (r_\pi)_{\pi \in T} \); job помечен `atRevision = r`. При изменении одного \( \pi \) — перекомпоновать с новым \( \varphi_{r'}(\pi) \), остальные листья **reuse** (IB2).
 
-**Shared analyzer** (`Scope=Solution`): capability на **session/solution** узле (не ребро между \( \pi_1 \) и \( \pi_2 \)); materialize → \( \mathsf{job}(\mathsf{StaticAnalysis}, \_, \mathsf{freeze\_tree}(\mathsf{Solution}, \emptyset), \theta) \).
+**Shared analyzer** (`Scope=Solution`): capability на **session/solution** узле (не ребро между \( \pi_1 \) и \( \pi_2 \)); materialize → \( \mathsf{job}(\mathsf{StaticAnalysis}, \_, \mathsf{freeze\_tree}(\mathsf{Solution}, \emptyset), \theta) \). Оркестратор **даёт ему всё нужное** — policy решает \( T \) и объём; потолка в модели нет.
 
-**Принцип:** FTC — **эфемерный вход job lane**, не статическое \( E_{\mathsf{feed}} \) / \( E_{\mathsf{req}} \) между чужими \( \mathrm{subgraph}(\pi) \).
+**Workspace projection (facade):** потребитель job'а (analyzer, build driver, test host) **не обязан** знать про \( \mathbb{P} \), FTC, federation. Порт материализует **видимую копию**:
+
+\[
+\pi_{\mathsf{ws}} : \varphi_r(T) \to \mathsf{WorkspaceView}
+\]
+
+— layout путей, sln/csproj, contents @ \( r \), как если бы у него была **своя** изолированная копия (temp dir, overlay FS, in-memory VFS — деталь порта). Анализатору не важно, что снимок **собран** оркестратором из чужих \( \pi \); контракт порта — «нормальный workspace @ revision \( r \)».
+
+**Принцип:** FTC — **эфемерный вход job lane**, не статическое \( E_{\mathsf{feed}} \) / \( E_{\mathsf{req}} \) между чужими \( \mathrm{subgraph}(\pi) \). Federation — **внутренняя** алгебра сессии; наружу — только projection.
 
 ### 2.9 Snapshot job (общий шаблон)
 
@@ -606,6 +614,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | WF1–WF8 | `GraphValidation.validate` (WF7–WF8 Phase 1b) |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
+| \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 
 ---
 
