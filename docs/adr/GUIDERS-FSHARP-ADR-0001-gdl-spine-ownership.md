@@ -28,7 +28,7 @@ Pattern: same as **guiders-core** ([0004](https://github.com/AI-Guiders/guiders-
 | GDL **emit** (Roslyn `*.g.cs`) | `AIGuiders.Execution.Emit.*` | C# |
 | Runtime mechanics | `AIGuiders.Execution.CommandPlane.*` | C# |
 
-**SSOT for `GdlFragment` / `GdlProject`:** `AIGuiders.Modeling.Gdl.Core` (F#; transitional ID `AIGuiders.Gdl.Core` until [ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) Phase D).
+**SSOT for `GdlFragment` / `GdlProject`:** `AIGuiders.Platform.Modeling.Gdl.Core` (F#; transitional ID `AIGuiders.Gdl.Core` until [ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) Phase D).
 
 ### 3. Interop (v0 → v1)
 
