@@ -2,7 +2,8 @@
 
 | | |
 |---|---|
-| **Status** | Accepted |
+| **Status** | Accepted · In progress |
+| **Implementation** | CDP `FederationSessionBridge` + `cdp_ide_session_scene` (0.5.750); Correspondence / buffer→patch next |
 | **Date** | 2026-09-02 |
 | **Tags** | #guiders #fsharp #federation #cdp #modeling #ide #correspondence |
 | **Related** | [GUIDERS-FSHARP-ADR-0004](./GUIDERS-FSHARP-ADR-0004-ide-session-modeling-ownership.md) · [GUIDERS-ADR-0062](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0062-ide-solution-session-orchestrator.md) · [GUIDERS-ADR-0063](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0063-anchors-federation-reincarnation.md) · [GUIDERS-ADR-0061](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0061-language-resolver-center.md) · [ide-session axioms](../math/ide-session/README.md) |
