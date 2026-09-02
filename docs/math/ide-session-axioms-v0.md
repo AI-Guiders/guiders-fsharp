@@ -347,6 +347,52 @@ G' = G \oplus \pi_G(\mathsf{plan}(\theta,\ \mathsf{freeze\_tree}(m,\Pi_0)))
 
 **Preview / dryRun:** \( \mathsf{plan}(\theta, \varphi_r) \) без \( \mathsf{apply} \); \( G \) не меняется.
 
+#### Корректность (тройки Хоара)
+
+\[
+\mathsf{Sat}(P,\ G,\ Q)
+\qquad\text{«тройка } (P,G,Q) \text{ выполнена»}
+\]
+
+| Сорт | Смысл (v0) | Примеры |
+|------|------------|---------|
+| \( P \) | **precondition** — контекст, в котором transform допустим | \( \sigma = \mathsf{DesignTime} \); anchor resolved; \( \mathsf{validate}(G) \) |
+| \( G \) | **state** — граф + contents @ revision (наш SSOT) | \( (\mathbb{P}, E_*, \omega, \kappa, \mathrm{contents}) \) |
+| \( Q \) | **postcondition** — что обязано остаться истинным | WF1–WF8; \( \mathsf{typecheck}(G) \); \( \mathsf{obs}(G) \) (поведение) |
+
+**Рефактор корректен**, если сохраняет тройку при замене \( G \) на \( G' \):
+
+\[
+\mathsf{Sat}(P,\ G,\ Q)
+\;\Rightarrow\;
+\mathsf{Refactor}(G,\ \theta) = G'
+\;\Rightarrow\;
+\mathsf{Sat}(P,\ G',\ Q)
+\]
+
+Эквивалентно (правило Хоара для морфизма):
+
+\[
+\{ P \}\; G \xrightarrow{\;\mathsf{Refactor}(\theta)\;} G' \;\{ Q \}
+\qquad\text{корректно}\qquad
+\{ P \}\; G \;\{ Q \} \Rightarrow \{ P \}\; G' \;\{ Q \}
+\]
+
+**Слои \( Q \)** (можно conjoin):
+
+\[
+Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
+\]
+
+| \( Q \) | Формулировка |
+|--------|----------------|
+| \( Q_{\mathsf{wf}} \) | \( \mathsf{validate}(G') \) — структура графа |
+| \( Q_{\mathsf{types}} \) | семантика well-typed @ contents' |
+| \( Q_{\mathsf{obs}} \) | \( \mathsf{obs}(G') = \mathsf{obs}(G) \) — **behavior preservation** (rename, extract, …) |
+| \( Q_{\mathsf{tests}} \) | опционально: test report green (дорого; LUT / CI) |
+
+**Code fix** (не refactor): может **намеренно** менять \( Q_{\mathsf{obs}} \) (bugfix); тогда отдельный класс \( \theta \) с ослабленным \( Q \).
+
 | ID | Формулировка |
 |----|----------------|
 | **RF1** | \( \mathsf{plan}(\theta, \varphi) \) **детерминирован** при фиксированном \( \varphi \) |
@@ -354,8 +400,9 @@ G' = G \oplus \pi_G(\mathsf{plan}(\theta,\ \mathsf{freeze\_tree}(m,\Pi_0)))
 | **RF3** | \( \mathsf{validate}(G') \) обязателен; WF1–WF8 после \( \oplus \) |
 | **RF4** | \( \Delta_G = \emptyset \) — норма; promotion \( \mathsf{scope} \) по \( \Delta \), не по имени transform |
 | **RF5** | Semantic work на \( \varphi \), не на dirty live (v0 default); sniper scope из \( \theta.\mathsf{anchor} \) (§7.4) |
+| **RF6** | **Hoare:** \( \mathsf{Sat}(P,G,Q) \Rightarrow \mathsf{Sat}(P,G',Q) \) после \( \mathsf{apply}(\mathsf{plan}) \); preview обязан **отклонить** \( \Delta \), если checker не может установить сохранение \( Q \) |
 
-## 3. Аксиомы структурной корректности (static WF)
+--- Аксиомы структурной корректности (static WF)
 
 Эти аксиомы проверяет `GraphValidation.validate` (Phase 1).
 
@@ -781,7 +828,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 | \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
-| RF1–RF5 | **ещё нет** → orchestrator + `CodeTransform` port |
+| RF1–RF6 | **ещё нет** → orchestrator + `CodeTransform` port + `HoareChecker` |
 
 ---
 
