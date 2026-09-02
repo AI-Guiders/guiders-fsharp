@@ -597,8 +597,11 @@ U' = \Delta_U \cup \mathrm{descendants}_{E_\pi}(\Delta_U)
 | **SN3** | Promotion file-wide / project-wide — только fallback (`FileStale`, `buildDriver=MsBuildInterop`) или broken public surface |
 | **SN4** | \( \mathsf{compile}(u, \ldots) \) вызывается **только** для \( u \in U' \); остальное — reuse \( \mathcal{H} \) |
 | **SN5** | `CodeSymbol` anchor (ADR-0063) — допустимый **ключ** \( u \) и sniper-target для emit scope |
+| **SN6** | **Не** EnC / Hot Reload: runtime patch, debug-only, кривой blast radius — **отвергнуто** как SSOT; sniper emit = детерминированный IL @ \( \varphi_r \) в \( \mathcal{H} \), не «магия дебаггера» |
 
 **Связь осей:** DesignTime \( \mathsf{refine} \) и CompileTime \( U' \) — **один** closure на \( E_{\mathsf{dep}} \), разные порты (semantic refresh vs IL emit).
+
+```text
 FileChange (live)     →  refine Δ_sem in Σ_π (syntax/semantic nodes)
                         →  FileStale(f) only as fallback
 freeze r → r'         →  Δ_files (coarse) OR Δ_sem (sniper path)
