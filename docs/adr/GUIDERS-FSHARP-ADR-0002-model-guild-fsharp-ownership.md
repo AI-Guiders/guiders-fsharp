@@ -108,15 +108,11 @@ Early bootstrap packages used **`AIGuiders.Gdl.*`** before the Modeling prefix w
 | `AIGuiders.Gdl.Parse.Deck` | `AIGuiders.Modeling.Gdl.Parse.Deck` |
 | `AIGuiders.Gdl.Validation` | `AIGuiders.Modeling.Gdl.Validation` |
 
-**When any transitional ID was published to nuget.org:**
+**Default path (no public consumers yet):** rename `PackageId` / namespace in-repo; old IDs were never published — **no** NuGet deprecation or unlist step.
 
-1. Ship **final** package under `AIGuiders.Modeling.*` ID (same assembly version line).
-2. Publish **one last** release of the old ID with `<PackageDeprecation>` → replacement package URL ([NuGet deprecation](https://learn.microsoft.com/en-us/nuget/nuget-org/deprecate-packages)).
-3. Update all federation repos + `authoring-toolchain` references in the same PR window.
-4. **Unlist** old ID after one release cycle if no external consumers remain (nuget.org does not hard-delete; unlist hides from search).
-5. Platform `AIGuiders.Platform.*` packages follow the same pattern into `AIGuiders.Execution.*`.
+**If an old ID was published** and something still references it: prefer **new package IDs + update federation references** in one window. Deprecation (`<PackageDeprecation>`) and unlist are **optional** polish for external adopters, not federation requirements — abandoned IDs can simply stop receiving releases while planets move to `Modeling.*` / `Execution.*`.
 
-**If a transitional ID never left CI** (local / git only): rename in-repo without deprecation dance.
+Platform `AIGuiders.Platform.*` → `AIGuiders.Execution.*` follows the same rule: rename when ready; formal deprecate only if we care about third-party discoverability.
 
 Namespaces and assembly names **SHOULD** match `PackageId` (`AIGuiders.Modeling.Gdl.Core`, etc.).
 
@@ -136,7 +132,7 @@ No merged mega-AST across branches ([0059](https://github.com/AI-Guiders/guiders
 Phase A (now)     F# GDL mirror under transitional AIGuiders.Gdl.* IDs
 Phase B           catalog, display, cockpit.logic Modeling packages
 Phase C           Notations Modeling branches
-Phase D           Rename → AIGuiders.Modeling.* / Execution.*; deprecate old NuGet IDs
+Phase D           Rename → AIGuiders.Modeling.* / Execution.*; update federation refs (deprecate old NuGet IDs only if needed)
 Phase E           Platform shims removed; LSP pins Modeling packages
 ```
 
