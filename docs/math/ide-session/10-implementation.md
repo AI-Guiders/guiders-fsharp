@@ -75,6 +75,12 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 
 **Теория GDL → IL:** IL как lingua franca — любой язык **в** экосистему через emit, любой **из** через metadata/reflection; F#/C# становятся optional surface, не SSOT. Заманчиво, но **после** session graph + Dash Studio vertical slice.
 
+### Federation reframe of CDP (стратегия)
+
+Pre-federation CDP = habitat без graph SSOT. После Modeling слоя почти каждая CDP-фича нормализуется в \(G\) + ports + conformance — CDP остаётся dogfood host, не владельцем модели.
+
+См. **[GUIDERS-FSHARP-ADR-0005](../adr/GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md)** (feature map, Correspondence pilot, migration rules).
+
 ---
 
 *Обсуждение: правь аксиомы прямо в PR/issue; F# подстраивается под формулы, не наоборот.*

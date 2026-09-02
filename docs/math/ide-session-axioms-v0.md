@@ -7,6 +7,7 @@
 | **SSOT code** | `AIGuiders.Platform.Modeling.Ide.Session` |
 | **Package** | **[ide-session/](ide-session/README.md)** — split by feature |
 | **Architecture** | [GUIDERS-ADR-0062](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0062-ide-solution-session-orchestrator.md) |
+| **CDP reframe** | [GUIDERS-FSHARP-ADR-0005](../adr/GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md) |
 | **Ownership** | [GUIDERS-FSHARP-ADR-0004](../adr/GUIDERS-FSHARP-ADR-0004-ide-session-modeling-ownership.md) |
 
 Монолит **разбит по фичам** → [ide-session/README.md](ide-session/README.md).

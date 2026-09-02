@@ -67,4 +67,6 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 
 ### 9.13 Conformance golden sessions — **решено**
 
-§11: математика без executable proof = декорация. GS1–GS5 в `ConformanceGoldenSessionTests`; `HoareChecker.refactorPreserves` (RF6), `StyleConformance` (ST3/ST5).
+### 9.14 Federation reframe of CDP — **направление зафиксировано**
+
+[GUIDERS-FSHARP-ADR-0005](../../adr/GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md): Modeling → Execution → CDP; feature map; Correspondence = next pilot.
