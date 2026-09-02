@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Ide.Session</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Ide.Session</AssemblyName>
+    <Description>IDE solution session graph IR — projects, capabilities, lifecycle, validation (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Ide.Session</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Identifiers.fs" />
+    <Compile Include="Lifecycle.fs" />
+    <Compile Include="Topology.fs" />
+    <Compile Include="Capabilities.fs" />
+    <Compile Include="Projects.fs" />
+    <Compile Include="SolutionGraph.fs" />
+    <Compile Include="GraphValidation.fs" />
+  </ItemGroup>
+</Project>
