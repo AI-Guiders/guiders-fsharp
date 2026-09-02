@@ -1,5 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Cockpit.DataBus
 
+open System
+
 /// <summary>Stable event id for bus catalog and dispatch policy (C# type name parity).</summary>
 type EventId =
     | BuildStateChanged
@@ -41,28 +43,40 @@ module EventId =
           StartupProjectPathChanged
           DeskSurfaceBuilt ]
 
+[<CLIMutable>]
 type BuildStateChanged =
     { IsBuilding: bool
-      LastExitCode: int option
-      LastBuildSucceeded: bool option }
+      LastExitCode: Nullable<int>
+      LastBuildSucceeded: Nullable<bool> }
 
+[<CLIMutable>]
 type TestsStateChanged = { Summary: string; ImpactedBadge: int }
 
+[<CLIMutable>]
 type GitStateChanged = { Line: string; CockpitShort: string }
 
+[<CLIMutable>]
 type IdeHostStateChanged =
     { CSharpLspProcessActive: bool
       MarkdownLspProcessActive: bool
       CSharpLspHostPresent: bool
       MarkdownLspHostPresent: bool }
 
-type StartupProjectPathChanged = { ProjectPath: string option }
+    static member Empty =
+        { CSharpLspProcessActive = false
+          MarkdownLspProcessActive = false
+          CSharpLspHostPresent = false
+          MarkdownLspHostPresent = false }
 
+[<CLIMutable>]
+type StartupProjectPathChanged = { ProjectPath: string }
+
+[<CLIMutable>]
 type DeskSurfaceBuilt =
     { Mode: string
       SeatCount: int
-      Go: string option
-      Utc: System.DateTimeOffset }
+      Go: string
+      Utc: DateTimeOffset }
 
 module EventCatalog =
     /// Events wired into IDE Health CCU fold (ADR 0097 quarry).

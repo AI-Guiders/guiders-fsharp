@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests
 
+open System
 open Xunit
 open AIGuiders.Platform.Modeling.Cockpit.DataBus
 
@@ -44,17 +45,17 @@ type DataBusModelTests() =
         let building =
             BuildStateFold.apply prior
                 { IsBuilding = true
-                  LastExitCode = None
-                  LastBuildSucceeded = None }
+                  LastExitCode = Nullable<int>()
+                  LastBuildSucceeded = Nullable<bool>() }
 
         Assert.True(building.IsBuilding)
 
         let finished =
             BuildStateFold.apply building
                 { IsBuilding = false
-                  LastExitCode = Some 0
-                  LastBuildSucceeded = Some true }
+                  LastExitCode = Nullable<int>(0)
+                  LastBuildSucceeded = Nullable<bool>(true) }
 
         Assert.False(finished.IsBuilding)
-        Assert.Equal(Some 0, finished.LastExitCode)
-        Assert.Equal(Some true, finished.LastBuildSucceeded)
+        Assert.Equal(0, finished.LastExitCode.Value)
+        Assert.True(finished.LastBuildSucceeded.Value)

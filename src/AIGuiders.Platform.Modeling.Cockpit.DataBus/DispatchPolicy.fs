@@ -28,3 +28,9 @@ module DispatchPolicy =
     let tryFromTypeName (name: string) (isBurstFlag: bool) =
         EventId.tryParse name
         |> Option.map (fun id -> id, isBurstFlag)
+
+    /// C# Execution runtime: map CLR event type name to burst/reliable policy.
+    let isBurstForTypeName (typeName: string) (policy: DispatchPolicy) =
+        match EventId.tryParse typeName with
+        | Some id -> isBurst id policy
+        | None -> false

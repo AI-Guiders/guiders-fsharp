@@ -1,23 +1,35 @@
 namespace AIGuiders.Platform.Modeling.Cockpit.DataBus
 
+open System
+
+[<CLIMutable>]
 type BuildStateSnapshot =
     { IsBuilding: bool
-      LastExitCode: int option
-      LastBuildSucceeded: bool option }
+      LastExitCode: Nullable<int>
+      LastBuildSucceeded: Nullable<bool> }
 
     static member Empty =
         { IsBuilding = false
-          LastExitCode = None
-          LastBuildSucceeded = None }
+          LastExitCode = Nullable()
+          LastBuildSucceeded = Nullable() }
 
 module BuildStateFold =
-    /// Parity with <c>BuildStateSnapshotUnit.Apply</c> in Platform.Cockpit.Channels.
+    let private hasValue (n: Nullable<int>) = n.HasValue
+    let private hasBool (n: Nullable<bool>) = n.HasValue
+
+    let private coalesceInt (next: Nullable<int>) (prior: Nullable<int>) =
+        if next.HasValue then next else prior
+
+    let private coalesceBool (next: Nullable<bool>) (prior: Nullable<bool>) =
+        if next.HasValue then next else prior
+
+    /// Parity with legacy <c>BuildStateSnapshotUnit.Apply</c> in Platform Execution channels.
     let apply (prior: BuildStateSnapshot) (event: BuildStateChanged) =
         if event.IsBuilding then
             { prior with IsBuilding = true }
-        elif event.LastExitCode.IsSome || event.LastBuildSucceeded.IsSome then
+        elif hasValue event.LastExitCode || hasBool event.LastBuildSucceeded then
             { IsBuilding = false
-              LastExitCode = event.LastExitCode |> Option.orElse prior.LastExitCode
-              LastBuildSucceeded = event.LastBuildSucceeded |> Option.orElse prior.LastBuildSucceeded }
+              LastExitCode = coalesceInt event.LastExitCode prior.LastExitCode
+              LastBuildSucceeded = coalesceBool event.LastBuildSucceeded prior.LastBuildSucceeded }
         else
             { prior with IsBuilding = false }

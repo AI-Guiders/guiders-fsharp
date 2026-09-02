@@ -1,42 +1,49 @@
 namespace AIGuiders.Platform.Modeling.Cockpit.DataBus
 
+open System
+
+[<CLIMutable>]
 type DebugBreakpointSnapshot =
     { File: string
       Line: int
-      Condition: string option }
+      Condition: string }
 
+[<CLIMutable>]
 type DebugVariableRow =
     { Name: string
       Value: string
-      Type: string option
+      Type: string
       VariablesReference: int
-      NamedVariables: int option
-      IndexedVariables: int option }
+      NamedVariables: Nullable<int>
+      IndexedVariables: Nullable<int> }
 
+[<CLIMutable>]
 type DebugVariableRootScope =
     { ScopeName: string
-      Roots: DebugVariableRow list }
+      Roots: DebugVariableRow[] }
 
+[<CLIMutable>]
 type DebugSessionSnapshot =
     { HasActiveSession: bool
       IsExecutionStopped: bool
-      StoppedFile: string option
+      StoppedFile: string
       StoppedLine: int
-      ExceptionText: string option
-      Breakpoints: DebugBreakpointSnapshot list
-      StackFrames: (string * string option * int) list
-      VariableRootScopes: DebugVariableRootScope list
+      ExceptionText: string
+      Breakpoints: DebugBreakpointSnapshot[]
+      StackFrames: (string * string * int)[]
+      VariableRootScopes: DebugVariableRootScope[]
       VariablesFrameIndex: int }
 
     static member Empty =
         { HasActiveSession = false
           IsExecutionStopped = false
-          StoppedFile = None
+          StoppedFile = ""
           StoppedLine = 0
-          ExceptionText = None
-          Breakpoints = []
-          StackFrames = []
-          VariableRootScopes = []
+          ExceptionText = ""
+          Breakpoints = Array.empty
+          StackFrames = Array.empty
+          VariableRootScopes = Array.empty
           VariablesFrameIndex = 0 }
 
+[<CLIMutable>]
 type DebugStateChanged = { Snapshot: DebugSessionSnapshot }
