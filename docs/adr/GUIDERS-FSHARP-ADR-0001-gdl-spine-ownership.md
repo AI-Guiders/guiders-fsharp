@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Accepted — v1 platform mirror in progress (2026-09-02) |
 | **Tags** | #guiders #fsharp #gdl #federation #spine #ir |
-| **Related** | [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0048](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0048-authoring-quarry-family.md) · [GUIDERS-ADR-0004](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0004-core-monorepo.md) |
+| **Related** | [GUIDERS-FSHARP-ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0048](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0048-authoring-quarry-family.md) · [GUIDERS-ADR-0004](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0004-core-monorepo.md) |
 
 ## Context
 
@@ -24,8 +24,9 @@ Pattern: same as **guiders-core** ([0004](https://github.com/AI-Guiders/guiders-
 |-------|------|----------|
 | GDL **spine** (DU, project graph, validation) | `guiders-fsharp` | F# |
 | GDL **parse** (wire → payload) | `guiders-fsharp` (north star) · `guiders-platform` `Authoring.*` (transitional) | F# · C# |
+| Runtime wire parse | `guiders-fsharp` `Notations.*` (north star) · `guiders-platform` `Notations.*` (transitional) | F# · C# |
 | GDL **emit** (Roslyn `*.g.cs`) | `guiders-platform` / assist | C# |
-| Runtime wire | `guiders-platform` | C# `Notations.*` |
+| Runtime mechanics | `guiders-platform` `CommandPlane.*` | C# |
 
 **SSOT for `GdlFragment` / `GdlProject`:** `AIGuiders.Gdl.Core` (F#).
 
