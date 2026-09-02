@@ -10,6 +10,7 @@ open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
+open DotNetWorkspace.Core
 open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Execution.Language
 
@@ -271,13 +272,113 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
         | FSharpGlyph.ExtensionMethod -> "extension"
         | _ -> "text"
 
-    let emptyRename newName =
+    let emptyRename newName message =
         { OldName = ""
           NewName = newName
           SymbolKind = ""
           Applied = false
+          Message = message
           Files = [||]
           Changes = [||] }
+
+    let rejectedRename newName message =
+        emptyRename newName message
+
+    let tryRenameBlocker (symbolUse: FSharpSymbolUse) (source: string) =
+        let line = getLineText source symbolUse.Range.StartLine
+
+        if line.Contains("(|") && line.Contains("|)") then
+            Some "Renaming active patterns is not supported."
+        else
+            match symbolUse.Symbol with
+            | :? FSharpMemberOrFunctionOrValue as m when m.IsActivePattern ->
+                Some "Renaming active patterns is not supported."
+            | :? FSharpUnionCase ->
+                Some "Renaming active pattern cases is not supported."
+            | _ -> None
+
+    let trySolutionGraph (solutionOrProjectPath: string) =
+        if String.IsNullOrWhiteSpace solutionOrProjectPath then
+            None
+        elif not (File.Exists solutionOrProjectPath) then
+            None
+        else
+            try
+                Some(DotNetWorkspace.Load solutionOrProjectPath)
+            with _ ->
+                None
+
+    let tryResolveSymbolInProject (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
+        let fullName = symbol.FullName
+
+        if String.IsNullOrWhiteSpace fullName then
+            Some symbol
+        else
+            match symbol with
+            | :? FSharpEntity ->
+                projectResults.AssemblySignature.Entities
+                |> Seq.tryFind (fun entity -> entity.FullName = fullName)
+                |> Option.map (fun entity -> entity :> FSharpSymbol)
+            | _ -> None
+
+    let symbolUseMatches (target: FSharpSymbol) (use': FSharpSymbolUse) =
+        let useSymbol = use'.Symbol
+        let fullName = target.FullName
+        let displayName = target.DisplayName
+
+        (not (String.IsNullOrWhiteSpace fullName) && useSymbol.FullName = fullName)
+        || (not (String.IsNullOrWhiteSpace displayName) && useSymbol.DisplayName = displayName)
+
+    let getUsesByFullName (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
+        projectResults.GetAllUsesOfAllSymbols()
+        |> Array.filter (symbolUseMatches symbol)
+
+    let getUsesInProject (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
+        let fullName = symbol.FullName
+
+        match tryResolveSymbolInProject symbol projectResults with
+        | Some projectSymbol ->
+            let direct = projectResults.GetUsesOfSymbol projectSymbol
+
+            if direct.Length > 0 then
+                direct
+            elif String.IsNullOrWhiteSpace fullName then
+                direct
+            else
+                getUsesByFullName symbol projectResults
+        | None ->
+            if String.IsNullOrWhiteSpace fullName && String.IsNullOrWhiteSpace symbol.DisplayName then
+                [||]
+            else
+                getUsesByFullName symbol projectResults
+
+    let getUsesOfSymbolAcrossWorkspace (symbol: FSharpSymbol) (req: LanguageRequest) (fallbackUses: FSharpSymbolUse array) =
+        task {
+            match trySolutionGraph req.SolutionOrProjectPath with
+            | None -> return fallbackUses
+            | Some graph ->
+                let collected = ResizeArray<FSharpSymbolUse>()
+
+                for project in graph.Projects do
+                    if project.Kind <> DotNetProjectKind.FSharp then
+                        ()
+                    else
+                        try
+                            match projectOptionsSource.TryLoad project.AbsolutePath with
+                            | Result.Ok options ->
+                                let! projectResults = checker.ParseAndCheckProject(options)
+
+                                for use' in getUsesInProject symbol projectResults do
+                                    collected.Add use'
+                            | Result.Error _ -> ()
+                        with _ ->
+                            ()
+
+                if collected.Count = 0 then
+                    return fallbackUses
+                else
+                    return collected.ToArray()
+        }
 
     let loadProjectContext (path: string) (source: string) (sourceText: ISourceText) (req: LanguageRequest) =
         task {
@@ -454,8 +555,16 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                             | None -> return { References = [||] }
                             | Some symbolUse ->
                                 let target = definitionSpan path symbolUse
+
+                                let! uses =
+                                    getUsesOfSymbolAcrossWorkspace
+                                        symbolUse.Symbol
+                                        req
+                                        (projectResults.GetUsesOfSymbol symbolUse.Symbol)
+
                                 let references =
-                                    projectResults.GetUsesOfSymbol symbolUse.Symbol
+                                    uses
+                                    |> Array.distinctBy (fun use' -> use'.Range, use'.FileName)
                                     |> Array.map (fun use' -> referenceFromUse path target use')
 
                                 return { References = references }
@@ -539,7 +648,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                 let apply = renameReq.Apply
 
                 if String.IsNullOrWhiteSpace newName then
-                    Task.FromResult(emptyRename newName)
+                    Task.FromResult(emptyRename newName "new_name is required.")
                 else
                     let path = req.FilePath
                     let source = readSource req
@@ -549,56 +658,66 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                         let! contextOpt = loadProjectContext path source sourceText req
 
                         match contextOpt with
-                        | None -> return emptyRename newName
+                        | None -> return emptyRename newName "Project context not available (open .fsproj or .slnx)."
                         | Some(_, projectResults, _, checkAnswer) ->
                             match checkAnswer with
-                            | FSharpCheckFileAnswer.Aborted -> return emptyRename newName
+                            | FSharpCheckFileAnswer.Aborted -> return emptyRename newName "Typecheck aborted."
                             | FSharpCheckFileAnswer.Succeeded checkResults ->
                                 match trySymbolUseAt path checkResults req.Line req.Column source with
-                                | None -> return emptyRename newName
+                                | None -> return emptyRename newName "No symbol at cursor."
                                 | Some symbolUse ->
-                                    let oldName = symbolUse.Symbol.DisplayName
-                                    let kind = symbolKind symbolUse.Symbol
+                                    match tryRenameBlocker symbolUse source with
+                                    | Some reason -> return rejectedRename newName reason
+                                    | None ->
+                                        let oldName = symbolUse.Symbol.DisplayName
+                                        let kind = symbolKind symbolUse.Symbol
 
-                                    let uses =
-                                        projectResults.GetUsesOfSymbol symbolUse.Symbol
-                                        |> Array.distinctBy (fun use' -> use'.Range, use'.FileName)
+                                        let! uses =
+                                            getUsesOfSymbolAcrossWorkspace
+                                                symbolUse.Symbol
+                                                req
+                                                (projectResults.GetUsesOfSymbol symbolUse.Symbol)
 
-                                    let grouped =
-                                        uses
-                                        |> Array.groupBy (fun use' ->
-                                            if String.IsNullOrWhiteSpace use'.FileName then
-                                                path
-                                            else
-                                                use'.FileName)
+                                        let distinctUses =
+                                            uses
+                                            |> Array.distinctBy (fun use' -> use'.Range, use'.FileName)
 
-                                    let mutable changes = ResizeArray<RenameFileChange>()
+                                        let grouped =
+                                            distinctUses
+                                            |> Array.groupBy (fun use' ->
+                                                if String.IsNullOrWhiteSpace use'.FileName then
+                                                    path
+                                                else
+                                                    use'.FileName)
 
-                                    for filePath, fileUses in grouped do
-                                        let fileSource =
-                                            if String.Equals(filePath, path, StringComparison.OrdinalIgnoreCase) then
-                                                source
-                                            else
-                                                readFileText filePath ""
+                                        let mutable changes = ResizeArray<RenameFileChange>()
 
-                                        let mutable updated = fileSource
+                                        for filePath, fileUses in grouped do
+                                            let fileSource =
+                                                if String.Equals(filePath, path, StringComparison.OrdinalIgnoreCase) then
+                                                    source
+                                                else
+                                                    readFileText filePath ""
 
-                                        for use' in fileUses |> Array.sortByDescending (fun u -> u.Range.StartLine, u.Range.StartColumn) do
-                                            updated <- replaceRangeInSource updated use'.Range newName
+                                            let mutable updated = fileSource
 
-                                        if not (String.Equals(updated, fileSource, StringComparison.Ordinal)) then
-                                            changes.Add({ Path = filePath; NewText = updated })
+                                            for use' in fileUses |> Array.sortByDescending (fun u -> u.Range.StartLine, u.Range.StartColumn) do
+                                                updated <- replaceRangeInSource updated use'.Range newName
 
-                                            if apply then
-                                                File.WriteAllText(filePath, updated)
+                                            if not (String.Equals(updated, fileSource, StringComparison.Ordinal)) then
+                                                changes.Add({ Path = filePath; NewText = updated })
 
-                                    let filePaths = changes |> Seq.map (fun c -> c.Path) |> Array.ofSeq
+                                                if apply then
+                                                    File.WriteAllText(filePath, updated)
 
-                                    return
-                                        { OldName = oldName
-                                          NewName = newName
-                                          SymbolKind = kind
-                                          Applied = apply
-                                          Files = filePaths
-                                          Changes = changes.ToArray() }
+                                        let filePaths = changes |> Seq.map (fun c -> c.Path) |> Array.ofSeq
+
+                                        return
+                                            { OldName = oldName
+                                              NewName = newName
+                                              SymbolKind = kind
+                                              Applied = apply
+                                              Message = ""
+                                              Files = filePaths
+                                              Changes = changes.ToArray() }
                     }

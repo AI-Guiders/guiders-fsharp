@@ -158,5 +158,6 @@ type GdlLanguageBackend() =
                       NewName = renameReq.NewName
                       SymbolKind = ""
                       Applied = false
+                      Message = ""
                       Files = [||]
                       Changes = [||] }

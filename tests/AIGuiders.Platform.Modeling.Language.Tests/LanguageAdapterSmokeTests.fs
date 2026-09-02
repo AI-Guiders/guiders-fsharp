@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Language.Tests
 
+open System
 open System.Threading
 open Xunit
 open AIGuiders.Platform.Execution.Language
@@ -273,3 +274,67 @@ module LanguageAdapterSmokeTests =
         finally
             if System.IO.Directory.Exists root then
                 System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs rename rejects active pattern`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-ap-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "ApProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Ap.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Ap.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(
+            fs,
+            "module Ap\n\nlet (|Even|Odd|) v = if v % 2 = 0 then Even else Odd\n\nlet _ = (|Even|Odd|) 2\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 3, 10, null, fsproj)
+            let renameReq = RenameSymbolRequest(req, "Renamed", false)
+
+            let result =
+                backend.RenameSymbolAsync(renameReq, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.Contains("active pattern", result.Message, StringComparison.OrdinalIgnoreCase)
+            Assert.Empty(result.Changes)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs rename preview spans workspace projects`` () =
+        let repoRoot =
+            System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let slnx = System.IO.Path.Combine(repoRoot, "AIGuiders.Platform.Modeling.slnx")
+
+        let kernelFs =
+            System.IO.Path.Combine(repoRoot, "src", "AIGuiders.Platform.Modeling.Language", "Kernel.fs")
+
+        if not (System.IO.File.Exists slnx) then
+            Assert.Fail(sprintf "slnx fixture missing: %s" slnx)
+        else
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(kernelFs, 87, 10, null, slnx)
+            let renameReq = RenameSymbolRequest(req, "LanguageRequestPreview", false)
+
+            let result =
+                backend.RenameSymbolAsync(renameReq, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.Equal("LanguageRequest", result.OldName)
+            Assert.False(result.Applied)
+            Assert.NotEmpty(result.Changes)
+            Assert.Contains(result.Files, fun f -> f.EndsWith("Kernel.fs"))

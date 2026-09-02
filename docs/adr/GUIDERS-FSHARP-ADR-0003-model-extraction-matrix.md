@@ -178,6 +178,17 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `LanguageIntelligence.*` | M/E | `Modeling.Gdl.Language` for neutral edits | adapters |
 | `Language.CSharp.*` / `Language.Xml.Anchors` | E | — | language-specific probes |
 
+#### 4.9.1 Language Resolver Center (LRC) — shipped slice (2026-09-03)
+
+| Package | Split | F# target | Status |
+|---------|-------|-----------|--------|
+| `Platform.Modeling.Language` | **M** | `Kernel.fs` — `LanguageRequest`, `LanguageDiagnostic`, `FindUsagesResult`, `RenameSymbolResult`, … | **shipped** (sibling `guiders-fsharp`) |
+| `Platform.Modeling.Language.Adapters.Fcs` | **M** | FCS backend — 7 IDE verbs (`get_diagnostics`, `get_document_symbols`, `go_to_definition`, `find_usages`, `get_completions`, `get_symbol_at_position`, `rename_symbol`); active-pattern rename blocker; workspace scan via `GetAllUsesOfAllSymbols` | **shipped** |
+| `Platform.Modeling.Language.Adapters.Gdl` | **M** | GDL adapter stubs (deck pilot) | scaffold |
+| `Platform.Execution.Language` | **E** | `LanguageResolverCenter`, `ILanguageBackend` federation gateway | **shipped** (sibling `guiders-platform`) |
+
+**Not yet extracted to NuGet** — model not fully separated from platform wave; CDP uses sibling `ProjectReference` via `eng/Guiders.Modeling.props`. F6 (`LanguageIntelligence` adapter consolidation per GUIDERS-ADR-0061) deferred.
+
 #### 4.10 Sources, Configurations, Utilities
 
 | Package | Split | F# target | Execution keeps |
@@ -205,6 +216,9 @@ Platform.Modeling.Navigation.*
 Platform.Modeling.Gdl.Correspondence
 Platform.Modeling.Gdl.Agent
 Platform.Modeling.Gdl.Language
+Platform.Modeling.Language
+Platform.Modeling.Language.Adapters.Fcs
+Platform.Modeling.Language.Adapters.Gdl
 Platform.Modeling.Conformance.*
 ```
 

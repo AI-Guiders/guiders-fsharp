@@ -79,6 +79,7 @@ type RenameSymbolResult =
       NewName: string
       SymbolKind: string
       Applied: bool
+      Message: string
       Files: string[]
       Changes: RenameFileChange[] }
 
