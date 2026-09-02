@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AIGuiders.Gdl.Core/AIGuiders.Gdl.Core.fsproj" />
+    <Project Path="src/AIGuiders.Gdl.Validation/AIGuiders.Gdl.Validation.fsproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AIGuiders.Gdl.Core.Tests/AIGuiders.Gdl.Core.Tests.fsproj" />
+  </Folder>
+</Solution>
