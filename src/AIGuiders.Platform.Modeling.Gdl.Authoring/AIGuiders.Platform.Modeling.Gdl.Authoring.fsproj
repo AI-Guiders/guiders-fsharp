@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>AIGuiders.Gdl.Authoring</RootNamespace>
-    <AssemblyName>AIGuiders.Gdl.Authoring</AssemblyName>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Authoring</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Authoring</AssemblyName>
     <Description>GDL authoring lexical kit — F# mirror of Platform Authoring.Core.</Description>
-    <PackageId>AIGuiders.Gdl.Authoring</PackageId>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Authoring</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Diagnostic.fs" />

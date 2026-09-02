@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Validation</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Validation</AssemblyName>
+    <Description>GDL project validation — cross-ref and quarry rules.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Validation</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GdlValidation.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Core\AIGuiders.Platform.Modeling.Gdl.Core.fsproj" />
+  </ItemGroup>
+</Project>

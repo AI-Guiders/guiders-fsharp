@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.Deck</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.Deck</AssemblyName>
+    <Description>GDL deck quarry parser — F# mirror of Platform Authoring.Deck.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.Deck</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="DeckParser.fs" />
+    <Compile Include="DeckMapping.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Presentation\AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Core\AIGuiders.Platform.Modeling.Gdl.Core.fsproj" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,6 @@
-namespace AIGuiders.Gdl.Core
+namespace AIGuiders.Platform.Modeling.Gdl.Core
 
-open AIGuiders.Gdl.Presentation
+open AIGuiders.Platform.Modeling.Gdl.Presentation
 
 /// Stable reference to one GDL document in a project directory.
 /// <c>Quarry</c> is the token before <c>.gdl</c> (e.g. <c>deck</c>, <c>catalog</c>).

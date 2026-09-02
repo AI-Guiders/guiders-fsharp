@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Core</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Core</AssemblyName>
+    <Description>GDL spine types — discriminated union project model (Guiders federation).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Core</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GdlTypes.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Presentation\AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
+  </ItemGroup>
+</Project>

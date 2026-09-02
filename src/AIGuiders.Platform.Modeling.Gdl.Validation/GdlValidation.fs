@@ -1,6 +1,6 @@
-namespace AIGuiders.Gdl.Validation
+namespace AIGuiders.Platform.Modeling.Gdl.Validation
 
-open AIGuiders.Gdl.Core
+open AIGuiders.Platform.Modeling.Gdl.Core
 
 type ValidationSeverity =
     | Error

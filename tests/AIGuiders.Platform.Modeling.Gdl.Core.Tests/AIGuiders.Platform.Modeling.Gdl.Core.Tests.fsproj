@@ -16,8 +16,8 @@
     <Content Include="Fixtures\Authoring\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Gdl.Core\AIGuiders.Gdl.Core.fsproj" />
-    <ProjectReference Include="..\..\src\AIGuiders.Gdl.Validation\AIGuiders.Gdl.Validation.fsproj" />
-    <ProjectReference Include="..\..\src\AIGuiders.Gdl.Parse.Deck\AIGuiders.Gdl.Parse.Deck.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Core\AIGuiders.Platform.Modeling.Gdl.Core.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Validation\AIGuiders.Platform.Modeling.Gdl.Validation.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Parse.Deck\AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
   </ItemGroup>
 </Project>

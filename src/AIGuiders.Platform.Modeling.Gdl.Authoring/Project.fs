@@ -1,4 +1,4 @@
-namespace AIGuiders.Gdl.Authoring
+namespace AIGuiders.Platform.Modeling.Gdl.Authoring
 
 open System.IO
 

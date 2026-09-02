@@ -1,6 +1,6 @@
-namespace AIGuiders.Gdl.Parse.Deck
+namespace AIGuiders.Platform.Modeling.Gdl.Parse.Deck
 
-open AIGuiders.Gdl.Core
+open AIGuiders.Platform.Modeling.Gdl.Core
 
 [<RequireQualifiedAccess>]
 module DeckMapping =

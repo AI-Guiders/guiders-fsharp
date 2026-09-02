@@ -1,8 +1,8 @@
-namespace AIGuiders.Gdl.Core.Tests
+namespace AIGuiders.Platform.Modeling.Gdl.Core.Tests
 
 open Xunit
-open AIGuiders.Gdl.Core
-open AIGuiders.Gdl.Validation
+open AIGuiders.Platform.Modeling.Gdl.Core
+open AIGuiders.Platform.Modeling.Gdl.Validation
 
 module DeckSpineTests =
     [<Fact>]

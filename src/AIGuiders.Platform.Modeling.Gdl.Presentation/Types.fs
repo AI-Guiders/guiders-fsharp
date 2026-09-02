@@ -1,4 +1,4 @@
-namespace AIGuiders.Gdl.Presentation
+namespace AIGuiders.Platform.Modeling.Gdl.Presentation
 
 type AttentionDisplayRole =
     | Unknown = 0

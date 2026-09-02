@@ -17,7 +17,7 @@ Federation has two **model-heavy** hyperlanes:
 
 Both are **algebraic**: discriminated shapes, exhaustive `match`, cross-ref validation, conformance vectors — not UI or runtime mechanics.
 
-[ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) placed GDL **spine** and **parse north star** in `guiders-fsharp`. Deck + `PresentationTopology` mirror shipped under transitional IDs (`AIGuiders.Gdl.*`).
+[ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) placed GDL **spine** and **parse north star** in `guiders-fsharp`. Deck + `PresentationTopology` mirror shipped as `AIGuiders.Platform.Modeling.Gdl.*` (**Phase A done**).
 
 **Notations** ([0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md)) follow the same pattern: wire format(s) → branch Core IR → mechanics consume.
 
@@ -66,20 +66,20 @@ guiders-fsharp                          guiders-platform
 
 ### 2. GDL Modeling packages (target map)
 
-| Package | Owns | Replaces (transitional) |
+| Package | Owns | Replaces (transitional C#) |
 |---------|------|-------------------------|
-| `AIGuiders.Platform.Modeling.Gdl.Core` | `GdlProject`, `GdlFragment`, quarry payload spine | `AIGuiders.Gdl.Core` |
-| `AIGuiders.Platform.Modeling.Gdl.Authoring` | lexical kit: blocks, tables, import, diagnostics | `AIGuiders.Gdl.Authoring` · `Platform.Authoring.Core` |
-| `AIGuiders.Platform.Modeling.Gdl.Presentation` | `PresentationTopology`, topology wire parse | `AIGuiders.Gdl.Presentation` · `IR.Presentation` |
+| `AIGuiders.Platform.Modeling.Gdl.Core` | `GdlProject`, `GdlFragment`, quarry payload spine | — |
+| `AIGuiders.Platform.Modeling.Gdl.Authoring` | lexical kit: blocks, tables, import, diagnostics | `Platform.Authoring.Core` |
+| `AIGuiders.Platform.Modeling.Gdl.Presentation` | `PresentationTopology`, topology wire parse | `IR.Presentation` |
 | `AIGuiders.Platform.Modeling.Gdl.Command` | catalog / bundle IR | `IR.Command` · `Authoring.Command.*` |
 | `AIGuiders.Platform.Modeling.Gdl.Cockpit` | cockpit.logic rule graph IR | proposed `Authoring.Cockpit.Logic` |
 | `AIGuiders.Platform.Modeling.Gdl.Display` | display binding IR | proposed `Authoring.Display.Binding` |
 | `AIGuiders.Platform.Modeling.Gdl.Expression` | shared `ExprNode` for `when` / conditions | proposed `Authoring.Expression` |
-| `AIGuiders.Platform.Modeling.Gdl.Parse.*` | quarry parsers (`Deck`, `Catalog`, …) | `AIGuiders.Gdl.Parse.*` · `Platform.Authoring.*` |
-| `AIGuiders.Platform.Modeling.Gdl.Validation` | cross-quarry rules | `AIGuiders.Gdl.Validation` |
+| `AIGuiders.Platform.Modeling.Gdl.Parse.*` | quarry parsers (`Deck`, `Catalog`, …) | `Platform.Authoring.*` |
+| `AIGuiders.Platform.Modeling.Gdl.Validation` | cross-quarry rules | — |
 | `AIGuiders.Platform.Modeling.Gdl.Project` | `*.gdlproj`, import graph | `Authoring.Project` |
 
-**Ship order:** deck + topology (**done**, transitional `AIGuiders.Gdl.*`) → catalog → display → cockpit.logic → expression → **rename to `Platform.Modeling.Gdl.*`** (§6).
+**Ship order:** deck + topology + rename (**done**) → catalog → display → cockpit.logic → expression.
 
 ### 3. Notations Modeling packages (target map)
 
@@ -120,8 +120,7 @@ Flat `AIGuiders.Platform.Authoring.*`, `Platform.IntermediateRepresentation.*`, 
 
 | Transitional | Target |
 |--------------|--------|
-| `AIGuiders.Gdl.*` (guiders-fsharp bootstrap) | `AIGuiders.Platform.Modeling.Gdl.*` |
-| `AIGuiders.Platform.Authoring.*` | `AIGuiders.Platform.Modeling.Gdl.*` (per quarry) |
+| flat `AIGuiders.Platform.Authoring.*` | `AIGuiders.Platform.Modeling.Gdl.*` (per quarry) |
 | `AIGuiders.Platform.IntermediateRepresentation.*` | absorbed into `Platform.Modeling.*` |
 | `AIGuiders.Platform.Notations.*` | `AIGuiders.Platform.Modeling.Notations.*` |
 | `AIGuiders.Platform.CommandPlane.*` | `AIGuiders.Platform.Execution.CommandPlane.*` |
@@ -143,7 +142,7 @@ No merged mega-AST ([0059](https://github.com/AI-Guiders/guiders-dotnet-platform
 ### 8. Migration phases
 
 ```text
-Phase A (now)     F# GDL mirror under transitional AIGuiders.Gdl.*
+Phase A (done)     Platform.Modeling.Gdl.* rename + deck/topology mirror
 Phase B           catalog, display, cockpit.logic under Platform.Modeling.Gdl.*
 Phase C           Platform.Modeling.Notations.* (F#)
 Phase D           Platform.Execution.* for runtime; abandon flat Platform.* 0.31.x

@@ -1,7 +1,7 @@
-namespace AIGuiders.Gdl.Parse.Deck
+namespace AIGuiders.Platform.Modeling.Gdl.Parse.Deck
 
-open AIGuiders.Gdl.Authoring
-open AIGuiders.Gdl.Presentation
+open AIGuiders.Platform.Modeling.Gdl.Authoring
+open AIGuiders.Platform.Modeling.Gdl.Presentation
 
 [<RequireQualifiedAccess>]
 module DeckParser =

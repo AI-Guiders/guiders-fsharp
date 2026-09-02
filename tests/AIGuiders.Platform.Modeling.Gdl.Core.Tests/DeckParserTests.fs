@@ -1,11 +1,11 @@
-namespace AIGuiders.Gdl.Core.Tests
+namespace AIGuiders.Platform.Modeling.Gdl.Core.Tests
 
 open System
 open System.IO
 open Xunit
-open AIGuiders.Gdl.Core
-open AIGuiders.Gdl.Parse.Deck
-open AIGuiders.Gdl.Presentation
+open AIGuiders.Platform.Modeling.Gdl.Core
+open AIGuiders.Platform.Modeling.Gdl.Parse.Deck
+open AIGuiders.Platform.Modeling.Gdl.Presentation
 
 module DeckParserTests =
     let private loadFixture name =
