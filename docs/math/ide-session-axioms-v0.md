@@ -147,7 +147,7 @@ G = (\mathbb{P},\ \mathbb{C},\ E_{\mathsf{proj}},\ E_{\mathsf{req}},\ E_{\mathsf
 \mathcal{S} = (G,\ \sigma,\ \rho_0)
 \]
 
-где \( \sigma \in \Phi \) — фаза сессии; \( \rho_0 \subseteq \mathcal{A}^* \) — **defaults сессии** (anchor overlay), не отдельная «магическая» политика.
+где \( \sigma \in \Phi \) — фаза сессии; \( \rho_0 \subseteq \mathcal{A}^* \) — **defaults сессии** (anchor overlay), не отдельная «магическая» политика. Полный state с журналом: §2.12 \( (G, \sigma, \rho_0, \Lambda) \).
 
 **Эффективная политика** — разрешение по иерархии:
 
@@ -463,7 +463,71 @@ Q_{\mathsf{style}} : \mathsf{rules}(G') \models \mathsf{EffectiveStyle}(G, \psi)
 | **ST4** | \( \mathsf{CodeStyle} \) \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) на proven path |
 | **ST5** | После \( \mathsf{plan}_{\mathsf{style}} \): \( \mathsf{typecheck}(G') \) @ \( \varphi \) **обязателен** перед apply; vendor output без check — **запрещён** для auto-apply (v0) |
 
----
+### 2.12 Revision ledger (Δ-stream) & Git subgraph
+
+**Agent memory** — не чат, а **журнал сессии** + replay. Habitat (CDP buffer, sniper/peel) — **источник событий**, не параллельный SSOT.
+
+\[
+\mathcal{S} = (G,\ \sigma,\ \rho_0,\ \Lambda)
+\qquad
+\Lambda = [\varepsilon_1, \varepsilon_2, \ldots, \varepsilon_n]
+\]
+
+**Запись журнала** \( \varepsilon_i \) (append-only):
+
+\[
+\varepsilon_i = (r_i,\ \mathsf{scope}_i,\ \theta_i,\ \Delta_i,\ \mathsf{anchor}_i,\ \gamma_i)
+\]
+
+| Поле | Смысл |
+|------|--------|
+| \( r_i \) | ревизия сессии (монотонна) |
+| \( \mathsf{scope}_i \) | FileChange … SolutionProjectCrud (§5.2) |
+| \( \theta_i \) | класс \( \Theta \) + spec (ref/fix/style/cfg/…) |
+| \( \Delta_i \) | \( (\Delta_{\mathsf{fs}}, \Delta_G) \) или summary hash |
+| \( \mathsf{anchor}_i \) | optional AnchorIntent (ADR-0063) |
+| \( \gamma_i \) | **Git pin** @ apply boundary (§2.12b) |
+
+**Replay:**
+
+\[
+G_0 \xrightarrow{\varepsilon_1} G_1 \xrightarrow{\varepsilon_2} \cdots \xrightarrow{\varepsilon_n} G_n
+\qquad
+\mathsf{replay}(G_0,\ \Lambda[1..k]) = G_k
+\]
+
+\[
+\mathsf{apply}(G_{i-1},\ \Delta_i) = G_i
+\]
+
+Live edit (CDP) без commit в журнал — **ephemeral** `FileChange` + \( \Sigma_\pi \) refine; **commit** (user/agent apply, save batch) — **append** \( \varepsilon_i \).
+
+#### 2.12b Git subgraph (overlay, не SSOT)
+
+Git — **port**; в сессии — **overlay** на границах apply:
+
+\[
+\Gamma_{\mathsf{git}} = (\mathsf{commit},\ \mathsf{branch},\ \mathsf{dirty},\ \mathsf{remote?})
+\qquad
+\gamma_i = \mathsf{pin}(\Gamma_{\mathsf{git}})
+\]
+
+v0: минимум \( \mathsf{commit} \) hash (HEAD @ apply). Цель: **склейка** IDE timeline ↔ git history — у оператора и агента **полная картина**, не только replay графа.
+
+\[
+(\Lambda,\ \Gamma_{\mathsf{git}}) \Rightarrow \mathsf{Timeline}
+\]
+
+**Code History Timeline** — projection журнала для UI: scrub \( k \in [0,n] \), показать \( G_k \), diff \( G_{k-1} \to G_k \), pin \( \gamma_k \). Presentation / debug / «как мы сюда пришли» — **убийца на демо**, не side feature.
+
+| ID | Формулировка |
+|----|----------------|
+| **LD1** | \( \Lambda \) **append-only**; удаление только compact/policy (archive), не silent mutate |
+| **LD2** | \( r_i \) строго монотонны в пределах сессии |
+| **LD3** | \( \mathsf{replay}(G_0, \Lambda) \) детерминирован при хранимых \( \Delta_i \) (или re-\( \mathsf{plan}(\theta_i, \varphi_{r_i}) \) @ stored φ) |
+| **LD4** | CDP/habitat events **ingress** в \( \Lambda \) через orchestrator — не второй журнал |
+| **LD5** | \( \gamma_i \) записывается на каждый **apply**; optional на preview-only |
+| **LD6** | Git **не** заменяет \( G \); \( \Gamma_{\mathsf{git}} \) — correlation layer, `git commit` — отдельное событие (может batch несколько \( \varepsilon_i \)) |
 
 ## 3. Аксиомы структурной корректности (static WF)
 
@@ -870,6 +934,10 @@ MSBuild / `dotnet` — port (`buildDriver`), не SSOT (§7.3). Свой build D
 
 v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename project на диске = новый узел. Позже: stable UUID в метаданных.
 
+### 9.11 Revision ledger & Timeline — **направление зафиксировано**
+
+§2.12: \( \Lambda \) (Δ-stream) + Git overlay \( \gamma \) @ apply; replay \( G_0 \to G_n \); Timeline = projection для UI/agent. CDP/habitat — ingress, не второй SSOT.
+
 ---
 
 ## 10. Соответствие коду (v0)
@@ -891,7 +959,8 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 | \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
-| RF1–RF8, ST1–ST4 | **ещё нет** → orchestrator + ports + `HoareChecker` |
+| RF1–RF8, ST1–ST5, LD1–LD6 | **ещё нет** → orchestrator + ports + `HoareChecker` + `SessionLedger` |
+| \( \Lambda \), Timeline | **ещё нет** → `RevisionLedger`, `GitPin`, `CodeHistoryTimeline` (Phase 2–3) |
 
 ---
 
@@ -921,7 +990,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6c. ~~Sub-file refinement (Σ_π, syntax/semantic nodes)~~ — §5.2a, I6–I8.  
 6d. ~~Sniper-scoped emit (semantic node → minimal U')~~ — §7.4, SN1–SN6.  
 6e. ~~Refactor as G → G' (plan/apply, Δ_fs + Δ_G)~~ — §2.10, RF1–RF8, Θ classes.  
-6f. ~~Code Style & EditorConfig in G~~ — §2.11, ST1–ST4.  
+6f. ~~Code Style & EditorConfig in G~~ — §2.11, ST1–ST5.  
+6g. ~~Revision ledger + Git subgraph + Timeline~~ — §2.12, §9.11, LD1–LD6.  
 7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
