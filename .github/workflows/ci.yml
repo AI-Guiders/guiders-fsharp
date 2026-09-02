@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-fsharp
+          path: federation/guiders-fsharp
+
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-dotnet-platform
+          path: federation/guiders-platform
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build and test
+        working-directory: federation/guiders-fsharp
+        run: |
+          dotnet restore AIGuiders.Platform.Modeling.slnx
+          dotnet build AIGuiders.Platform.Modeling.slnx --no-restore -c Release
+          dotnet test AIGuiders.Platform.Modeling.slnx --no-build -c Release

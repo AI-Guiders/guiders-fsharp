@@ -1,0 +1,51 @@
+# Publish AIGuiders.Platform.Modeling.* to nuget.org (Trusted Publishing / OIDC).
+# nuget.org: Trusted Publishing → owner AIGuiders, repo guiders-fsharp, workflow release.yml
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-fsharp
+          path: federation/guiders-fsharp
+
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-dotnet-platform
+          path: federation/guiders-platform
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Test
+        working-directory: federation/guiders-fsharp
+        run: dotnet test AIGuiders.Platform.Modeling.slnx -c Release
+
+      - name: Pack
+        working-directory: federation/guiders-fsharp
+        run: dotnet pack AIGuiders.Platform.Modeling.slnx -c Release --output ./artifacts
+
+      - name: NuGet login (OIDC)
+        uses: NuGet/login@v1
+        id: nuget_login
+        with:
+          user: LonelySoul
+
+      - name: Push nupkg / snupkg
+        working-directory: federation/guiders-fsharp
+        env:
+          NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
+        run: bash scripts/nuget/push-artifacts.sh 'artifacts/AIGuiders.Platform.Modeling.*.nupkg'

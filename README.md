@@ -34,7 +34,7 @@ dotnet test AIGuiders.Platform.Modeling.slnx
 
 Software: [MIT](LICENSE) ([OSI text](https://opensource.org/license/MIT)) · Ethical use: [declaration](https://github.com/AI-Guiders/licensing/blob/main/docs/ethical-use.md)
 
-Private GitHub (org access). Consumed via sibling `ProjectReference` until public NuGet publish.
+Public federation repo. NuGet prefix `AIGuiders.Platform.Modeling.*` (sibling checkout of `guiders-dotnet-platform` required for LRC adapter builds).
 
 ## Learn F#
 
