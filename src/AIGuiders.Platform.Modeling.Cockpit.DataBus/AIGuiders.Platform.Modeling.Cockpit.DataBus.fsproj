@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.DataBus</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.DataBus</AssemblyName>
+    <Description>Cockpit DataBus schema — event catalog, dispatch policy, projection graph (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Cockpit.DataBus</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="EventCatalog.fs" />
+    <Compile Include="DebugTypes.fs" />
+    <Compile Include="DispatchPolicy.fs" />
+    <Compile Include="Stratum.fs" />
+    <Compile Include="Channels.fs" />
+    <Compile Include="ProjectionGraph.fs" />
+    <Compile Include="BuildStateFold.fs" />
+    <Compile Include="IdeHealthProjection.fs" />
+  </ItemGroup>
+</Project>

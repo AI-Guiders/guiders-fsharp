@@ -18,6 +18,7 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 | `AIGuiders.Platform.Modeling.Gdl.Presentation` | `PresentationTopology` IR + wire parse |
 | `AIGuiders.Platform.Modeling.Gdl.Parse.Deck` | `*.deck.gdl` parser |
 | `AIGuiders.Platform.Modeling.Gdl.Validation` | cross-quarry project rules |
+| `AIGuiders.Platform.Modeling.Cockpit.DataBus` | event catalog, dispatch policy, projection graph |
 
 ## Build
 

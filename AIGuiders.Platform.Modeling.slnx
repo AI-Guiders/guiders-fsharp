@@ -5,8 +5,10 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Authoring/AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Presentation/AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Deck/AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.DataBus/AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests.fsproj" />
   </Folder>
 </Solution>
