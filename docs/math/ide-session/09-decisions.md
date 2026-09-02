@@ -64,3 +64,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 - Mixed federation: \( E_{\mathsf{proj}} \) связывает DotNet ↔ Gdl ↔ Planet в одном \( G \).
 
 Отвергнуто: отдельная «GDL session», обход invalidation/freeze/ledger для declare-time, `if (gdl)` в ядре оркестратора.
+
+### 9.13 Conformance golden sessions — **решено**
+
+§11: математика без executable proof = декорация. GS1–GS5 в `ConformanceGoldenSessionTests`; `HoareChecker.refactorPreserves` (RF6), `StyleConformance` (ST3/ST5).

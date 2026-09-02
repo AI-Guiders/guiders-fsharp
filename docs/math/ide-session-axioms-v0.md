@@ -25,6 +25,7 @@
 | Adaptive | [08-adaptive.md](ide-session/08-adaptive.md) |
 | Decisions | [09-decisions.md](ide-session/09-decisions.md) |
 | Implementation | [10-implementation.md](ide-session/10-implementation.md) |
+| Conformance | [11-conformance.md](ide-session/11-conformance.md) |
 
 ---
 

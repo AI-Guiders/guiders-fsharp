@@ -24,7 +24,7 @@
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 | \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
-| RF1–RF8, ST1–ST5, LD1–LD6 | **ещё нет** → orchestrator + ports + `HoareChecker` + `SessionLedger` |
+| RF1–RF8, ST1–ST5, LD1–LD6 | `HoareChecker`, `StyleConformance`, `Conformance` (GS1–GS5); ledger **ещё нет** |
 | \( \Lambda \), Timeline | **ещё нет** → `RevisionLedger`, `GitPin`, `CodeHistoryTimeline` (Phase 2–3) |
 
 ---
@@ -61,7 +61,7 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx / gdlproj: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \leftarrow \mathcal{K}_\tau \) (`ProjectCapabilityCatalog.forKind`).  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
-10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
+10. ~~Доказуемые свойства~~ — golden sessions §11 (`ConformanceGoldenSessionTests`); runtime props (FileChange/M) Phase 2+.
 
 ### Будущие ветки (не v0, не блокируют Dash Studio)
 

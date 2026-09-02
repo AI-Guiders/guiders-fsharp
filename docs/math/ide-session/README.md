@@ -29,6 +29,7 @@
 | [08-adaptive.md](08-adaptive.md) | Adaptive topology | 8 |
 | [09-decisions.md](09-decisions.md) | Решения / open questions | 9 |
 | [10-implementation.md](10-implementation.md) | Code map, example, evolution | 10–12 |
+| [11-conformance.md](11-conformance.md) | Golden sessions, Hoare/ST executable proofs | 11 |
 
 ---
 
@@ -37,7 +38,7 @@
 1. **01** → **02** → **04** (граф + invalidation + jobs)
 2. **03** → **05** (snapshots + build)
 3. **06** → **07** (transforms + ledger)
-4. **09** → **10** (decisions + code)
+4. **09** → **10** → **11** (decisions + code + conformance)
 
 ---
 

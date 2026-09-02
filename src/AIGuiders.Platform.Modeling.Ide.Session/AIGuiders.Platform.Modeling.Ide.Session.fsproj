@@ -15,5 +15,8 @@
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="SolutionGraph.fs" />
     <Compile Include="GraphValidation.fs" />
+    <Compile Include="GraphPatch.fs" />
+    <Compile Include="Hoare.fs" />
+    <Compile Include="Conformance.fs" />
   </ItemGroup>
 </Project>
