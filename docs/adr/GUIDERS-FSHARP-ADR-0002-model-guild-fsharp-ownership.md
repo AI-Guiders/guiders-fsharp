@@ -108,9 +108,10 @@ Cockpit is **not** one layer. Declare annunciation + pure eval = Modeling (F#); 
     → trace (rule id, matched when)
          │
          ▼
-    DataBus.Publish / subscribe   Platform.Execution.Cockpit.DataBus
-    Transport, Channels, CDS      Platform.Execution.Cockpit.*
-    EicasStrip, zone visibility   Platform.Execution.Studio.*
+    event → fact projection        Platform.Modeling.Cockpit.DataBus  ← schema + wiring graph
+    DataBus.Publish / subscribe    Platform.Execution.Cockpit.DataBus  ← thin runtime only
+    Transport, Channels, CDS       Platform.Execution.Cockpit.*
+    EicasStrip, zone visibility      Platform.Execution.Studio.*
 ```
 
 | Package | Language | Owns |
@@ -118,8 +119,10 @@ Cockpit is **not** one layer. Declare annunciation + pure eval = Modeling (F#); 
 | `AIGuiders.Platform.Modeling.Gdl.Cockpit` | F# | `CockpitRuleGraph`, facts/rules/alerting/projectors IR |
 | `AIGuiders.Platform.Modeling.Gdl.Expression` | F# | shared `ExprNode` eval substrate (deck + cockpit) |
 | `AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic` | F# | `*.cockpit.logic.gdl` parser |
-| `AIGuiders.Platform.Modeling.Cockpit.Rules` | F# | **headless** `evaluate(graph, facts) → outcomes + trace` — no DataBus, no WPF |
-| `AIGuiders.Platform.Execution.Cockpit.*` | C# | DataBus, Transport, Channels, Composition, CDS routing **runtime** |
+| `AIGuiders.Platform.Modeling.Cockpit.Rules` | F# | **headless** `evaluate(graph, facts) → outcomes + trace` — no IO, no WPF |
+| `AIGuiders.Platform.Modeling.Cockpit.DataBus` | F# | typed event catalog, dispatch policy, projection/fold wiring graph |
+| `AIGuiders.Platform.Execution.Cockpit.DataBus` | C# | `IDataBus` impl: publish/subscribe, threading, bounded channels |
+| `AIGuiders.Platform.Execution.Cockpit.*` | C# | Transport, Channels, Composition, CDS snapshot **runtime** |
 
 **Normative:** `Platform.Cockpit.Rules` (proposed in platform ADR-0057 as C#) **moves to F#** as `Platform.Modeling.Cockpit.Rules`. Execution calls Modeling eval; it does not re-implement rule matching.
 
@@ -131,7 +134,7 @@ Cockpit is **not** one layer. Declare annunciation + pure eval = Modeling (F#); 
 |---------|------|----------------------------------------|
 | `AIGuiders.Platform.Execution.CommandPlane.*` | catalog/registry, execute, completion | `Platform.CommandPlane.*` |
 | `AIGuiders.Platform.Execution.Studio.*` | WPF / product surfaces | `guiders-wpf`, Studio hosts |
-| `AIGuiders.Platform.Execution.Cockpit.*` | DataBus, transport, channels, composition runtime | `Platform.Cockpit.*` **minus** rule eval |
+| `AIGuiders.Platform.Execution.Cockpit.*` | transport, channels, composition, **DataBus runtime** | `Platform.Cockpit.*` **minus** rule eval and event schema |
 | `AIGuiders.Platform.Execution.Emit.*` | Roslyn `*.g.cs` from Modeling IR | platform emit tools |
 | `AIGuiders.Platform.Execution.MCPlane` | agent envelope | `Platform.MCPlane` |
 | `AIGuiders.Platform.Execution.Routing` | intent route/execute seam | `Platform.Routing` |
@@ -144,7 +147,9 @@ Flat `AIGuiders.Platform.Authoring.*`, `Platform.IntermediateRepresentation.*`, 
 |----------|------|------------------|
 | Declare IR (GDL) | `Platform.Modeling.Gdl.*` | PackageReference; optional `[<CLIMutable>]` on hot records |
 | Wire IR (Notations) | `Platform.Modeling.Notations.*` | same |
-| Cockpit eval | `Platform.Modeling.Cockpit.Rules` | `evaluate()` call from DataBus adapter |
+| Cockpit eval | `Platform.Modeling.Cockpit.Rules` | `evaluate()` call from fold adapter |
+| DataBus schema + wiring | `Platform.Modeling.Cockpit.DataBus` | event types, policy, projection graph; optional `[<CLIMutable>]` |
+| DataBus runtime | `Platform.Execution.Cockpit.DataBus` | `InMemoryDataBus`, thread marshaling |
 | Runtime-only views | `*.g.cs` emit | generated snapshots where WPF/registry need it |
 
 ### 7. NuGet identity migration
@@ -158,6 +163,7 @@ Flat `AIGuiders.Platform.Authoring.*`, `Platform.IntermediateRepresentation.*`, 
 | `AIGuiders.Platform.Notations.*` | `AIGuiders.Platform.Modeling.Notations.*` |
 | `AIGuiders.Platform.CommandPlane.*` | `AIGuiders.Platform.Execution.CommandPlane.*` |
 | `AIGuiders.Platform.Cockpit.*` (runtime) | `AIGuiders.Platform.Execution.Cockpit.*` |
+| `AIGuiders.Platform.Cockpit.DataBus` (events + policy) | `AIGuiders.Platform.Modeling.Cockpit.DataBus` (F#) + `Execution.Cockpit.DataBus` (runtime) |
 | proposed `Platform.Cockpit.Rules` | `AIGuiders.Platform.Modeling.Cockpit.Rules` (F#) |
 
 **Default path:** flat `Platform.*` at **0.31.x** stops receiving releases; new IDs from **1.0** (or next wave). Federation repos update refs in one window. NuGet deprecation/unlist **optional** — downloads are mostly CI restore ([§ nuget reality](https://github.com/NuGet/Home/issues/931)), external adopters negligible.
@@ -319,10 +325,13 @@ Default **F#** when the module is predominantly:
 
 Default **C# Execution** when the module is predominantly:
 
-- DataBus / async IO / DAL probes
+- `Publish` / `Subscribe` dispatch, locks, `Channel<T>`, UI thread post
+- async IO / DAL probes
 - WPF / Avalonia / Skia host and bindings
 - Roslyn emit, registry singletons, DI composition root
 - MCP tool surface and process boundaries
+
+**DataBus split (normative):** event **shapes**, burst/reliable **policy**, subsystem→event→CCU→channel **wiring graph**, and event→fact projection for `.cockpit.logic` = **Modeling (F#)**. `InMemoryDataBus` and host adapters = **Execution (C#)** — thin shell around the schema.
 
 **No second IR in C#** — Execution MAY hold `[<CLIMutable>]` views or thin DTO mappers at the seam; MUST NOT fork shapes.
 
@@ -338,6 +347,37 @@ Phase D            Platform.Execution.* for runtime; absorb IR.*; abandon flat P
 Phase E            LSP / toolchain globs: Platform.Modeling.* + Platform.Execution.*
 ```
 
+### 15. DataBus — schema and wiring graph (Modeling), runtime (Execution)
+
+[CIDE 0099](https://github.com/AI-Guiders/cascade-ide/blob/main/docs/en/adr/0099-ide-databus-typed-events-and-projections.md) already separates **typed domain events** from transport (0094) and CCU convolution (0097). Today `Platform.Cockpit.DataBus` mixes both: event records + policy live beside `InMemoryDataBus`. **Normative split:**
+
+```text
+Platform.Modeling.Cockpit.DataBus (F#)
+  ├── EventCatalog          BuildStateChanged, GitStateChanged, …
+  ├── DispatchPolicy        burst vs reliable per event id
+  ├── StratumTag            workspace / solution / IDE (ADR 0095)
+  ├── ProjectionGraph       event → fold step → channel DTO field
+  └── FactBinding           event/snapshot slot ↔ cockpit.logic fact id
+
+Platform.Execution.Cockpit.DataBus (C#)
+  ├── IDataBus              Publish / Subscribe contract (thin)
+  ├── InMemoryDataBus       sync + async dispatch, bounded channels
+  └── HostAdapter           UI-thread post, product composition root
+```
+
+| Today (mixed C#) | Modeling (F#) | Execution (C#) |
+|------------------|---------------|----------------|
+| `BuildStateChanged`, `GitStateChanged`, … | `EventCatalog` DU / records | publish payload as-is |
+| `DataBusEventPolicy.Default` | `DispatchPolicy` table | read policy at route creation |
+| implicit VM wiring | `ProjectionGraph` edges | subscribe handlers from graph emit |
+| `InMemoryDataBus` | — | sole owner |
+
+**Why F#:** the bus is a **typed graph** — nodes = events/facts/snapshots; edges = `publishes`, `subscribes`, `foldsTo`, `projectsTo`. Exhaustive validation (“every channel input has a source event or fact”) is algebra, not runtime.
+
+**Execution stays thin:** no event taxonomy in C#; no duplicate policy tables. Generated or hand-written adapter: `ProjectionGraph` → `Subscribe<T>` registrations + CCU fold order.
+
+**Link to Circuit (§10):** `feeds` (subsystem → channel) terminates on **event catalog ids**; `foldsTo` (channel → CCU step) is the projection subgraph inside `Modeling.Cockpit.DataBus`.
+
 ## Consequences
 
 - Layer visible in package name **and** under `Platform` glob — publish scripts, CPM, docs need one new segment, not a new root.
@@ -345,11 +385,12 @@ Phase E            LSP / toolchain globs: Platform.Modeling.* + Platform.Executi
 - `AIGuiders.Cdp.*`, `AgentNotes.*`, MCP packages unaffected.
 - Graph-backed instruments (Semantic Map, trace-flow, GitMap) get a **single Modeling spine** instead of per-product graph types.
 - Cockpit channel/subsystem wiring becomes **testable IR** instead of implicit product registries.
+- DataBus event taxonomy and projection wiring become **declarative F# graph**; C# host is dispatch only.
 
 ## Non-goals
 
 - Top-level `AIGuiders.Modeling.*` (rejected — breaks Platform glob family)
 - Rewriting CommandPlane **execution engine** in F# (registry, execute, IO)
-- Rewriting DataBus / WPF / Skia **hosts** in F#
+- Rewriting DataBus **runtime** (`InMemoryDataBus`, threading) in F#
 - Single unified AST across GDL + Notations + Graph (separate spines; shared Expression only)
 - TS/Kotlin native Notations ports (per [0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md))
