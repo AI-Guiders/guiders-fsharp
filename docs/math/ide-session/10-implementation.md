@@ -24,7 +24,8 @@
 | \( \Sigma_\pi \), `refine` | **ещё нет** → port `CompilerServices` / semantic substrate (Phase 2) |
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
-| \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
+| \( \mathsf{Refactor} \), \( \oplus \) | `RefactorPlan`, `SessionPatch`, `FileSystemPatch`, `GraphStructurePatch` |
+| \( \mathsf{scope}(\Delta) \) | `SessionPatch.scope` |
 | RF1–RF8, ST1–ST5, LD1–LD6 | `HoareChecker`, `StyleConformance`, `Conformance` (GS1–GS5); ledger **ещё нет** |
 | \( \Lambda \), Timeline | **ещё нет** → `RevisionLedger`, `GitPin`, `CodeHistoryTimeline` (Phase 2–3) |
 

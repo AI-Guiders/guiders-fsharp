@@ -13,6 +13,7 @@ type TypecheckRequirement =
 
 type ObsPredicate =
     | RenamePreserves of oldName: string * newName: string
+    | TypeMoved of typeName: string * sourcePath: string * targetPath: string
 
 type ObsRequirement =
     | ObsMustPreserve of ObsPredicate list
@@ -35,6 +36,10 @@ module HoarePostcondition =
     let refactorRename oldName newName =
         { Types = TypesRequired
           Obs = ObsMustPreserve [ RenamePreserves(oldName, newName) ] }
+
+    let refactorMoveType typeName sourcePath targetPath =
+        { Types = TypesRequired
+          Obs = ObsMustPreserve [ TypeMoved(typeName, sourcePath, targetPath) ] }
 
     let styleProven =
         { Types = TypesRequired
@@ -69,6 +74,25 @@ module ObsChecker =
         else
             Violated(violations |> Seq.toList)
 
+    let private typeDeclarationMarker (typeName: string) = $"type {typeName}"
+
+    let private checkTypeMoved (typeName: string) (sourcePath: string) (targetPath: string) (contents: Map<string, string>) =
+        let marker = typeDeclarationMarker typeName
+        let violations = ResizeArray()
+
+        match Map.tryFind sourcePath contents with
+        | Some text when text.Contains marker ->
+            violations.Add($"TypeMoved: '{marker}' still present in source '{sourcePath}'.")
+        | _ -> ()
+
+        match Map.tryFind targetPath contents with
+        | None -> violations.Add($"TypeMoved: target '{targetPath}' missing from contents.")
+        | Some text when not (text.Contains marker) ->
+            violations.Add($"TypeMoved: '{marker}' not found in target '{targetPath}'.")
+        | _ -> ()
+
+        if violations.Count = 0 then Satisfied else Violated(violations |> Seq.toList)
+
     let check (requirement: ObsRequirement) (contents: Map<string, string>) =
         match requirement with
         | ObsIgnored -> Satisfied
@@ -78,6 +102,10 @@ module ObsChecker =
                 |> List.collect (function
                     | RenamePreserves(old, newName) ->
                         match checkRename old newName contents with
+                        | Satisfied -> []
+                        | Violated vs -> vs
+                    | TypeMoved(typeName, sourcePath, targetPath) ->
+                        match checkTypeMoved typeName sourcePath targetPath contents with
                         | Satisfied -> []
                         | Violated vs -> vs)
 

@@ -30,6 +30,34 @@ module GoldenSessions =
 
         GoldenSession.create "rename-local-symbol" graph contents DesignTime
 
+    let moveTypeToFile =
+        let projectPath = @"D:\repo\src\App\App.fsproj"
+        let sourcePath = @"D:\repo\src\App\Module.fs"
+        let targetPath = @"D:\repo\src\App\Foo.fs"
+        let id = ProjectId.create projectPath
+
+        let project =
+            ProjectNode.create
+                id
+                (DotNet { Language = FSharp })
+                projectPath
+                (CapabilityCatalog.defaultDotNet ())
+
+        let graph =
+            SolutionGraph.create
+                @"D:\repo\App.slnx"
+                [ project ]
+                (Map.ofList [ sourcePath, id ])
+                []
+                []
+
+        let contents =
+            Map.ofList
+                [ sourcePath,
+                  "module App\n\ntype Foo = { X: int }\n\nlet useFoo () = Foo { X = 1 }\n" ]
+
+        GoldenSession.create "move-type-to-file" graph contents DesignTime
+
 type ConformanceGoldenSessionTests() =
 
     [<Fact>]
@@ -65,6 +93,42 @@ type ConformanceGoldenSessionTests() =
         match result with
         | Violated vs -> Assert.Contains(vs, fun v -> v.Contains("typecheck"))
         | Satisfied -> Assert.Fail("Expected Q_types violation when typecheck not run.")
+
+    [<Fact>]
+    member _.``Move type plan satisfies RF6 and updates omega``() =
+        let session = GoldenSessions.moveTypeToFile
+        let sourcePath = @"D:\repo\src\App\Module.fs"
+        let targetPath = @"D:\repo\src\App\Foo.fs"
+        let owner = ProjectId.create @"D:\repo\src\App\App.fsproj"
+
+        let result =
+            Conformance.runMoveTypeGolden
+                session
+                { TypeName = "Foo"
+                  SourcePath = sourcePath
+                  TargetPath = targetPath
+                  Owner = owner
+                  UpdatedSourceContents = "module App\n\nlet useFoo () = Foo { X = 1 }\n"
+                  ExtractedContents = "module App\n\ntype Foo = { X: int }\n" }
+                Passed
+
+        match result with
+        | Satisfied ->
+            let patch =
+                RefactorPlan.planMoveTypeToFile
+                    { TypeName = "Foo"
+                      SourcePath = sourcePath
+                      TargetPath = targetPath
+                      Owner = owner
+                      UpdatedSourceContents = "module App\n\nlet useFoo () = Foo { X = 1 }\n"
+                      ExtractedContents = "module App\n\ntype Foo = { X: int }\n" }
+
+            let graph', _ = SessionPatch.apply session.Graph session.Contents patch
+            Assert.True(Map.containsKey targetPath graph'.FileOwnership)
+
+            let validation = GraphValidation.validate graph'
+            Assert.True(validation.IsValid, validation.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
+        | Violated vs -> Assert.Fail(String.concat "; " vs)
 
     [<Fact>]
     member _.``Vendor style without typecheck is rejected for auto-apply``() =

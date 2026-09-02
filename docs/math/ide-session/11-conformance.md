@@ -16,6 +16,7 @@
 | \( \mathsf{Sat}(P,G,Q) \) | `HoareChecker.sat*` / `refactorPreserves` |
 | \( \Delta = (\Delta_{\mathsf{fs}}, \Delta_G) \) | `SessionPatch` + `GraphPatch` |
 | \( \mathsf{plan}_{\mathsf{rename}} \) | `RefactorPlan.planRename` |
+| \( \mathsf{plan}_{\mathsf{move}} \) | `RefactorPlan.planMoveTypeToFile` / `planMovePath` |
 | ST3 / ST5 style gate | `StyleConformance.evaluateAutoApply` |
 | Golden fixture | `GoldenSession` + `tests/.../GoldenSessions` |
 
@@ -30,6 +31,7 @@
 | **GS3** | vendor style output, typecheck `NotRun` | `StyleApplyDecision.Rejected` (ST5) |
 | **GS4** | vendor + `Passed` | `PreviewOnly` (ST3 — не default commit path) |
 | **GS5** | proven + `Passed` | `AutoApplyAllowed` |
+| **GS6** | `plan(move type → file)` | `Conformance.runMoveTypeGolden` → `Satisfied`; \( \omega \) + `validate(G')` |
 
 ### 11.3 Расширение (Phase 2+)
 

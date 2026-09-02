@@ -79,6 +79,39 @@ Solution ── Project CRUD     (slnx graph, membership)
 
 Оркестратор сессии знает **только** \( \mathsf{scope} \); \( \mathsf{refine} \) — зона ответственности порта \( \mathsf{CompilerServices} \) (Roslyn/FCS incremental).
 
+#### 5.2b File-as-graph (unification)
+
+**Файл — не «внешний blob», а подграф**, сериализованный в текст:
+
+\[
+f \in \mathrm{paths}(\pi) \quad\Rightarrow\quad
+\Sigma_\pi \supseteq (N_{\mathsf{syn}}(f),\ N_{\mathsf{sem}}(f),\ E_{\mathsf{dep}}|_f)
+\]
+
+| View | Носитель |
+|------|----------|
+| Текст @ path | сериализация \( N_{\mathsf{syn}}(f) \) (+ spans как атрибуты) |
+| Buffer / editor | live projection на тот же подграф |
+| \( \omega(f) = \pi \) | ownership на уровне solution graph \( G \) |
+
+**Refactor / Move / Rename** — один морфизм \( G \to G' \) (§2.10):
+
+\[
+\mathsf{plan}(\theta,\ \varphi) \to \Delta = (\Delta_{\mathsf{fs}},\ \Delta_G)
+\qquad
+G' = G \oplus \Delta_G
+\]
+
+| Transform | \( \Delta_G \) | \( \mathsf{scope}(\Delta) \) |
+|-----------|----------------|------------------------------|
+| rename (symbol/local) | \( \emptyset \) | `FileChange` |
+| move type → new file | \( \omega \) update | `ProjectFileCrud` |
+| move/rename path | \( \omega \) transfer | `ProjectFileCrud` |
+
+Проверяемость **по необходимости**: `validate(G')` всегда; Hoare \( Q_{\mathsf{obs}} \) / \( Q_{\mathsf{types}} \) — для класса \( \Theta_{\mathsf{ref}} \) (RF6), не для каждого vendor apply.
+
+Код: `RefactorPlan`, `SessionPatch.scope`, `SessionPatch.apply` — единый pipeline preview → apply → invalidate.
+
 **Уровни refinement** (от мелкого к крупному внутри FileChange):
 
 | Level | Событие | \( \mathsf{refine}(\delta) \) |

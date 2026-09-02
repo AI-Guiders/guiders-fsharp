@@ -38,37 +38,14 @@ module GoldenSession =
           Contents = contents
           Phase = phase }
 
-module RefactorPlan =
-    type RenameSymbol =
-        { OldName: string
-          NewName: string
-          Files: string list }
-
-    let planRename (contents: Map<string, string>) (spec: RenameSymbol) : SessionPatch =
-        let replacements =
-            spec.Files
-            |> List.choose (fun path ->
-                match Map.tryFind path contents with
-                | None -> None
-                | Some text when text.Contains spec.OldName ->
-                    Some
-                        { Path = path
-                          Old = spec.OldName
-                          New = spec.NewName }
-                | Some _ -> None)
-
-        { FileSystem = { Replacements = replacements; PathRenames = [] }
-          Graph = GraphStructurePatch.empty }
-
 module Conformance =
-    let runRenameGolden
+    let private runRefactorGolden
         (session: GoldenSession)
-        (spec: RefactorPlan.RenameSymbol)
+        (patch: SessionPatch)
+        (post: HoarePostcondition)
         (typecheckAfter: TypecheckVerdict)
         =
         let pre = HoarePrecondition.refactorDefault
-        let post = HoarePostcondition.refactorRename spec.OldName spec.NewName
-        let patch = RefactorPlan.planRename session.Contents spec
 
         HoareChecker.refactorPreserves
             pre
@@ -78,3 +55,24 @@ module Conformance =
             post
             patch
             typecheckAfter
+
+    let runRenameGolden
+        (session: GoldenSession)
+        (spec: RefactorPlan.RenameSymbol)
+        (typecheckAfter: TypecheckVerdict)
+        =
+        let patch = RefactorPlan.planRename session.Contents spec
+        let post = HoarePostcondition.refactorRename spec.OldName spec.NewName
+        runRefactorGolden session patch post typecheckAfter
+
+    let runMoveTypeGolden
+        (session: GoldenSession)
+        (spec: RefactorPlan.MoveTypeToFile)
+        (typecheckAfter: TypecheckVerdict)
+        =
+        let patch = RefactorPlan.planMoveTypeToFile spec
+
+        let post =
+            HoarePostcondition.refactorMoveType spec.TypeName spec.SourcePath spec.TargetPath
+
+        runRefactorGolden session patch post typecheckAfter
