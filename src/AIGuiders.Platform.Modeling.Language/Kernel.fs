@@ -64,6 +64,25 @@ type CompletionsResult = { Items: LanguageCompletion[] }
 type FindUsagesResult = { References: LanguageReference[] }
 
 [<CLIMutable>]
+type SymbolAtPositionResult =
+    { Kind: string
+      Name: string
+      QualifiedName: string
+      Span: SourceSpan }
+
+[<CLIMutable>]
+type RenameFileChange = { Path: string; NewText: string }
+
+[<CLIMutable>]
+type RenameSymbolResult =
+    { OldName: string
+      NewName: string
+      SymbolKind: string
+      Applied: bool
+      Files: string[]
+      Changes: RenameFileChange[] }
+
+[<CLIMutable>]
 type LanguageRequest =
     { FilePath: string
       Line: int

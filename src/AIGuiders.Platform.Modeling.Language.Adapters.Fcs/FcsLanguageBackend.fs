@@ -6,6 +6,8 @@ open System.Threading
 open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Diagnostics
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
 open AIGuiders.Platform.Modeling.Language
@@ -170,6 +172,139 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
 
         collected.ToArray()
 
+    let symbolKind (symbol: FSharpSymbol) =
+        match symbol with
+        | :? FSharpEntity -> "type"
+        | :? FSharpMemberOrFunctionOrValue as m when m.IsProperty -> "property"
+        | :? FSharpMemberOrFunctionOrValue as m when m.IsModuleValueOrMember -> "value"
+        | :? FSharpMemberOrFunctionOrValue as m when m.IsConstructor -> "constructor"
+        | :? FSharpMemberOrFunctionOrValue -> "member"
+        | _ -> "symbol"
+
+    let qualifiedName (symbol: FSharpSymbol) =
+        let name = symbol.FullName
+        if String.IsNullOrWhiteSpace name then symbol.DisplayName else name
+
+    let trySymbolUseAt (path: string) (checkResults: FSharpCheckFileResults) (line: int) (column: int) (source: string) =
+        let lineStr = getLineText source line
+
+        match tryExtractIdentifier lineStr column with
+        | None -> None
+        | Some (name, colAtEnd) ->
+            checkResults.GetSymbolUseAtLocation(line, colAtEnd, lineStr, [ name ])
+
+    let definitionSpan (path: string) (symbolUse: FSharpSymbolUse) =
+        let declOpt =
+            symbolUse.Symbol.DeclarationLocation
+            |> Option.orElse symbolUse.Symbol.SignatureLocation
+
+        match declOpt with
+        | Some decl when not (String.IsNullOrWhiteSpace decl.FileName) || decl.StartLine > 0 ->
+            let declPath =
+                if String.IsNullOrWhiteSpace decl.FileName then
+                    path
+                else
+                    decl.FileName
+
+            toSpan declPath decl
+        | _ -> toSpan path symbolUse.Range
+
+    let referenceFromUse (path: string) (target: SourceSpan) (symbolUse: FSharpSymbolUse) =
+        let usePath =
+            if String.IsNullOrWhiteSpace symbolUse.FileName then
+                path
+            else
+                symbolUse.FileName
+
+        { Span = toSpan usePath symbolUse.Range
+          Target = target
+          Kind = "reference" }
+
+    let readFileText (path: string) (preferredSource: string) =
+        if not (String.IsNullOrWhiteSpace preferredSource) then
+            preferredSource
+        elif File.Exists path then
+            File.ReadAllText path
+        else
+            ""
+
+    let replaceRangeInSource (source: string) (range: range) (replacement: string) =
+        let normalized = source.Replace("\r\n", "\n")
+        let lines = normalized.Split('\n')
+        let lineIdx = range.StartLine - 1
+
+        if lineIdx < 0 || lineIdx >= lines.Length then
+            source
+        else
+            let line = lines.[lineIdx]
+            let startCol = max 0 range.StartColumn
+            let length = max 0 (range.EndColumn - range.StartColumn + 1)
+            let endExclusive = min line.Length (startCol + length)
+
+            let newLine =
+                if startCol >= line.Length then
+                    line + replacement
+                else
+                    line.Substring(0, startCol) + replacement + line.Substring(endExclusive)
+
+            lines.[lineIdx] <- newLine
+            String.Join(Environment.NewLine, lines)
+
+    let completionKind glyph =
+        match glyph with
+        | FSharpGlyph.Class
+        | FSharpGlyph.Struct
+        | FSharpGlyph.Interface
+        | FSharpGlyph.Enum
+        | FSharpGlyph.EnumMember
+        | FSharpGlyph.Delegate
+        | FSharpGlyph.Typedef -> "type"
+        | FSharpGlyph.Method
+        | FSharpGlyph.OverridenMethod -> "method"
+        | FSharpGlyph.Property -> "property"
+        | FSharpGlyph.Field -> "field"
+        | FSharpGlyph.Event -> "event"
+        | FSharpGlyph.NameSpace -> "namespace"
+        | FSharpGlyph.Variable -> "variable"
+        | FSharpGlyph.Constant -> "constant"
+        | FSharpGlyph.Union -> "union"
+        | FSharpGlyph.ExtensionMethod -> "extension"
+        | _ -> "text"
+
+    let emptyRename newName =
+        { OldName = ""
+          NewName = newName
+          SymbolKind = ""
+          Applied = false
+          Files = [||]
+          Changes = [||] }
+
+    let loadProjectContext (path: string) (source: string) (sourceText: ISourceText) (req: LanguageRequest) =
+        task {
+            let ext = Path.GetExtension(path)
+
+            if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+                let! projectOptions, _scriptDiags =
+                    checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
+
+                let! projectResults = checker.ParseAndCheckProject(projectOptions)
+                let! parseResults, checkAnswer = checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                return Some(projectOptions, projectResults, parseResults, checkAnswer)
+            else
+                match
+                    FcsProjectResolver.resolveFsproj path req.SolutionOrProjectPath
+                    |> Option.bind (fun fsproj ->
+                        match projectOptionsSource.TryLoad fsproj with
+                        | Result.Ok options -> Some options
+                        | Result.Error _ -> None)
+                with
+                | Some projectOptions ->
+                    let! projectResults = checker.ParseAndCheckProject(projectOptions)
+                    let! parseResults, checkAnswer = checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                    return Some(projectOptions, projectResults, parseResults, checkAnswer)
+                | None -> return None
+        }
+
     interface ILanguageBackend with
         member _.LanguageId = LanguageIds.Fsharp
 
@@ -297,3 +432,173 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                         | Some nav -> nav
                         | None -> Unchecked.defaultof<LanguageNavigation>
                 }
+
+        member _.FindUsagesAsync(req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<FindUsagesResult>(ct)
+            else
+                let path = req.FilePath
+                let source = readSource req
+                let sourceText = SourceText.ofString source
+
+                task {
+                    let! contextOpt = loadProjectContext path source sourceText req
+
+                    match contextOpt with
+                    | None -> return { References = [||] }
+                    | Some(_, projectResults, _, checkAnswer) ->
+                        match checkAnswer with
+                        | FSharpCheckFileAnswer.Aborted -> return { References = [||] }
+                        | FSharpCheckFileAnswer.Succeeded checkResults ->
+                            match trySymbolUseAt path checkResults req.Line req.Column source with
+                            | None -> return { References = [||] }
+                            | Some symbolUse ->
+                                let target = definitionSpan path symbolUse
+                                let references =
+                                    projectResults.GetUsesOfSymbol symbolUse.Symbol
+                                    |> Array.map (fun use' -> referenceFromUse path target use')
+
+                                return { References = references }
+                }
+
+        member _.GetCompletionsAsync(req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<CompletionsResult>(ct)
+            else
+                let path = req.FilePath
+                let source = readSource req
+                let sourceText = SourceText.ofString source
+
+                task {
+                    let! contextOpt = loadProjectContext path source sourceText req
+
+                    match contextOpt with
+                    | None -> return { Items = [||] }
+                    | Some(_, _, parseResults, checkAnswer) ->
+                        match checkAnswer with
+                        | FSharpCheckFileAnswer.Aborted -> return { Items = [||] }
+                        | FSharpCheckFileAnswer.Succeeded checkResults ->
+                            let lineStr = getLineText source req.Line
+                            let col0 = max 0 (req.Column - 1)
+                            let partialLongName = QuickParse.GetPartialLongNameEx(lineStr, col0)
+
+                            let decls =
+                                checkResults.GetDeclarationListInfo(
+                                    Some parseResults,
+                                    req.Line,
+                                    lineStr,
+                                    partialLongName,
+                                    (fun () -> []))
+
+                            let items =
+                                decls.Items
+                                |> Array.map (fun item ->
+                                    { Label = item.NameInList
+                                      Kind = completionKind item.Glyph
+                                      Detail = ""
+                                      InsertText = item.NameInList })
+
+                            return { Items = items }
+                }
+
+        member _.GetSymbolAtPositionAsync(req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<SymbolAtPositionResult>(ct)
+            else
+                let path = req.FilePath
+                let source = readSource req
+                let sourceText = SourceText.ofString source
+
+                task {
+                    let! contextOpt = loadProjectContext path source sourceText req
+
+                    match contextOpt with
+                    | None -> return Unchecked.defaultof<SymbolAtPositionResult>
+                    | Some(_, _, _, checkAnswer) ->
+                        match checkAnswer with
+                        | FSharpCheckFileAnswer.Aborted -> return Unchecked.defaultof<SymbolAtPositionResult>
+                        | FSharpCheckFileAnswer.Succeeded checkResults ->
+                            match trySymbolUseAt path checkResults req.Line req.Column source with
+                            | None -> return Unchecked.defaultof<SymbolAtPositionResult>
+                            | Some symbolUse ->
+                                let span = toSpan path symbolUse.Range
+
+                                return
+                                    { Kind = symbolKind symbolUse.Symbol
+                                      Name = symbolUse.Symbol.DisplayName
+                                      QualifiedName = qualifiedName symbolUse.Symbol
+                                      Span = span }
+                }
+
+        member _.RenameSymbolAsync(renameReq, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<RenameSymbolResult>(ct)
+            else
+                let req = renameReq.Request
+                let newName = renameReq.NewName
+                let apply = renameReq.Apply
+
+                if String.IsNullOrWhiteSpace newName then
+                    Task.FromResult(emptyRename newName)
+                else
+                    let path = req.FilePath
+                    let source = readSource req
+                    let sourceText = SourceText.ofString source
+
+                    task {
+                        let! contextOpt = loadProjectContext path source sourceText req
+
+                        match contextOpt with
+                        | None -> return emptyRename newName
+                        | Some(_, projectResults, _, checkAnswer) ->
+                            match checkAnswer with
+                            | FSharpCheckFileAnswer.Aborted -> return emptyRename newName
+                            | FSharpCheckFileAnswer.Succeeded checkResults ->
+                                match trySymbolUseAt path checkResults req.Line req.Column source with
+                                | None -> return emptyRename newName
+                                | Some symbolUse ->
+                                    let oldName = symbolUse.Symbol.DisplayName
+                                    let kind = symbolKind symbolUse.Symbol
+
+                                    let uses =
+                                        projectResults.GetUsesOfSymbol symbolUse.Symbol
+                                        |> Array.distinctBy (fun use' -> use'.Range, use'.FileName)
+
+                                    let grouped =
+                                        uses
+                                        |> Array.groupBy (fun use' ->
+                                            if String.IsNullOrWhiteSpace use'.FileName then
+                                                path
+                                            else
+                                                use'.FileName)
+
+                                    let mutable changes = ResizeArray<RenameFileChange>()
+
+                                    for filePath, fileUses in grouped do
+                                        let fileSource =
+                                            if String.Equals(filePath, path, StringComparison.OrdinalIgnoreCase) then
+                                                source
+                                            else
+                                                readFileText filePath ""
+
+                                        let mutable updated = fileSource
+
+                                        for use' in fileUses |> Array.sortByDescending (fun u -> u.Range.StartLine, u.Range.StartColumn) do
+                                            updated <- replaceRangeInSource updated use'.Range newName
+
+                                        if not (String.Equals(updated, fileSource, StringComparison.Ordinal)) then
+                                            changes.Add({ Path = filePath; NewText = updated })
+
+                                            if apply then
+                                                File.WriteAllText(filePath, updated)
+
+                                    let filePaths = changes |> Seq.map (fun c -> c.Path) |> Array.ofSeq
+
+                                    return
+                                        { OldName = oldName
+                                          NewName = newName
+                                          SymbolKind = kind
+                                          Applied = apply
+                                          Files = filePaths
+                                          Changes = changes.ToArray() }
+                    }

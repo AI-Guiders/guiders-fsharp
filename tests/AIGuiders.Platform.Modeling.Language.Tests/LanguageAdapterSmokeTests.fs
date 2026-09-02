@@ -132,3 +132,144 @@ module LanguageAdapterSmokeTests =
         finally
             if System.IO.Directory.Exists root then
                 System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs find usages returns references for let binding`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-usages-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "UsageProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Usage.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Usage.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(
+            fs,
+            "module Usage\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+
+            let usages =
+                backend.FindUsagesAsync(req, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.True(usages.References.Length >= 2)
+            Assert.Contains(usages.References, fun r -> r.Span.Line = 3)
+            Assert.Contains(usages.References, fun r -> r.Span.Line = 5)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs get symbol at position resolves let binding`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-symbol-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "SymProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Sym.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Sym.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(fs, "module Sym\n\nlet answer = 42\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 3, 5, null, fsproj)
+
+            let symbol =
+                backend.GetSymbolAtPositionAsync(req, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.Equal("answer", symbol.Name)
+            Assert.Equal("value", symbol.Kind)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs get completions returns items in scope`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-complete-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "CompleteProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Complete.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Complete.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(fs, "module Complete\n\nlet answer = 42\n\nlet useIt () = ans\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+
+            let completions =
+                backend.GetCompletionsAsync(req, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.Contains(completions.Items, fun item -> item.Label = "answer")
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs rename preview plans text changes without apply`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-rename-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "RenameProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Rename.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Rename.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(
+            fs,
+            "module Rename\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+            let renameReq = RenameSymbolRequest(req, "renamed", false)
+
+            let result =
+                backend.RenameSymbolAsync(renameReq, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.Equal("answer", result.OldName)
+            Assert.Equal("renamed", result.NewName)
+            Assert.False(result.Applied)
+            Assert.NotEmpty(result.Changes)
+            Assert.Contains(result.Changes, fun c -> c.NewText.Contains("renamed"))
+            Assert.Equal(System.IO.File.ReadAllText(fs), System.IO.File.ReadAllText(fs))
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)

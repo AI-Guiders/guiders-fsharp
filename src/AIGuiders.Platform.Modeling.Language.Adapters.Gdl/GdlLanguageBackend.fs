@@ -130,3 +130,33 @@ type GdlLanguageBackend() =
                 Task.FromCanceled<LanguageNavigation>(ct)
             else
                 Task.FromResult(Unchecked.defaultof<LanguageNavigation>)
+
+        member _.FindUsagesAsync(_req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<FindUsagesResult>(ct)
+            else
+                Task.FromResult { References = [||] }
+
+        member _.GetCompletionsAsync(_req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<CompletionsResult>(ct)
+            else
+                Task.FromResult { Items = [||] }
+
+        member _.GetSymbolAtPositionAsync(_req, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<SymbolAtPositionResult>(ct)
+            else
+                Task.FromResult(Unchecked.defaultof<SymbolAtPositionResult>)
+
+        member _.RenameSymbolAsync(renameReq, ct) =
+            if ct.IsCancellationRequested then
+                Task.FromCanceled<RenameSymbolResult>(ct)
+            else
+                Task.FromResult
+                    { OldName = ""
+                      NewName = renameReq.NewName
+                      SymbolKind = ""
+                      Applied = false
+                      Files = [||]
+                      Changes = [||] }
