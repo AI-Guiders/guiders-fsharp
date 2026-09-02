@@ -56,7 +56,7 @@ end prose
 
 `verified_by` edges connect `facts:` rows to golden sessions in `Modeling.Ide.Session` (first backend). MdLinker / Correspondence.Resolve treat broken `normates` / `verified_by` like broken bracket anchors.
 
-### 4. GGL / `.ggpl`
+### 4. GGL / `.ggl`
 
 ```text
 module Session based on adr:GUIDERS-FSHARP-ADR-0004 { ... }
