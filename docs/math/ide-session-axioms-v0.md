@@ -57,10 +57,10 @@
 Фиксированное конечное множество \( \mathbb{K} \) (расширяемое версией схемы):
 
 \[
-\mathbb{K} = \{ \mathsf{CompilerServices},\ \mathsf{StaticAnalysis},\ \mathsf{Build},\ \mathsf{TestDiscovery},\ \mathsf{TestRun},\ \mathsf{CodeTransform},\ \mathsf{LspBridge} \}
+\mathbb{K} = \{ \mathsf{CompilerServices},\ \mathsf{StaticAnalysis},\ \mathsf{Build},\ \mathsf{TestDiscovery},\ \mathsf{TestRun},\ \mathsf{CodeTransform},\ \mathsf{CodeStyle},\ \mathsf{LspBridge} \}
 \]
 
-\( \mathsf{CodeTransform} \) — рефакторинги, code fixes, codegen, rename solution-wide: **тот же** on-demand паттерн, что Build/Test (§7).
+\( \mathsf{CodeTransform} \) — рефакторинги, fixes, codegen (классы \( \Theta \) — §2.10). \( \mathsf{CodeStyle} \) — EditorConfig / naming / formatting как **операции над тем же** \( G \) (§2.11). Оба — on-demand §7.
 
 ### 1.4 Виды project
 
@@ -266,6 +266,7 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 | \( \mathsf{Build} \) | артефакты (dll, js bundle, …) | опционально feed; **не** трогает sources |
 | \( \mathsf{TestRun} \) | test report | нет |
 | \( \mathsf{CodeTransform} \) | **patch** \( \Delta_{\mathsf{fs}} \) (edits + optional renames) | `apply(\Delta)` → scope §5.2 |
+| \( \mathsf{CodeStyle} \) | **patch** \( \Delta_{\mathsf{fs}} \) (format / style) | `apply(\Delta)` → \( \mathsf{FileChange} \); semantic path → Hoare §2.11 |
 | \( \mathsf{StaticAnalysis} \) (heavy) | report / diagnostics snapshot | нет (или merge в per-file cache) |
 
 **Preview:** \( \mathsf{job}(\mathsf{CodeTransform}, \ldots) \) с флагом `dryRun` — чистая функция на \( \varphi \), без `apply`.
@@ -391,7 +392,22 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 | \( Q_{\mathsf{obs}} \) | \( \mathsf{obs}(G') = \mathsf{obs}(G) \) — **behavior preservation** (rename, extract, …) |
 | \( Q_{\mathsf{tests}} \) | опционально: test report green (дорого; LUT / CI) |
 
-**Code fix** (не refactor): может **намеренно** менять \( Q_{\mathsf{obs}} \) (bugfix); тогда отдельный класс \( \theta \) с ослабленным \( Q \).
+#### Классы \( \Theta \) (не путать)
+
+\[
+\Theta = \Theta_{\mathsf{ref}} \uplus \Theta_{\mathsf{fix}} \uplus \Theta_{\mathsf{style}} \uplus \Theta_{\mathsf{cfg}}
+\]
+
+| Класс | Зачем | Hoare \( Q \) (default) | \( Q_{\mathsf{obs}} \) |
+|-------|-------|--------------------------|-------------------------|
+| \( \Theta_{\mathsf{ref}} \) **Refactor** | структура / читаемость | \( Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}} \) | **сохраняем** |
+| \( \Theta_{\mathsf{fix}} \) **Fix** | закрыть diagnostic / bug | \( Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{diag}} \) | **может меняться** — это не refactor |
+| \( \Theta_{\mathsf{style}} \) **CodeStyle** | формат / naming / style rules | см. §2.11 | обычно сохраняем; не обязано |
+| \( \Theta_{\mathsf{cfg}} \) **Config** | `.editorconfig`, analyzer props, rule sets | \( Q_{\mathsf{wf}} \); меняется \( \psi \), не обязательно sources | n/a |
+
+**Fix** — отдельная операция: \( \theta.\mathsf{diagnosticId} \), цель \( Q_{\mathsf{diag}} \) («этот diagnostic исчез»), **не** ослабленный refactor.
+
+**Config** (EditorConfig и пр.) — операции над **policy-носителями** графа (\( \psi \), файлы правил в \( \omega \)), не над семантикой программы; compile **не гарантируют**.
 
 | ID | Формулировка |
 |----|----------------|
@@ -400,7 +416,48 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 | **RF3** | \( \mathsf{validate}(G') \) обязателен; WF1–WF8 после \( \oplus \) |
 | **RF4** | \( \Delta_G = \emptyset \) — норма; promotion \( \mathsf{scope} \) по \( \Delta \), не по имени transform |
 | **RF5** | Semantic work на \( \varphi \), не на dirty live (v0 default); sniper scope из \( \theta.\mathsf{anchor} \) (§7.4) |
-| **RF6** | **Hoare:** \( \mathsf{Sat}(P,G,Q) \Rightarrow \mathsf{Sat}(P,G',Q) \) после \( \mathsf{apply}(\mathsf{plan}) \); preview обязан **отклонить** \( \Delta \), если checker не может установить сохранение \( Q \) |
+| **RF6** | **Hoare (Refactor):** для \( \theta \in \Theta_{\mathsf{ref}} \): \( \mathsf{Sat}(P,G,Q) \Rightarrow \mathsf{Sat}(P,G',Q) \); preview **отклоняет** \( \Delta \), если \( Q \) не установим |
+| **RF7** | **Hoare (Fix):** \( Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{diag}} \); \( Q_{\mathsf{obs}} \) **не** требуется |
+| **RF8** | **Hoare (Style):** semantic path (§2.11) — может требовать \( Q_{\mathsf{types}} \); text-only path — без guarantee compile |
+
+### 2.11 Code Style & EditorConfig в графе
+
+**Ничего не мешает** держать style в том же \( G \), что и compile/refactor:
+
+| Носитель | Что |
+|----------|-----|
+| \( \omega(f) \) | `.editorconfig`, `GlobalAnalyzerConfig`, style rule files |
+| \( \psi(\pi) \), \( \psi(\mathsf{session}) \) | resolved effective style (merge иерархии каталогов) |
+| \( \kappa_\pi(\mathsf{CodeStyle}) \) | capability: format, organize usings, naming fix |
+| \( E_{\mathsf{gov}} \) | catalog / session → project style policy |
+
+**Операция** — тот же каркас §2.10:
+
+\[
+\mathsf{StyleApply}(G, \theta) = G'
+\qquad
+\mathsf{plan}_{\mathsf{style}}(\theta, \varphi) \to \Delta
+\]
+
+**Два пути** (критично для Hoare):
+
+| Path | Механизм | Гарантии |
+|------|----------|----------|
+| **text** | whitespace / regex / line-based | \( Q_{\mathsf{style}} \) только; **может** сломать \( Q_{\mathsf{types}} \) |
+| **semantic** | через \( \mathsf{CompilerServices} \) / syntax+semantic tree | можно требовать \( Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{style}} \); часто \( Q_{\mathsf{obs}} \) |
+
+\[
+Q_{\mathsf{style}} : \mathsf{rules}(G') \models \mathsf{EffectiveStyle}(G, \psi)
+\]
+
+**EditorConfig CRUD** (\( \Theta_{\mathsf{cfg}} \)): меняет правила и \( \psi \), не обязан трогать program sources; после apply — optional \( \mathsf{StyleApply} \) (on-demand).
+
+| ID | Формулировка |
+|----|----------------|
+| **ST1** | Effective style = merge по иерархии путей (как EditorConfig), результат в \( \psi \) или derived view — **не** отдельный конфиг в обход \( G \) |
+| **ST2** | Default format-on-save в IDE = \( \mathsf{FileChange} \) + refine; **explicit** format solution = \( \mathsf{job}(\mathsf{CodeStyle}, \ldots) \) |
+| **ST3** | Semantic style **предпочтителен** для guaranteed path; text-only — с явным warn в preview |
+| **ST4** | \( \mathsf{CodeStyle} \) \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) при semantic path (как CodeTransform) |
 
 ---
 
@@ -830,7 +887,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 | \( \mathsf{Refactor} \), \( \oplus \) | **ещё нет** → `RefactorPlan`, `GraphPatch`, `FileSystemPatch` (Phase 2) |
-| RF1–RF6 | **ещё нет** → orchestrator + `CodeTransform` port + `HoareChecker` |
+| RF1–RF8, ST1–ST4 | **ещё нет** → orchestrator + ports + `HoareChecker` |
 
 ---
 
@@ -859,7 +916,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6b. ~~Frozen Tree Composition~~ — §2.8b, §9.10 (shared analyzer, build closure).  
 6c. ~~Sub-file refinement (Σ_π, syntax/semantic nodes)~~ — §5.2a, I6–I8.  
 6d. ~~Sniper-scoped emit (semantic node → minimal U')~~ — §7.4, SN1–SN6.  
-6e. ~~Refactor as G → G' (plan/apply, Δ_fs + Δ_G)~~ — §2.10, RF1–RF5.  
+6e. ~~Refactor as G → G' (plan/apply, Δ_fs + Δ_G)~~ — §2.10, RF1–RF8, Θ classes.  
+6f. ~~Code Style & EditorConfig in G~~ — §2.11, ST1–ST4.  
 7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
