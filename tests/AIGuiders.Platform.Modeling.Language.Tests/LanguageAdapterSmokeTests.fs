@@ -59,3 +59,39 @@ module LanguageAdapterSmokeTests =
             |> Async.RunSynchronously
 
         Assert.Single(symbols.Root.Children, fun deck -> deck.Kind = "deck" && deck.Name = "dashspec-studio")
+
+    [<Fact>]
+    let ``Fcs reports semantic errors with fsproj context`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-sem-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "SemProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Sem.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Sem.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(fs, "module Sem\nlet x = totallyUnknownIdentifier\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 1, 1, null, null)
+
+            let result =
+                backend.GetDiagnosticsAsync(req, System.Threading.CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.NotEmpty(result.Diagnostics)
+
+            Assert.Contains(
+                result.Diagnostics,
+                fun d -> d.Severity = AIGuiders.Platform.Modeling.Language.Severity.Error)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)

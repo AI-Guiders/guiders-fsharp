@@ -35,6 +35,28 @@ type FcsLanguageBackend() =
         else
             ""
 
+    let toDiagnostic (path: string) (d: FSharpDiagnostic) =
+        { Id = d.Subcategory
+          Severity = toSeverity d.Severity
+          Message = d.Message
+          Span = toSpan path d.Range
+          Tags = [||]
+          Language = LanguageIds.Fsharp }
+
+    let collectCheckDiagnostics checkAnswer =
+        match checkAnswer with
+        | FSharpCheckFileAnswer.Succeeded results -> results.Diagnostics
+        | FSharpCheckFileAnswer.Aborted -> Array.empty
+
+    let getDiagnosticsFromParse (parseResults: FSharpParseFileResults) path =
+        parseResults.Diagnostics
+        |> Array.map (fun (d: FSharpDiagnostic) -> toDiagnostic path d)
+
+    let getDiagnosticsFromCheck parseResults checkAnswer path =
+        Array.append
+            (getDiagnosticsFromParse parseResults path)
+            (collectCheckDiagnostics checkAnswer |> Array.map (fun d -> toDiagnostic path d))
+
     let symbol name kind (path: string) range container =
         { Name = name
           Kind = kind
@@ -98,24 +120,39 @@ type FcsLanguageBackend() =
             else
                 let path = req.FilePath
                 let source = readSource req
-                let parseOptions =
-                    { FSharpParsingOptions.Default with
-                        SourceFiles = [| path |] }
+                let sourceText = SourceText.ofString source
 
                 task {
-                    let! parseResults = checker.ParseFile(path, SourceText.ofString source, parseOptions)
+                    let ext = Path.GetExtension(path)
 
-                    let diagnostics =
-                        parseResults.Diagnostics
-                        |> Array.map (fun (d: FSharpDiagnostic) ->
-                            { Id = d.Subcategory
-                              Severity = toSeverity d.Severity
-                              Message = d.Message
-                              Span = toSpan path d.Range
-                              Tags = [||]
-                              Language = LanguageIds.Fsharp })
+                    if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+                        let! projectOptions, _scriptDiags =
+                            checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
 
-                    return { Diagnostics = diagnostics }
+                        let! parseResults, checkAnswer =
+                            checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+
+                        let diagnostics = getDiagnosticsFromCheck parseResults checkAnswer path
+                        return { Diagnostics = diagnostics }
+                    else
+                        match
+                            FcsProjectResolver.resolveFsproj path req.SolutionOrProjectPath
+                            |> Option.bind FcsProjectOptionsCache.tryGet
+                        with
+                        | Some projectOptions ->
+                            let! parseResults, checkAnswer =
+                                checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+
+                            let diagnostics = getDiagnosticsFromCheck parseResults checkAnswer path
+                            return { Diagnostics = diagnostics }
+                        | None ->
+                            let parseOptions =
+                                { FSharpParsingOptions.Default with
+                                    SourceFiles = [| path |] }
+
+                            let! parseResults = checker.ParseFile(path, sourceText, parseOptions)
+                            let diagnostics = getDiagnosticsFromParse parseResults path
+                            return { Diagnostics = diagnostics }
                 }
 
         member _.GetDocumentSymbolsAsync(req, ct) =
