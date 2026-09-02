@@ -67,6 +67,69 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
           Container = container
           Children = [||] }
 
+    let getLineText (source: string) (line: int) =
+        let lines = source.Replace("\r\n", "\n").Split('\n')
+        let index = line - 1
+
+        if index >= 0 && index < lines.Length then
+            lines.[index]
+        else
+            ""
+
+    let isIdentChar (c: char) =
+        System.Char.IsLetterOrDigit c || c = '_' || c = '\''
+
+    let tryExtractIdentifier (line: string) (column: int) =
+        if String.IsNullOrEmpty line then
+            None
+        else
+            let col0 = min (max 0 (column - 1)) (line.Length - 1)
+
+            let mutable start = col0
+            let mutable end_ = col0
+
+            while start > 0 && isIdentChar line.[start - 1] do
+                start <- start - 1
+
+            while end_ < line.Length - 1 && isIdentChar line.[end_ + 1] do
+                end_ <- end_ + 1
+
+            if start <= end_ && isIdentChar line.[start] then
+                Some(line.Substring(start, end_ - start + 1), end_ + 1)
+            else
+                None
+
+    let tryNavigationFromCheck (path: string) (checkAnswer: FSharpCheckFileAnswer) (line: int) (column: int) (source: string) =
+        match checkAnswer with
+        | FSharpCheckFileAnswer.Succeeded checkResults ->
+            let lineStr = getLineText source line
+
+            match tryExtractIdentifier lineStr column with
+            | None -> None
+            | Some (name, colAtEnd) ->
+                match checkResults.GetSymbolUseAtLocation(line, colAtEnd, lineStr, [ name ]) with
+                | None -> None
+                | Some symbolUse ->
+                    let declOpt =
+                        symbolUse.Symbol.SignatureLocation
+                        |> Option.orElse symbolUse.Symbol.DeclarationLocation
+
+                    match declOpt with
+                    | None -> None
+                    | Some decl ->
+                        if String.IsNullOrWhiteSpace decl.FileName && decl.StartLine <= 0 then
+                            None
+                        else
+                            let declPath =
+                                if String.IsNullOrWhiteSpace decl.FileName then
+                                    path
+                                else
+                                    decl.FileName
+
+                            let span = toSpan declPath decl
+                            Some { Definition = span; Declarations = [| span |] }
+        | FSharpCheckFileAnswer.Aborted -> None
+
     let collectSymbols (path: string) (parseResults: FSharpParseFileResults) =
         let collected = ResizeArray<LanguageSymbol>()
 
@@ -190,8 +253,47 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                               Children = children } }
                 }
 
-        member _.GoToDefinitionAsync(_req, ct) =
+        member _.GoToDefinitionAsync(req, ct) =
             if ct.IsCancellationRequested then
                 Task.FromCanceled<LanguageNavigation>(ct)
             else
-                Task.FromResult(Unchecked.defaultof<LanguageNavigation>)
+                let path = req.FilePath
+                let source = readSource req
+                let sourceText = SourceText.ofString source
+
+                task {
+                    let ext = Path.GetExtension(path)
+
+                    let! navigation =
+                        if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+                            task {
+                                let! projectOptions, _scriptDiags =
+                                    checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
+
+                                let! _, checkAnswer =
+                                    checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+
+                                return tryNavigationFromCheck path checkAnswer req.Line req.Column source
+                            }
+                        else
+                            match
+                                FcsProjectResolver.resolveFsproj path req.SolutionOrProjectPath
+                                |> Option.bind (fun fsproj ->
+                                    match projectOptionsSource.TryLoad fsproj with
+                                    | Result.Ok options -> Some options
+                                    | Result.Error _ -> None)
+                            with
+                            | Some projectOptions ->
+                                task {
+                                    let! _, checkAnswer =
+                                        checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+
+                                    return tryNavigationFromCheck path checkAnswer req.Line req.Column source
+                                }
+                            | None -> Task.FromResult(None)
+
+                    return
+                        match navigation with
+                        | Some nav -> nav
+                        | None -> Unchecked.defaultof<LanguageNavigation>
+                }

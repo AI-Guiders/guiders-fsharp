@@ -95,3 +95,40 @@ module LanguageAdapterSmokeTests =
         finally
             if System.IO.Directory.Exists root then
                 System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs go to definition resolves let binding`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-goto-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "GotoProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Goto.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Goto.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(
+            fs,
+            "module Goto\n\nlet answer = 42\n\nlet useIt () = answer\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 5, 16, null, fsproj)
+
+            let nav =
+                backend.GoToDefinitionAsync(req, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.NotNull(nav)
+            Assert.Equal(fs, nav.Definition.Path)
+            Assert.Equal(3, nav.Definition.Line)
+            Assert.Contains(nav.Declarations, fun span -> span.Line = 3 && span.Path = fs)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
