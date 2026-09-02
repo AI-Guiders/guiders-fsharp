@@ -20,6 +20,8 @@ AIGuiders.Platform.Modeling.Ide.Session.Ports — parser traits (slnx, tsconfig,
 
 See [GUIDERS-ADR-0062](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0062-ide-solution-session-orchestrator.md) for full normative model.
 
+**Math (axioms):** [ide-session-axioms-v0.md](../math/ide-session-axioms-v0.md) — evolving formal layer; F# is notation.
+
 ## Consequence for this repo
 
 - New language = new `ProjectKind` + adapter — modeled here, not in CDP warm hooks.
