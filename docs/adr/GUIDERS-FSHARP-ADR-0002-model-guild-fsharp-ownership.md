@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Accepted (2026-09-02; `Platform.Modeling` / `Platform.Execution` prefix same day) |
 | **Tags** | #guiders #fsharp #gdl #notations #ir #modeling #execution #federation |
-| **Related** | [GUIDERS-FSHARP-ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) · [GUIDERS-ADR-0058](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0058-presentation-topology-ir.md) |
+| **Related** | [GUIDERS-FSHARP-ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0057](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0057-cockpit-logic-authoring-quarry.md) · [GUIDERS-ADR-0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) · [GUIDERS-ADR-0058](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0058-presentation-topology-ir.md) |
 
 ## Context
 
@@ -59,9 +59,9 @@ AIGuiders.Platform.*               umbrella (publish filters, docs — excludes 
 ```text
 guiders-fsharp                          guiders-platform
 ├── Platform.Modeling.Gdl.*             ├── Platform.Execution.CommandPlane.*
-└── Platform.Modeling.Notations.*       ├── Platform.Execution.Studio.*
-                                        ├── Platform.Execution.Cockpit.*
-                                        └── Platform.Execution.Emit.*
+├── Platform.Modeling.Notations.*       ├── Platform.Execution.Studio.*
+├── Platform.Modeling.Cockpit.Rules     ├── Platform.Execution.Cockpit.*  (DataBus, Transport, Channels only)
+└── …                                   └── Platform.Execution.Emit.*
 ```
 
 ### 2. GDL Modeling packages (target map)
@@ -93,28 +93,59 @@ guiders-fsharp                          guiders-platform
 
 Mechanics in `Platform.Execution.*` call `Platform.Modeling.Notations.*.Parse(wire)` and receive stable IR.
 
-### 4. Execution packages (target map)
+### 4. Cockpit vertical slice ([0057](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0057-cockpit-logic-authoring-quarry.md))
+
+Cockpit is **not** one layer. Declare annunciation + pure eval = Modeling (F#); pub/sub + UI subscription = Execution (C#).
+
+```text
+*.cockpit.logic.gdl
+    → Parse.CockpitLogic          Platform.Modeling.Gdl.Parse.CockpitLogic
+    → CockpitRuleGraph IR         Platform.Modeling.Gdl.Cockpit
+    → ExprNode (when / derived)   Platform.Modeling.Gdl.Expression
+    → evaluate(facts) → outcomes  Platform.Modeling.Cockpit.Rules   ← pure F#
+    → trace (rule id, matched when)
+         │
+         ▼
+    DataBus.Publish / subscribe   Platform.Execution.Cockpit.DataBus
+    Transport, Channels, CDS      Platform.Execution.Cockpit.*
+    EicasStrip, zone visibility   Platform.Execution.Studio.*
+```
+
+| Package | Language | Owns |
+|---------|----------|------|
+| `AIGuiders.Platform.Modeling.Gdl.Cockpit` | F# | `CockpitRuleGraph`, facts/rules/alerting/projectors IR |
+| `AIGuiders.Platform.Modeling.Gdl.Expression` | F# | shared `ExprNode` eval substrate (deck + cockpit) |
+| `AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic` | F# | `*.cockpit.logic.gdl` parser |
+| `AIGuiders.Platform.Modeling.Cockpit.Rules` | F# | **headless** `evaluate(graph, facts) → outcomes + trace` — no DataBus, no WPF |
+| `AIGuiders.Platform.Execution.Cockpit.*` | C# | DataBus, Transport, Channels, Composition, CDS routing **runtime** |
+
+**Normative:** `Platform.Cockpit.Rules` (proposed in platform ADR-0057 as C#) **moves to F#** as `Platform.Modeling.Cockpit.Rules`. Execution calls Modeling eval; it does not re-implement rule matching.
+
+**Split from `.deck`:** `.deck` owns `eicas when alerts` (projection hook); `.cockpit.logic` owns what counts as alert and severity ([0057](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0057-cockpit-logic-authoring-quarry.md) §3).
+
+### 5. Execution packages (target map)
 
 | Package | Owns | Replaces (flat `Platform.*` at 0.31.x) |
 |---------|------|----------------------------------------|
 | `AIGuiders.Platform.Execution.CommandPlane.*` | catalog/registry, execute, completion | `Platform.CommandPlane.*` |
 | `AIGuiders.Platform.Execution.Studio.*` | WPF / product surfaces | `guiders-wpf`, Studio hosts |
-| `AIGuiders.Platform.Execution.Cockpit.*` | DataBus, transport, composition runtime | `Platform.Cockpit.*` |
+| `AIGuiders.Platform.Execution.Cockpit.*` | DataBus, transport, channels, composition runtime | `Platform.Cockpit.*` **minus** rule eval |
 | `AIGuiders.Platform.Execution.Emit.*` | Roslyn `*.g.cs` from Modeling IR | platform emit tools |
 | `AIGuiders.Platform.Execution.MCPlane` | agent envelope | `Platform.MCPlane` |
 | `AIGuiders.Platform.Execution.Routing` | intent route/execute seam | `Platform.Routing` |
 
 Flat `AIGuiders.Platform.Authoring.*`, `Platform.IntermediateRepresentation.*`, `Platform.Notations.*` (model halves) → **abandon at 0.31.x**; new work ships under `Platform.Modeling.*` only.
 
-### 5. IR lives in Modeling — Execution consumes
+### 6. IR lives in Modeling — Execution consumes
 
 | IR class | SSOT | Execution access |
 |----------|------|------------------|
 | Declare IR (GDL) | `Platform.Modeling.Gdl.*` | PackageReference; optional `[<CLIMutable>]` on hot records |
 | Wire IR (Notations) | `Platform.Modeling.Notations.*` | same |
+| Cockpit eval | `Platform.Modeling.Cockpit.Rules` | `evaluate()` call from DataBus adapter |
 | Runtime-only views | `*.g.cs` emit | generated snapshots where WPF/registry need it |
 
-### 6. NuGet identity migration
+### 7. NuGet identity migration
 
 **Target IDs** use `AIGuiders.Platform.Modeling.*` / `AIGuiders.Platform.Execution.*`.
 
@@ -124,13 +155,14 @@ Flat `AIGuiders.Platform.Authoring.*`, `Platform.IntermediateRepresentation.*`, 
 | `AIGuiders.Platform.IntermediateRepresentation.*` | absorbed into `Platform.Modeling.*` |
 | `AIGuiders.Platform.Notations.*` | `AIGuiders.Platform.Modeling.Notations.*` |
 | `AIGuiders.Platform.CommandPlane.*` | `AIGuiders.Platform.Execution.CommandPlane.*` |
-| `AIGuiders.Platform.Cockpit.*` | `AIGuiders.Platform.Execution.Cockpit.*` |
+| `AIGuiders.Platform.Cockpit.*` (runtime) | `AIGuiders.Platform.Execution.Cockpit.*` |
+| proposed `Platform.Cockpit.Rules` | `AIGuiders.Platform.Modeling.Cockpit.Rules` (F#) |
 
 **Default path:** flat `Platform.*` at **0.31.x** stops receiving releases; new IDs from **1.0** (or next wave). Federation repos update refs in one window. NuGet deprecation/unlist **optional** — downloads are mostly CI restore ([§ nuget reality](https://github.com/NuGet/Home/issues/931)), external adopters negligible.
 
 Namespaces and assembly names **SHOULD** match `PackageId`.
 
-### 7. Boundary: GDL vs Notations (unchanged semantics)
+### 8. Boundary: GDL vs Notations (unchanged semantics)
 
 | | GDL | Notations |
 |---|-----|-----------|
@@ -139,11 +171,11 @@ Namespaces and assembly names **SHOULD** match `PackageId`.
 
 No merged mega-AST ([0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) §9).
 
-### 8. Migration phases
+### 9. Migration phases
 
 ```text
 Phase A (done)     Platform.Modeling.Gdl.* rename + deck/topology mirror
-Phase B           catalog, display, cockpit.logic under Platform.Modeling.Gdl.*
+Phase B           catalog + cockpit.logic (parse, IR, Expression, Cockpit.Rules eval)
 Phase C           Platform.Modeling.Notations.* (F#)
 Phase D           Platform.Execution.* for runtime; abandon flat Platform.* 0.31.x
 Phase E           LSP / toolchain globs: Platform.Modeling.* + Platform.Execution.*
