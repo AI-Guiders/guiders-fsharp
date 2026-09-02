@@ -10,9 +10,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeckSpineTests.fs" />
+    <Compile Include="DeckParserTests.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures\Authoring\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Gdl.Core\AIGuiders.Gdl.Core.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Gdl.Validation\AIGuiders.Gdl.Validation.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Gdl.Parse.Deck\AIGuiders.Gdl.Parse.Deck.fsproj" />
   </ItemGroup>
 </Project>

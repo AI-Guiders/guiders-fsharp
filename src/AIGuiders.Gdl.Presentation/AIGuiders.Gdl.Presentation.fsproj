@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Gdl.Presentation</RootNamespace>
+    <AssemblyName>AIGuiders.Gdl.Presentation</AssemblyName>
+    <Description>GDL presentation IR — F# mirror of Platform IR.Presentation + TopologyNotation.</Description>
+    <PackageId>AIGuiders.Gdl.Presentation</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="TopologyNotation.fs" />
+  </ItemGroup>
+</Project>

@@ -9,4 +9,7 @@
   <ItemGroup>
     <Compile Include="GdlTypes.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Gdl.Presentation\AIGuiders.Gdl.Presentation.fsproj" />
+  </ItemGroup>
 </Project>

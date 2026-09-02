@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Accepted (v0 bootstrap 2026-09-02) |
+| **Status** | Accepted — v1 platform mirror in progress (2026-09-02) |
 | **Tags** | #guiders #fsharp #gdl #federation #spine #ir |
 | **Related** | [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0048](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0048-authoring-quarry-family.md) · [GUIDERS-ADR-0004](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0004-core-monorepo.md) |
 
@@ -23,7 +23,7 @@ Pattern: same as **guiders-core** ([0004](https://github.com/AI-Guiders/guiders-
 | Layer | Repo | Language |
 |-------|------|----------|
 | GDL **spine** (DU, project graph, validation) | `guiders-fsharp` | F# |
-| GDL **parse** (wire → payload) | `guiders-platform` | C# `Authoring.*` |
+| GDL **parse** (wire → payload) | `guiders-fsharp` (north star) · `guiders-platform` `Authoring.*` (transitional) | F# · C# |
 | GDL **emit** (Roslyn `*.g.cs`) | `guiders-platform` / assist | C# |
 | Runtime wire | `guiders-platform` | C# `Notations.*` |
 
@@ -32,8 +32,9 @@ Pattern: same as **guiders-core** ([0004](https://github.com/AI-Guiders/guiders-
 ### 3. Interop (v0 → v1)
 
 1. **v0:** C# parsers keep local AST (`DeckDocument`); tests map to F# `GdlFragment` manually.
-2. **v1:** `Authoring.*` references `AIGuiders.Gdl.Core`; mappers at parse boundary.
-3. **Public C# API:** use F# records with `[<CLIMutable>]` or thin DTOs when planets need idiomatic C#.
+2. **v1 (in flight):** F# mirror — `AIGuiders.Gdl.Authoring`, `AIGuiders.Gdl.Presentation`, `AIGuiders.Gdl.Parse.Deck`; parity tests vs platform fixtures.
+3. **v2:** `Authoring.*` references F# packages or becomes thin shim; mappers at parse boundary only where C# planets still need DTOs.
+4. **Public C# API:** use F# records with `[<CLIMutable>]` or thin DTOs when planets need idiomatic C#.
 
 ### 4. Quarry plugin model
 
@@ -47,6 +48,5 @@ New quarry = new case on `GdlFragment` + validation rules + (optional) F# metric
 
 ## Non-goals (v0)
 
-- Rewriting `Authoring.Deck` parser in F#
-- Full `PresentationTopology` port (wire string stub on `DeckPreset` only)
+- Catalog / cockpit.logic parsers in F# (deck + topology shipped first)
 - `guiders-fsharp` CI publish to nuget.org (local build + git first)

@@ -16,7 +16,7 @@ module DeckSpineTests =
         match entry.Fragment with
         | GdlFragment.Deck deck ->
             Assert.Equal("dashspec-studio", deck.Planet)
-            Assert.Equal("(MFD)(F)", deck.Presets.Head.TopologyWire.Value)
+            Assert.Equal("(MFD)(F)", deck.Presets.Head.Topology.Value.SourceWire)
             Assert.Equal("report-preview", deck.Presets.Head.ForwardZoneId.Value)
         | other -> failwith $"Expected Deck fragment, got {other}"
 
@@ -33,7 +33,7 @@ module DeckSpineTests =
             { GdlSpine.dashSpecStudioDeck () with
                 Presets =
                     [ { Name = "broken"
-                        TopologyWire = None
+                        Topology = None
                         ForwardZoneId = Some "missing-zone"
                         MfdZoneIds = []
                         EicasPolicy = None } ] }

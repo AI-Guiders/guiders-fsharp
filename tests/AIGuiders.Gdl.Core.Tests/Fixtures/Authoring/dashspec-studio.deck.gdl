@@ -1,0 +1,16 @@
+# DashSpec Studio deck — GUIDERS-ADR-0055 v0 fixture
+deck dashspec-studio
+
+preset report-author
+  topology (MFD)(F)
+  forward report-preview
+  mfd spec-tree | resolve
+  eicas when alerts
+end preset
+
+zones
+  report-preview = forward
+  repl             = forward
+  spec-tree        = mfd
+end zones
+end deck

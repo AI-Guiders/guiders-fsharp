@@ -1,5 +1,7 @@
 namespace AIGuiders.Gdl.Core
 
+open AIGuiders.Gdl.Presentation
+
 /// Stable reference to one GDL document in a project directory.
 /// <c>Quarry</c> is the token before <c>.gdl</c> (e.g. <c>deck</c>, <c>catalog</c>).
 type GdlDocumentRef =
@@ -13,7 +15,7 @@ type CatalogPayload = { Planet: string }
 /// One attention preset from <c>*.deck.gdl</c>.
 type DeckPreset =
     { Name: string
-      TopologyWire: string option
+      Topology: PresentationTopology option
       ForwardZoneId: string option
       MfdZoneIds: string list
       EicasPolicy: string option }
@@ -59,20 +61,22 @@ module GdlSpine =
         { LogicalPath = logicalPath
           Quarry = quarry }
 
-    /// Minimal projection of <c>dashspec-studio.deck.gdl</c> fixture (topology IR mapping comes later).
     let dashSpecStudioDeck () : DeckPayload =
-        { Planet = "dashspec-studio"
-          Presets =
-            [ { Name = "report-author"
-                TopologyWire = Some "(MFD)(F)"
-                ForwardZoneId = Some "report-preview"
-                MfdZoneIds = [ "spec-tree"; "resolve" ]
-                EicasPolicy = Some "when alerts" } ]
-          ZoneBindings =
-            Map.ofList
-                [ "report-preview", "forward"
-                  "repl", "forward"
-                  "spec-tree", "mfd" ] }
+        match TopologyNotation.parse "(MFD)(F)" with
+        | { Topology = Some topology } ->
+            { Planet = "dashspec-studio"
+              Presets =
+                [ { Name = "report-author"
+                    Topology = Some topology
+                    ForwardZoneId = Some "report-preview"
+                    MfdZoneIds = [ "spec-tree"; "resolve" ]
+                    EicasPolicy = Some "when alerts" } ]
+              ZoneBindings =
+                Map.ofList
+                    [ "report-preview", "forward"
+                      "repl", "forward"
+                      "spec-tree", "mfd" ] }
+        | _ -> failwith "dashspec-studio topology wire must parse"
 
     let dashSpecStudioProject () : GdlProject =
         let deck = dashSpecStudioDeck ()

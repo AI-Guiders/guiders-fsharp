@@ -2,6 +2,9 @@
   <Folder Name="/src/">
     <Project Path="src/AIGuiders.Gdl.Core/AIGuiders.Gdl.Core.fsproj" />
     <Project Path="src/AIGuiders.Gdl.Validation/AIGuiders.Gdl.Validation.fsproj" />
+    <Project Path="src/AIGuiders.Gdl.Authoring/AIGuiders.Gdl.Authoring.fsproj" />
+    <Project Path="src/AIGuiders.Gdl.Presentation/AIGuiders.Gdl.Presentation.fsproj" />
+    <Project Path="src/AIGuiders.Gdl.Parse.Deck/AIGuiders.Gdl.Parse.Deck.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Gdl.Core.Tests/AIGuiders.Gdl.Core.Tests.fsproj" />

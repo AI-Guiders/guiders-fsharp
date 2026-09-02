@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Gdl.Authoring</RootNamespace>
+    <AssemblyName>AIGuiders.Gdl.Authoring</AssemblyName>
+    <Description>GDL authoring lexical kit — F# mirror of Platform Authoring.Core.</Description>
+    <PackageId>AIGuiders.Gdl.Authoring</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Diagnostic.fs" />
+    <Compile Include="Source.fs" />
+    <Compile Include="BlockReader.fs" />
+    <Compile Include="Import.fs" />
+    <Compile Include="Project.fs" />
+  </ItemGroup>
+</Project>
