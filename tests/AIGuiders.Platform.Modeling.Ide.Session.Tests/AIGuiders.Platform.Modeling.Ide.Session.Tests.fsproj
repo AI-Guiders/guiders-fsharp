@@ -12,6 +12,7 @@
     <Compile Include="SessionGraphTests.fs" />
     <Compile Include="InvalidationScopeTests.fs" />
     <Compile Include="SessionPatchTests.fs" />
+    <Compile Include="SessionOrchestratorTests.fs" />
     <Compile Include="ConformanceGoldenSessionTests.fs" />
   </ItemGroup>
   <ItemGroup>

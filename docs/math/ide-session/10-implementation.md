@@ -20,14 +20,15 @@
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
 | WF1–WF8 | `GraphValidation.validate` (WF7–WF8 shipped Phase 1b) |
 | Invalidation scope lattice | `InvalidationScope` (`promotes`, `max`) |
-| \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
-| \( \Sigma_\pi \), `refine` | **ещё нет** → port `CompilerServices` / semantic substrate (Phase 2) |
-| \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
-| \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
-| \( \mathsf{Refactor} \), \( \oplus \) | `RefactorPlan`, `SessionPatch`, `FileSystemPatch`, `GraphStructurePatch` |
+| \( M, \mu \) | `MaterializedState` + `SessionOrchestrator` (v0 invalidate stub) |
+| \( \Sigma_\pi \), `refine` | **port** `CompilerServices` (Roslyn/FCS); axioms §5.2a |
+| \( \varphi_r \), `freeze` / `freeze_tree` | `FrozenSnapshot` + `FreezeMode` |
+| \( \pi_{\mathsf{ws}} \) | **port** `WorkspaceView` (Phase 2 emit) |
+| \( \mathsf{Refactor} \), \( \oplus \) | `RefactorPlan`, `SessionPatch`, `SessionOrchestrator.applyPatch` |
 | \( \mathsf{scope}(\Delta) \) | `SessionPatch.scope` |
-| RF1–RF8, ST1–ST5, LD1–LD6 | `HoareChecker`, `StyleConformance`, `Conformance` (GS1–GS5); ledger **ещё нет** |
-| \( \Lambda \), Timeline | **ещё нет** → `RevisionLedger`, `GitPin`, `CodeHistoryTimeline` (Phase 2–3) |
+| RF1–RF8, ST1–ST5 | `HoareChecker`, `StyleConformance`, `Conformance` (GS1–GS6) |
+| \( \Lambda \), Timeline | `RevisionLedger` (append v0); Timeline **Phase 3** |
+| CDP dogfood | `cdp_ide_session_scene`, `cdp_session.federation`, `cdp_health.federation` |
 
 ---
 
@@ -63,8 +64,9 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 7. ~~Код: `InvalidationScope`, …, `E_proj`~~ — Phase 1b (`InvalidationScope`, `ProjectEdges`, `Ports.DotNet`).  
 8. ~~Порт slnx / gdlproj~~ — `DotNetSlnxGraphPort.load` / `loadSession`; gdlproj **ещё нет**.  
 9. ~~`GraphValidation`: WF7, WF8~~ — shipped.  
-10. Orchestrator host: `Execution.Ide.Session.SolutionSessionHost.Open` (platform).  
-11. ~~Доказуемые свойства~~ — golden sessions §11 (`ConformanceGoldenSessionTests`); runtime props (FileChange/M) Phase 2+.
+10. Orchestrator: `Execution.Ide.Session.FederationSessionRuntime` + `SessionOrchestrator`.  
+11. CDP dogfood: `cdp_ide_session_scene`, federation pulse on `cdp_session` / `cdp_health`.  
+12. ~~Доказуемые свойства~~ — golden sessions §11; runtime M props expanding.
 
 ### Будущие ветки (не v0, не блокируют Dash Studio)
 

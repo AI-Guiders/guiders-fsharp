@@ -19,6 +19,10 @@
     <Compile Include="GraphValidation.fs" />
     <Compile Include="GraphPatch.fs" />
     <Compile Include="RefactorPlan.fs" />
+    <Compile Include="MaterializedState.fs" />
+    <Compile Include="FrozenSnapshot.fs" />
+    <Compile Include="RevisionLedger.fs" />
+    <Compile Include="SessionOrchestrator.fs" />
     <Compile Include="Hoare.fs" />
     <Compile Include="Conformance.fs" />
   </ItemGroup>
