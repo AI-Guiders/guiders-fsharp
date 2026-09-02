@@ -17,8 +17,12 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Bracket/AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Keyboard/AIGuiders.Platform.Modeling.Notations.Keyboard.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Argument/AIGuiders.Platform.Modeling.Notations.Argument.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Language/AIGuiders.Platform.Modeling.Language.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Fcs/AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Gdl/AIGuiders.Platform.Modeling.Language.Adapters.Gdl.fsproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests.fsproj" />
   </Folder>
