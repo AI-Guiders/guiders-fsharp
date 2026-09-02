@@ -10,7 +10,8 @@ open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
-open DotNetWorkspace.Core
+open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Execution.Language
 
@@ -297,14 +298,20 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                 Some "Renaming active pattern cases is not supported."
             | _ -> None
 
-    let trySolutionGraph (solutionOrProjectPath: string) =
-        if String.IsNullOrWhiteSpace solutionOrProjectPath then
+    let isFSharpProject (project: ProjectNode) =
+        match project.Kind with
+        | DotNet { Language = FSharp } -> true
+        | _ -> false
+
+    /// Federation SolutionGraph SSOT (ADR-0004) — not raw DotNetWorkspace.
+    let tryLoadSolutionGraph (anchorPath: string) =
+        if String.IsNullOrWhiteSpace anchorPath then
             None
-        elif not (File.Exists solutionOrProjectPath) then
+        elif not (File.Exists anchorPath) then
             None
         else
             try
-                Some(DotNetWorkspace.Load solutionOrProjectPath)
+                Some(DotNetSlnxGraphPort.load anchorPath)
             with _ ->
                 None
 
@@ -314,25 +321,22 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
 
     let getUsesOfSymbolAcrossWorkspace (symbol: FSharpSymbol) (req: LanguageRequest) (fallbackUses: FSharpSymbolUse array) =
         task {
-            match trySolutionGraph req.SolutionOrProjectPath with
+            match tryLoadSolutionGraph req.SolutionOrProjectPath with
             | None -> return fallbackUses
             | Some graph ->
                 let collected = ResizeArray<FSharpSymbolUse>()
 
-                for project in graph.Projects do
-                    if project.Kind <> DotNetProjectKind.FSharp then
-                        ()
-                    else
-                        try
-                            match projectOptionsSource.TryLoad project.AbsolutePath with
-                            | Result.Ok options ->
-                                let! projectResults = checker.ParseAndCheckProject(options)
+                for project in graph.Projects |> List.filter isFSharpProject do
+                    try
+                        match projectOptionsSource.TryLoad project.AbsolutePath with
+                        | Result.Ok options ->
+                            let! projectResults = checker.ParseAndCheckProject(options)
 
-                                for use' in getUsesInProject symbol projectResults do
-                                    collected.Add use'
-                            | Result.Error _ -> ()
-                        with _ ->
-                            ()
+                            for use' in getUsesInProject symbol projectResults do
+                                collected.Add use'
+                        | Result.Error _ -> ()
+                    with _ ->
+                        ()
 
                 if collected.Count = 0 then
                     return fallbackUses
