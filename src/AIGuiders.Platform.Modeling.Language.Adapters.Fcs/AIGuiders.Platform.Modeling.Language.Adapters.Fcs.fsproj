@@ -32,15 +32,19 @@
 
   <ItemGroup>
 
+    <Compile Include="IFcsProjectOptionsSource.fs" />
+    <Compile Include="FcsProjectOptionsWire.fs" />
     <Compile Include="FcsProjectResolver.fs" />
-
-    <Compile Include="FcsProjectOptionsCache.fs" />
-
+    <Compile Include="FcsProjectOptionsIonideSource.fs" />
+    <Compile Include="FcsProjectOptionsProbeSource.fs" />
+    <Compile Include="FcsProjectOptionsPipeline.fs" />
     <Compile Include="FcsLanguageBackend.fs" />
 
   </ItemGroup>
 
   <ItemGroup>
+
+    <ProjectReference Include="..\..\..\guiders-core\src\DotNetWorkspace.Core\DotNetWorkspace.Core.csproj" />
 
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
 

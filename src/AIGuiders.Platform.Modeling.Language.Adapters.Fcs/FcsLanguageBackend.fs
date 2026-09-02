@@ -11,7 +11,10 @@ open FSharp.Compiler.Text
 open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Execution.Language
 
-type FcsLanguageBackend() =
+type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
+    let projectOptionsSource =
+        defaultArg projectOptionsSource FcsProjectOptions.Default
+
     let checker = FSharpChecker.Create(keepAssemblyContents = false)
 
     let toSpan (path: string) (range: range) =
@@ -137,7 +140,10 @@ type FcsLanguageBackend() =
                     else
                         match
                             FcsProjectResolver.resolveFsproj path req.SolutionOrProjectPath
-                            |> Option.bind FcsProjectOptionsCache.tryGet
+                            |> Option.bind (fun fsproj ->
+                                match projectOptionsSource.TryLoad fsproj with
+                                | Result.Ok options -> Some options
+                                | Result.Error _ -> None)
                         with
                         | Some projectOptions ->
                             let! parseResults, checkAnswer =
