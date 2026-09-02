@@ -23,12 +23,12 @@ Pattern: same as **guiders-core** ([0004](https://github.com/AI-Guiders/guiders-
 | Layer | Repo | Language |
 |-------|------|----------|
 | GDL **spine** (DU, project graph, validation) | `guiders-fsharp` | F# |
-| GDL **parse** (wire → payload) | `guiders-fsharp` (north star) · `guiders-platform` `Authoring.*` (transitional) | F# · C# |
-| Runtime wire parse | `guiders-fsharp` `Notations.*` (north star) · `guiders-platform` `Notations.*` (transitional) | F# · C# |
-| GDL **emit** (Roslyn `*.g.cs`) | `guiders-platform` / assist | C# |
-| Runtime mechanics | `guiders-platform` `CommandPlane.*` | C# |
+| GDL **parse** (wire → payload) | `AIGuiders.Modeling.Gdl.*` (north star) · `AIGuiders.Gdl.*` (transitional) · `Platform.Authoring.*` (transitional C#) | F# |
+| Runtime wire parse | `AIGuiders.Modeling.Notations.*` (north star) · `Platform.Notations.*` (transitional C#) | F# |
+| GDL **emit** (Roslyn `*.g.cs`) | `AIGuiders.Execution.Emit.*` | C# |
+| Runtime mechanics | `AIGuiders.Execution.CommandPlane.*` | C# |
 
-**SSOT for `GdlFragment` / `GdlProject`:** `AIGuiders.Gdl.Core` (F#).
+**SSOT for `GdlFragment` / `GdlProject`:** `AIGuiders.Modeling.Gdl.Core` (F#; transitional ID `AIGuiders.Gdl.Core` until [ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) Phase D).
 
 ### 3. Interop (v0 → v1)
 

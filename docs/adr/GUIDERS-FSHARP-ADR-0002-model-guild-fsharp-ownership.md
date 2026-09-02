@@ -1,9 +1,9 @@
-# GUIDERS-FSHARP-ADR-0002: Model guild ownership (GDL + Notations → F#)
+# GUIDERS-FSHARP-ADR-0002: Modeling vs Execution (GDL + Notations → F#)
 
 | | |
 |---|---|
-| **Status** | Accepted (2026-09-02) |
-| **Tags** | #guiders #fsharp #gdl #notations #ir #model-guild #federation |
+| **Status** | Accepted (2026-09-02; package prefix amended same day) |
+| **Tags** | #guiders #fsharp #gdl #notations #ir #modeling #execution #federation |
 | **Related** | [GUIDERS-FSHARP-ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) · [GUIDERS-ADR-0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) · [GUIDERS-ADR-0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) · [GUIDERS-ADR-0058](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0058-presentation-topology-ir.md) |
 
 ## Context
@@ -17,116 +17,140 @@ Federation has two **model-heavy** hyperlanes:
 
 Both are **algebraic**: discriminated shapes, exhaustive `match`, cross-ref validation, conformance vectors — not UI or runtime mechanics.
 
-[ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) placed GDL **spine** and **parse north star** in `guiders-fsharp`. Deck + `PresentationTopology` mirror shipped (`AIGuiders.Gdl.Authoring`, `AIGuiders.Gdl.Presentation`, `AIGuiders.Gdl.Parse.Deck`).
+[ADR-0001](./GUIDERS-FSHARP-ADR-0001-gdl-spine-ownership.md) placed GDL **spine** and **parse north star** in `guiders-fsharp`. Deck + `PresentationTopology` mirror shipped under transitional IDs (`AIGuiders.Gdl.*`).
 
-**Notations** ([0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md)) follow the same pattern: wire format(s) → branch Core IR → mechanics consume. Keyboard chords, slash paths, argument tails, bracket profiles — all model-heavy. They belong in the same **model guild** as GDL, not in the execution guild.
+**Notations** ([0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md)) follow the same pattern: wire format(s) → branch Core IR → mechanics consume. Keyboard chords, slash paths, argument tails, bracket profiles — all model-heavy.
 
-`guiders-platform` should remain the **runtime guild**: CommandPlane mechanics, WPF/Studio surfaces, Roslyn emit host, MCP bridges — **consumers** of IR, not definers.
+One **.NET** world; two **layers** by responsibility, not by accident of language:
+
+```text
+AIGuiders.Modeling.*    F#   parse, IR, rules, validation, conformance
+AIGuiders.Execution.*   C#   UI, registry, execute, emit host, MCP glue
+```
+
+Repos (`guiders-fsharp`, `guiders-platform`) are transport. The **NuGet prefix** is the normative axis.
 
 ## Decision
 
-### 1. Two guilds, two repos (unchanged monorepo pattern)
+### 1. Package prefix (normative)
+
+| Prefix | Language | Owns |
+|--------|----------|------|
+| **`AIGuiders.Modeling.*`** | F# | GDL + Notations: grammars, IR SSOT, validation, conformance |
+| **`AIGuiders.Execution.*`** | C# | CommandPlane, Studio, emit, planet adapters — **consumers** of Modeling |
+
+**Dependency rule:** `Execution` → `Modeling`. Never a second authoritative IR in `Execution`.
 
 ```text
-guiders-fsharp — MODEL GUILD (F# SSOT)
-├── Gdl.*           declare-time: parse, IR, validation, project graph
-└── Notations.*     runtime wire: grammar, profiles, normalized IR
-
-guiders-platform — EXECUTION GUILD (C#)
-├── CommandPlane.*  catalog/registry, execute, completion glue
-├── MCPlane         agent envelope
-├── Studio / WPF    product surfaces
-└── Emit.*          Roslyn *.g.cs (reads F# IR, writes C# runtime)
+guiders-fsharp (Modeling monorepo)          guiders-platform (Execution monorepo)
+├── AIGuiders.Modeling.Gdl.*                ├── AIGuiders.Execution.CommandPlane.*
+└── AIGuiders.Modeling.Notations.*          ├── AIGuiders.Execution.Studio.*
+                                            └── AIGuiders.Execution.Emit.*
 ```
 
-**Rule:** C# **MUST NOT** maintain a parallel authoritative IR definition once the F# package ships. C# references F# NuGet or generated projections at emit boundaries only.
+### 2. GDL Modeling packages (target map)
 
-### 2. GDL model packages (target map)
+| Package | Owns | Replaces (transitional) |
+|---------|------|-------------------------|
+| `AIGuiders.Modeling.Gdl.Core` | `GdlProject`, `GdlFragment`, quarry payload spine | `AIGuiders.Gdl.Core` |
+| `AIGuiders.Modeling.Gdl.Authoring` | lexical kit: blocks, tables, import, diagnostics | `AIGuiders.Gdl.Authoring` · `Platform.Authoring.Core` |
+| `AIGuiders.Modeling.Gdl.Presentation` | `PresentationTopology`, topology wire parse | `AIGuiders.Gdl.Presentation` · `IR.Presentation` |
+| `AIGuiders.Modeling.Gdl.Command` | catalog / bundle IR | `IR.Command` · `Authoring.Command.*` |
+| `AIGuiders.Modeling.Gdl.Cockpit` | cockpit.logic rule graph IR | proposed `Authoring.Cockpit.Logic` |
+| `AIGuiders.Modeling.Gdl.Display` | display binding IR | proposed `Authoring.Display.Binding` |
+| `AIGuiders.Modeling.Gdl.Expression` | shared `ExprNode` for `when` / conditions | proposed `Authoring.Expression` |
+| `AIGuiders.Modeling.Gdl.Parse.*` | quarry parsers (`Deck`, `Catalog`, …) | `AIGuiders.Gdl.Parse.*` · `Platform.Authoring.*` |
+| `AIGuiders.Modeling.Gdl.Validation` | cross-quarry rules | `AIGuiders.Gdl.Validation` |
+| `AIGuiders.Modeling.Gdl.Project` | `*.gdlproj`, import graph | `Authoring.Project` |
 
-NuGet prefix: **`AIGuiders.Gdl.*`** in `guiders-fsharp`.
+**Ship order:** deck + topology (**done**, transitional IDs) → catalog → display → cockpit.logic → expression → full `GdlProject` loader → **rename to `Modeling.*` prefix** (§6).
 
-| Package | Owns | Replaces (transitional C#) |
-|---------|------|----------------------------|
-| `AIGuiders.Gdl.Core` | `GdlProject`, `GdlFragment`, quarry payload spine | — |
-| `AIGuiders.Gdl.Authoring` | lexical kit: blocks, tables, import, diagnostics | `Platform.Authoring.Core` |
-| `AIGuiders.Gdl.Presentation` | `PresentationTopology`, topology wire parse | `IR.Presentation` + `Notations.Presentation.Topology` (declare) |
-| `AIGuiders.Gdl.Command` | catalog / bundle IR | `IR.Command` + `Authoring.Command.*` |
-| `AIGuiders.Gdl.Cockpit` | cockpit.logic rule graph IR | proposed `Authoring.Cockpit.Logic` |
-| `AIGuiders.Gdl.Display` | display binding IR | proposed `Authoring.Display.Binding` |
-| `AIGuiders.Gdl.Expression` | shared `ExprNode` for `when` / conditions | proposed `Authoring.Expression` |
-| `AIGuiders.Gdl.Parse.*` | quarry parsers (`Deck`, `Catalog`, …) | `Platform.Authoring.*` parsers |
-| `AIGuiders.Gdl.Validation` | cross-quarry rules | partial today |
-| `AIGuiders.Gdl.Project` | `*.gdlproj`, import graph | `Authoring.Project` |
-
-**Ship order (normative intent):** deck + topology (**done**) → catalog → display → cockpit.logic → expression → full `GdlProject` loader.
-
-### 3. Notations model packages (target map)
-
-NuGet prefix: **`AIGuiders.Notations.*`** in `guiders-fsharp` (sibling tree to `Gdl.*`, same monorepo).
+### 3. Notations Modeling packages (target map)
 
 | Package | Owns | Replaces (transitional C#) |
 |---------|------|----------------------------|
-| `AIGuiders.Notations.Core` | shared profiles, conformance hooks, branch registry | — |
-| `AIGuiders.Notations.Keyboard` | `NormalizedKeySequence`, Vim/KeyGesture grammars | `InputNotation.*` |
-| `AIGuiders.Notations.Command` | `NormalizedCommandLine`, slash/console path rules | `CommandPlane.Slash` inline + `Notations.Command.*` |
-| `AIGuiders.Notations.Argument` | `NormalizedArguments`, tail profiles | `Notations.Argument.*` |
-| `AIGuiders.Notations.Bracket` | `NormalizedBracketWire`, delimiter profiles | `Notations.Bracket.*` |
+| `AIGuiders.Modeling.Notations.Core` | profiles, conformance hooks, branch registry | — |
+| `AIGuiders.Modeling.Notations.Keyboard` | `NormalizedKeySequence`, Vim/KeyGesture grammars | `InputNotation.*` |
+| `AIGuiders.Modeling.Notations.Command` | `NormalizedCommandLine`, slash/console path rules | `CommandPlane.Slash` inline · `Notations.Command.*` |
+| `AIGuiders.Modeling.Notations.Argument` | `NormalizedArguments`, tail profiles | `Notations.Argument.*` |
+| `AIGuiders.Modeling.Notations.Bracket` | `NormalizedBracketWire`, delimiter profiles | `Notations.Bracket.*` |
 
-Each branch: **wire parser(s) + IR types + conformance vectors** in F#. Mechanics in C# call `Notations.*.Parse(wire)` and receive stable IR records/enums.
+Mechanics in `AIGuiders.Execution.*` call `Modeling.Notations.*.Parse(wire)` and receive stable IR.
 
-### 4. IR lives in F# — C# consumes
+### 4. Execution packages (target map)
 
-| IR class | SSOT | C# access |
-|----------|------|-----------|
-| Declare IR (GDL output) | `AIGuiders.Gdl.*` | ProjectReference / NuGet; optional `[<CLIMutable>]` on hot records |
-| Wire IR (Notations output) | `AIGuiders.Notations.*` | same |
-| Runtime-only views | `*.g.cs` emit | generated from F# IR snapshots where WPF/registry need it |
+| Package | Owns | Replaces (transitional) |
+|---------|------|-------------------------|
+| `AIGuiders.Execution.CommandPlane.*` | catalog/registry, execute, completion | `AIGuiders.Platform.CommandPlane.*` |
+| `AIGuiders.Execution.Studio.*` | WPF / product surfaces | `AIGuiders.Platform.Studio.*` |
+| `AIGuiders.Execution.Emit.*` | Roslyn `*.g.cs` from Modeling IR | platform emit tools |
+| `AIGuiders.Execution.MCPlane` | agent envelope | `MCPlane` |
 
-**No** long-lived `AIGuiders.Platform.IntermediateRepresentation.*` duplicate. Platform IR packages become **type-forward shims** during migration, then removed.
+`AIGuiders.Platform.*` and `AIGuiders.Platform.IntermediateRepresentation.*` → shim → obsolete (no long-lived IR duplicate).
 
-### 5. Boundary: GDL vs Notations (unchanged semantics)
+### 5. IR lives in Modeling — Execution consumes
+
+| IR class | SSOT | Execution access |
+|----------|------|------------------|
+| Declare IR (GDL) | `AIGuiders.Modeling.Gdl.*` | PackageReference; optional `[<CLIMutable>]` on hot records |
+| Wire IR (Notations) | `AIGuiders.Modeling.Notations.*` | same |
+| Runtime-only views | `*.g.cs` emit | generated snapshots where WPF/registry need it |
+
+### 6. NuGet identity migration (transitional `AIGuiders.Gdl.*`)
+
+Early bootstrap packages used **`AIGuiders.Gdl.*`** before the Modeling prefix was chosen. **Target ID is always `AIGuiders.Modeling.Gdl.*`.**
+
+| Transitional (rename from) | Target |
+|----------------------------|--------|
+| `AIGuiders.Gdl.Core` | `AIGuiders.Modeling.Gdl.Core` |
+| `AIGuiders.Gdl.Authoring` | `AIGuiders.Modeling.Gdl.Authoring` |
+| `AIGuiders.Gdl.Presentation` | `AIGuiders.Modeling.Gdl.Presentation` |
+| `AIGuiders.Gdl.Parse.Deck` | `AIGuiders.Modeling.Gdl.Parse.Deck` |
+| `AIGuiders.Gdl.Validation` | `AIGuiders.Modeling.Gdl.Validation` |
+
+**When any transitional ID was published to nuget.org:**
+
+1. Ship **final** package under `AIGuiders.Modeling.*` ID (same assembly version line).
+2. Publish **one last** release of the old ID with `<PackageDeprecation>` → replacement package URL ([NuGet deprecation](https://learn.microsoft.com/en-us/nuget/nuget-org/deprecate-packages)).
+3. Update all federation repos + `authoring-toolchain` references in the same PR window.
+4. **Unlist** old ID after one release cycle if no external consumers remain (nuget.org does not hard-delete; unlist hides from search).
+5. Platform `AIGuiders.Platform.*` packages follow the same pattern into `AIGuiders.Execution.*`.
+
+**If a transitional ID never left CI** (local / git only): rename in-repo without deprecation dance.
+
+Namespaces and assembly names **SHOULD** match `PackageId` (`AIGuiders.Modeling.Gdl.Core`, etc.).
+
+### 7. Boundary: GDL vs Notations (unchanged semantics)
 
 | | GDL | Notations |
 |---|-----|-----------|
 | **When** | declare-time (authoring, CI, LSP) | runtime wire (keyboard, slash, console) |
 | **Surface** | `*.{quarry}.gdl`, `*.gdlproj` | chord, `/path`, `key=value`, `[…]` |
-| **Example** | `topology (MFD)(F)` in deck | `<C-k>`, `/docs adr open` |
-| **Repo** | `AIGuiders.Gdl.*` | `AIGuiders.Notations.*` |
+| **Prefix** | `AIGuiders.Modeling.Gdl.*` | `AIGuiders.Modeling.Notations.*` |
 
-Topology appears in **both** only at different layers: deck quarry declares logical hosts (GDL); optional future wire profiles may reference channel tokens at Notations boundary — **distinct IR types**, no merged mega-AST ([0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) §9 non-goal).
+No merged mega-AST across branches ([0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md) §9).
 
-### 6. Migration phases
+### 8. Migration phases
 
 ```text
-Phase A (now)     F# GDL mirror: deck + PresentationTopology + spine DU
-Phase B           F# catalog, display, cockpit.logic parsers + IR packages
-Phase C           F# Notations branches (Keyboard → Command → Argument → Bracket)
-Phase D           platform Authoring.* / IR.* / Notations.* → thin shim or obsolete
-Phase E           authoring-toolchain LSP pins F# packages; conformance vectors run both sides until shim removed
+Phase A (now)     F# GDL mirror under transitional AIGuiders.Gdl.* IDs
+Phase B           catalog, display, cockpit.logic Modeling packages
+Phase C           Notations Modeling branches
+Phase D           Rename → AIGuiders.Modeling.* / Execution.*; deprecate old NuGet IDs
+Phase E           Platform shims removed; LSP pins Modeling packages
 ```
 
-**Shim rule:** C# wrapper MAY re-export F# types for one release cycle; MUST NOT fork IR shapes.
-
-### 7. What stays C# (execution guild)
-
-| Stays C# | Why |
-|----------|-----|
-| `CommandPlane.*` | execute, registry, completion orchestration |
-| `MCPlane` | agent pulse / envelope |
-| Studio / WPF / product hosts | UI binding |
-| Roslyn emit pipeline | generates C# from F# IR |
-| Planet-specific adapters | not federation SSOT |
+**Shim rule:** C# wrapper MAY re-export Modeling types for one release cycle; MUST NOT fork IR shapes.
 
 ## Consequences
 
-- One **model guild** language (F#) for declare + wire grammars; operators learn DU/`match` once across GDL and Notations.
-- `guiders-fsharp` grows beyond `Gdl.*` into `Notations.*` — still one sibling monorepo, not a third repo.
-- Platform ADRs ([0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md), [0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md)) remain normative for **semantics**; **implementation SSOT** moves to F# packages listed above.
-- Conformance: `docs/conformance/` vectors stay language-neutral JSON; F# and C# shims both run vectors until Phase D completes.
+- Layer is visible in the **package name** — no guessing whether a dependency is model or runtime.
+- One F# dialect across GDL + Notations; one C# dialect across Execution — same .NET, clear boundary.
+- Renaming cost is **front-loaded** in Phase D; semantics ADRs ([0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md), [0059](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md)) stay valid; only implementation IDs change.
 
 ## Non-goals
 
 - Rewriting CommandPlane execution engine in F#
 - Rewriting WPF Studio in F#
-- Single unified AST across GDL quarries **or** across GDL + Notations (IR stays per branch)
-- TS/Kotlin native Notations ports (still per [0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md) — reference quarry on NuGet; native port per stack)
+- Single unified AST across GDL quarries **or** across GDL + Notations
+- TS/Kotlin native Notations ports (per [0021](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0021-notations-quarry-family.md))
