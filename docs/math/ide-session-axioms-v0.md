@@ -20,6 +20,7 @@
 - \( \Phi \) — множество фаз lifecycle  
 - \( \top \) — множество топологий materialization  
 - \( \mathcal{A} \) — множество атрибутов (меток на узлах/рёбрах)  
+- \( \mathcal{P} \) — множество **policy-ключей** (lazy, evict, feed, buildDriver, …) — v0: строковые ключи в \( \mathcal{A}^* \), позже typed schema  
 - \( \mathrm{paths} \) — множество путей файловой системы  
 - \( \mathrm{id}(\pi) \) — идентификатор project-узла \( \pi \in \mathbb{P} \)
 
@@ -56,8 +57,10 @@
 Фиксированное конечное множество \( \mathbb{K} \) (расширяемое версией схемы):
 
 \[
-\mathbb{K} = \{ \mathsf{CompilerServices},\ \mathsf{StaticAnalysis},\ \mathsf{Build},\ \mathsf{TestDiscovery},\ \mathsf{TestRun},\ \mathsf{LspBridge} \}
+\mathbb{K} = \{ \mathsf{CompilerServices},\ \mathsf{StaticAnalysis},\ \mathsf{Build},\ \mathsf{TestDiscovery},\ \mathsf{TestRun},\ \mathsf{CodeTransform},\ \mathsf{LspBridge} \}
 \]
+
+\( \mathsf{CodeTransform} \) — рефакторинги, code fixes, codegen, rename solution-wide: **тот же** on-demand паттерн, что Build/Test (§7).
 
 ### 1.4 Виды project
 
@@ -90,13 +93,15 @@ c = (\mathrm{id}(\pi),\ k,\ \alpha)
 
 ### 2.3 Рёбра
 
-Три бинарных отношения на \( V \times V \):
+Четыре бинарных отношения на \( V \times V \) (v0: три семантических + policy overlay):
 
 \[
-E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}} \subseteq V \times V
+E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}} \subseteq V \times V
 \]
 
-Каждое ребро может нести метку \( \lambda(e) \in \mathcal{A}^* \) (словарь строк — v0).
+\( E_{\mathsf{gov}} \) — **policy governs**: «этот узел/политика **управляет** поведением того» (session → capability, catalog → project, …). Может быть пустым, если всё задано атрибутами.
+
+Каждое ребро несёт метку \( \lambda(e) \in \mathcal{A}^* \) (словарь строк — v0); policy-ключи — подмножество ключей в \( \lambda \).
 
 ### 2.4 Владение файлами
 
@@ -109,16 +114,43 @@ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}} \subseteq V \times V
 ### 2.5 Статический граф решения
 
 \[
-G = (\mathbb{P},\ \mathbb{C},\ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ \omega,\ \kappa)
+G = (\mathbb{P},\ \mathbb{C},\ E_{\mathsf{req}},\ E_{\mathsf{inv}},\ E_{\mathsf{feed}},\ E_{\mathsf{gov}},\ \omega,\ \kappa,\ \psi)
 \]
+
+где \( \psi : V \rightharpoonup \mathcal{A}^* \) — **policy-атрибуты на узлах** (в т.ч. на \( \pi \) и \( c \)); дублируют/уточняют поля в \( \kappa \).
 
 ### 2.6 Сессия
 
 \[
-\mathcal{S} = (G,\ \sigma,\ \rho)
+\mathcal{S} = (G,\ \sigma,\ \rho_0)
 \]
 
-где \( \sigma \in \Phi \) — фаза сессии, \( \rho \) — политика (lazy/eager, evict-on-close, …).
+где \( \sigma \in \Phi \) — фаза сессии; \( \rho_0 \subseteq \mathcal{A}^* \) — **defaults сессии** (anchor overlay), не отдельная «магическая» политика.
+
+**Эффективная политика** — разрешение по иерархии:
+
+\[
+\rho_{\mathsf{eff}}(v, p) =
+  \psi(v)(p)
+  \;\|\;
+  \lambda(e)(p)\ \text{для } e \in E_{\mathsf{gov}},\ e=(u,v)
+  \;\|\;
+  \rho_0(p)
+  \;\|\;
+  \rho_{\mathsf{catalog}}(k, p)
+\]
+
+(первое определённое значение; \( v \in \mathbb{C} \Rightarrow \) смотрим также project-родителя \( \pi \)).
+
+| Носитель | Примеры policy-ключей |
+|----------|----------------------|
+| \( \rho_0 \) (session) | `designTimeLoad=lazy`, `evictOnClose=true` |
+| \( \psi(\pi) \) | `lut.enabled`, `restoreOnOpen` |
+| \( \kappa_\pi(k) \subseteq \psi(c) \) | `buildDriver`, `topology`, `feedAfterBuild` |
+| \( \lambda(e) \) на \( E_{\mathsf{gov}} \) | `(session → CS): warm=eager` |
+| \( \lambda(e) \) на \( E_{\mathsf{inv}} \)/\( E_{\mathsf{feed}} \) | `onSuccess=evict`, `coalesce=true` |
+
+**Принцип:** политика — **те же** атрибуты и отношения, что и остальной граф; оркестратор не читает отдельный конфиг в обход \( G \).
 
 ### 2.7 Materialized state (динамика, v0 sketch)
 
@@ -127,6 +159,47 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 \]
 
 \( M \) — множество capability, для которых оркестратор уже поднял handle; \( \mu(c) \) — **фактическая** топология после разрешения \( \mathsf{Adaptive} \).
+
+### 2.8 Frozen snapshot (on-demand jobs)
+
+Для фоновых и явно запрошенных операций — **не** живой буфер редактора, а **замороженный** срез поддерева:
+
+\[
+\varphi_r(\pi) = (\mathrm{subtree}(\pi),\ \omega_r,\ \mathrm{contents}_r,\ \kappa_{\pi,r})
+\]
+
+где \( r \) — ревизия (монотонный счётчик сессии или hash снимка).
+
+\[
+\mathsf{freeze}(\pi) \to \varphi_r(\pi)
+\]
+
+**Свойства:**
+
+- \( \varphi_r \) **иммутабелен** после создания; правки файлов после \( r \) не меняют уже запущенный job.
+- Job \( \mathsf{Build}(\pi)@\varphi_r \) **не читает** dirty live-state, пока политика не разрешит `BuildWithDirty` (v0: **запрещено** по умолчанию).
+- Несколько job'ов на одном \( \pi \) с разными \( r \) допустимы; оркестратор может **коалесцировать** (оставить только последний \( r \)).
+
+### 2.9 Snapshot job (общий шаблон)
+
+Любая on-demand операция над \( \varphi \):
+
+\[
+\mathsf{job}(k, \pi, \varphi_r, \theta) \to \mathsf{Result}
+\]
+
+где \( k \in \mathbb{K} \), \( \theta \) — спецификация (build target, refactor id, fix id, …).
+
+| \( k \) | \( \mathsf{Result} \) | Apply к live |
+|---------|----------------------|--------------|
+| \( \mathsf{Build} \) | артефакты (dll, js bundle, …) | опционально feed; **не** трогает sources |
+| \( \mathsf{TestRun} \) | test report | нет |
+| \( \mathsf{CodeTransform} \) | **patch** \( \Delta_{\mathsf{fs}} \) (edits + optional renames) | `apply(\Delta)` → scope §5.2 |
+| \( \mathsf{StaticAnalysis} \) (heavy) | report / diagnostics snapshot | нет (или merge в per-file cache) |
+
+**Preview:** \( \mathsf{job}(\mathsf{CodeTransform}, \ldots) \) с флагом `dryRun` — чистая функция на \( \varphi \), без `apply`.
+
+**Requires:** \( \mathsf{CodeTransform} \) обычно \( E_{\mathsf{req}} \) → \( \mathsf{CompilerServices} \) на **том же** \( \varphi \) (transient semantic model), не обязательно live \( M \).
 
 ---
 
@@ -138,7 +211,7 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 |----|----------------|
 | **WF1** | \( \mathrm{id} \) инъективен на \( \mathbb{P} \) |
 | **WF2** | \( \forall \pi.\ |\mathrm{dom}(\kappa_\pi)| = |\{k : \kappa_\pi(k)\ \text{defined}\}| \) и каждый \( k \) встречается **не более одного раза** |
-| **WF3** | \( \forall e \in E_{\mathsf{req}} \cup E_{\mathsf{inv}} \cup E_{\mathsf{feed}}.\ e = (u,v) \Rightarrow u \in V \land v \in V \) |
+| **WF3** | \( \forall e \in E_{\mathsf{req}} \cup E_{\mathsf{inv}} \cup E_{\mathsf{feed}} \cup E_{\mathsf{gov}}.\ e = (u,v) \Rightarrow u \in V \land v \in V \) |
 | **WF4** | Граф \( (V, E_{\mathsf{req}}) \) — **ацикличен** (DAG на \( \mathsf{requires} \)) |
 | **WF5** | \( \forall f \in \mathrm{dom}(\omega).\ \omega(f) \in \mathbb{P} \) |
 | **WF6** | Если \( \alpha = \kappa_\pi(k) \) и \( \alpha.\mathsf{topology} = \mathsf{Adaptive} \), то \( \alpha.\mathsf{rules} \neq \emptyset \) |
@@ -237,14 +310,158 @@ Solution ── Project CRUD     (slnx graph, membership)
 |----|----------------|
 | **L1** | Допустим только если \( \phi' \ge \sigma \) **или** явный rollback по политике |
 | **L2** | \( \mathrm{advance}(\cdot, \mathsf{DesignTime}) \) не требует \( \mathsf{CompileTime} \) materialization |
-| **L3** | \( \mathrm{advance}(\cdot, \mathsf{CompileTime}) \) **может** materialize \( \mathsf{Build} \); **не обязан** materialize \( \mathsf{CompilerServices} \) in-process build |
-| **L4** | После \( \mathrm{advance}(\cdot, \mathsf{CompileTime}) \) и успешного build, если \( E_{\mathsf{feed}} \) связывает Build → CompilerServices, то CompilerServices \( \notin M \) или помечен stale до refresh DesignTime |
+| **L3** | \( \mathrm{advance}(\cdot, \mathsf{CompileTime}) \) **не materialize** \( \mathsf{Build} \) автоматически; Build — **on-demand** (\( \mathsf{EnsureCapability}(\mathsf{Build}, \varphi) \)) |
+| **L4** | \( \mathsf{Build}(\pi)@\varphi_r \) выполняется **в фоне**; live \( \mathsf{CompilerServices}(\pi) \in M \) **не evict** из-за старта/завершения build |
+| **L5** | После успешного build: feed по \( E_{\mathsf{feed}} \) (Build → CompilerServices) — **опционально** и только по политике; иначе артефакт живёт отдельно от DesignTime |
 
-**Интуиция:** DesignTime и CompileTime — разные «режимы»; диагностика не должна незаметно тянуть full build (согласовано с ADR-0062).
+**Интуиция:** DesignTime — интерактивный слой; CompileTime/TestTime — **запрашиваемые** subprocess-job'ы над frozen snapshot, не побочный эффект каждого edit.
 
 ---
 
-## 7. Adaptive — разрешение топологии
+## 7. On-demand snapshot jobs (Build, Test, Refactor, …)
+
+CompileTime / TestTime / transform capability **не привязаны** к invalidation scope из §5.2.
+
+| ID | Формулировка |
+|----|----------------|
+| **OD1** | \( \mathsf{FileChange} \), \( \mathsf{ProjectFileCrud} \) **не** materialize \( \mathsf{Build} \), \( \mathsf{TestRun} \), \( \mathsf{CodeTransform} \) |
+| **OD2** | Materialize on-demand только по явному запросу (user, `cdp_build`, refactor preview, LUT, CI) |
+| **OD3** | Запрос → \( \varphi \leftarrow \mathsf{freeze}(\pi) \) → \( \mathsf{job}(k,\pi,\varphi,\theta) \); live \( M \) не трогаем до `apply` |
+| **OD4** | Job @ \( \varphi_r \) **не invalidate** при последующих \( \mathsf{FileChange} \); результат помечен `atRevision = r` |
+| **OD5** | **LUT:** `freeze → Build → TestDiscovery → TestRun` (debounced) |
+| **OD6** | **Refactor / fix:** semantic work на \( \varphi \); `apply(\Delta)` порождает \( \mathsf{FileChange} \) / \( \mathsf{ProjectFileCrud} \) — invalidation **после** apply, не до |
+
+```text
+Live session (DesignTime)          Snapshot job lane
+─────────────────────────          ──────────────────
+FileChange → per-file stale        freeze(subtree) → φ_r
+CompilerServices(π) ∈ M            job(k, π, φ_r, θ):
+  (continues uninterrupted)          Build      → artifacts
+                                   TestRun    → report
+                                   CodeTransform → Δ (preview or apply)
+```
+
+**Следствие:** blanket «CompileTime invalidates DesignTime» **отвергнут** для interactive path.
+
+### 7.2 Policy — атрибут или ребро, не отдельный мир
+
+Все «если / когда / как» из §5–§7 — **читаются** через \( \rho_{\mathsf{eff}} \):
+
+| Поведение | Где живёт policy |
+|-----------|------------------|
+| Lazy vs eager warm | \( \rho_0 \) или \( E_{\mathsf{gov}} \)(session → \( \mathsf{CompilerServices} \)) |
+| `BuildWithDirty` | \( \psi(c_{\mathsf{Build}}) \) |
+| Feed после build | \( \lambda \) на \( E_{\mathsf{feed}} \) или `feedAfterBuild` в \( \kappa \) |
+| Coalesce snapshot jobs | \( \psi(\pi) \) или session default |
+| Adaptive rules | уже в \( \kappa \); это **policy внутри** capability-атрибута |
+
+| ID | Формулировка |
+|----|----------------|
+| **P1** | Оркестратор принимает решения только через \( \rho_{\mathsf{eff}}(v,p) \) и аксиомы §3–§7, не через скрытые globals |
+| **P2** | Смена policy = изменение \( \psi \), \( \lambda \), или \( \rho_0 \) — **не** смена сортов графа |
+| **P3** | \( E_{\mathsf{gov}} \) ацикличен по project-ownership (как \( E_{\mathsf{req}} \) на capability DAG) |
+| **P4** | User/settings overlay мержится в \( \rho_0 \) / \( \psi \) при `Open`; не отдельный runtime channel |
+
+```text
+ρ_catalog  →  ρ_0 (session)  →  ψ(π)  →  κ_π(k)  →  λ(edge)
+   defaults      anchor           project    capability   governs/feed
+```
+
+### 7.3 Build substrate — MSBuild не SSOT
+
+**SSOT сессии:** \( G \), \( \omega \), \( \kappa \) — наш граф решения. MSBuild / `dotnet` — **один из backend'ов** capability \( \mathsf{Build} \), не модель мира.
+
+\[
+\alpha.\mathsf{buildDriver} \in \{ \mathsf{MsBuildInterop},\ \mathsf{DotNetCli},\ \mathsf{GuidersBuild},\ \mathsf{Npm},\ \ldots \}
+\]
+
+| Слой | Роль MSBuild (legacy) | Целевое состояние |
+|------|----------------------|-------------------|
+| **DesignTime** | `MsBuildWorkspace`, in-proc evaluation | **Ports.DotNet** → options для Roslyn/FCS из \( G \) + sdk assets; MSBuild **не** в hot path |
+| **CompileTime** | `dotnet build`, MSBuild.exe | **Pluggable** driver; свой DAG над \( \varphi \) (`GuidersBuild`) когда готов |
+| **Project file** | `.csproj` / `.fsproj` как источник правды | **Порт импорта** в \( \kappa_\pi \); позже — native project descriptor в графе |
+
+**Аксиомы:**
+
+| ID | Формулировка |
+|----|----------------|
+| **BS1** | Оркестратор **не** держит MSBuild evaluation graph как часть \( G \) |
+| **BS2** | Смена `buildDriver` — атрибут capability, не смена сортов графа |
+| **BS3** | \( \mathsf{GuidersBuild} \) строит по \( \varphi \) и внутреннему compile DAG (targets как данные); subprocess MSBuild — fallback port |
+| **BS4** | Refactor / analyzer / emit **не обязаны** знать про MSBuild, только про semantic model @ \( \varphi \) |
+
+**Прагматика миграции:** tactical `dotnet build` остаётся в Phase 2–4; стратегически MSBuild уходит за границу **port** (как сейчас FCS уже на Sdk loader, не Ionide probe). «Забыть как страшный сон» = **архитектурно** выкинуть из SSOT, не обязательно удалить бинарник завтра.
+
+### 7.4 Incremental build & compile
+
+Свой compile DAG + кэш артефактов — **естественное** продолжение \( \varphi \) и scope-invalidation, не отдельная подсистема.
+
+#### Compile graph (наш DAG, не MSBuild)
+
+\[
+\Gamma_\pi = (U_\pi,\ E_\pi,\ \mathsf{emit})
+\]
+
+\( U_\pi \) — **compilation units** (файл, модуль, project node — гранулярность policy); \( E_\pi \subseteq U_\pi \times U_\pi \) — зависимости; \( \mathsf{emit} : U \to \mathsf{Artifact} \).
+
+#### Artifact cache
+
+\[
+\mathcal{H} : \mathsf{hash}(\mathsf{inputs}(u)) \rightharpoonup (\mathsf{IL},\ \mathsf{pdb},\ \ldots)
+\]
+
+Кэш привязан к **замороженным** входам @ \( \varphi_r \), не к live dirty (кроме `BuildWithDirty`).
+
+#### Incremental build (unit-level)
+
+При \( \varphi_{r'} \) после \( \varphi_r \):
+
+\[
+\Delta_{\mathsf{files}} = \{ f : \mathrm{contents}_{r'}(f) \neq \mathrm{contents}_r(f) \}
+\]
+
+\[
+U' = \{ u \in U_\pi : u \cap \Delta_{\mathsf{files}} \neq \emptyset \} \cup \mathrm{descendants}_{E_\pi}(U')
+\]
+
+**Job:** \( \mathsf{Build}(\pi)@\varphi_{r'} \) пересобирает только \( U' \); остальное — **reuse** из \( \mathcal{H} \).
+
+| ID | Формулировка |
+|----|----------------|
+| **IB1** | Incremental build — **diff двух snapshot'ов** + transitive closure на \( \Gamma_\pi \), не полный rebuild по умолчанию |
+| **IB2** | LUT / background lane **коалесцирует** \( r' \) и запускает один incremental job на последний diff |
+| **IB3** | `buildDriver=MsBuildInterop` может делегировать incrementality MSBuild; `GuidersBuild` держит \( \Gamma_\pi \), \( \mathcal{H} \) как SSOT |
+
+#### Incremental **compilation** (finer than project)
+
+DesignTime уже держит **incremental semantic model** (Roslyn/FCS) в \( \mathsf{CompilerServices} \). Emit — отдельный слой:
+
+\[
+\mathsf{compile}(u,\ \mathsf{symbols@}\varphi) \to \mathsf{IL}_u
+\]
+
+- **Не обязан** перекомпилировать весь \( \pi \), если изменился один \( u \) и public API \( u \) не сломан (reference assembly / metadata-only deps).
+- **IL как interchange:** ECMA-335 + `System.Reflection.Metadata` / Cecil — открытый контракт; линковка, diff, hot-reload patch — над **артефактами**, не над MSBuild XML.
+
+| ID | Формулировка |
+|----|----------------|
+| **IC1** | \( \mathsf{CompilerServices} \) (DesignTime) и \( \mathsf{emit} \) (CompileTime) **разделяют** dependency graph, но не обязаны один handle |
+| **IC2** | Incremental emit затрагивает минимальный \( U' \); invalidation public surface → расширить \( U' \) по \( E_\pi \) |
+| **IC3** | PDB / sequence points — часть артефакта в \( \mathcal{H} \); debug feed опционален (policy) |
+
+```text
+FileChange (live)     →  stale semantic cache (per-file)
+freeze r → r'         →  Δ_files
+Build@φ_r'            →  U' = closure(Δ) on Γ_π
+                      →  compile only U' → IL → link/reuse H
+LUT                   →  TestRun on new IL subset
+```
+
+**Следствие:** MSBuild incremental — **одна реализация** `IB*` через port; целевое состояние — наш \( \Gamma_\pi + \mathcal{H} \), IL-native pipeline.
+
+---
+
+## 8. Adaptive — разрешение топологии
 
 Пусть \( \alpha.\mathsf{rules} = \{ r_1,\ldots,r_n \} \) упорядоченный список правил вида
 
@@ -260,9 +477,9 @@ r_i : \mathsf{pred}_i(\mathcal{S}, \pi, k) \Rightarrow t_i \in \top \setminus \{
 
 ---
 
-## 8. Решения и открытые вопросы
+## 9. Решения и открытые вопросы
 
-### 8.1 Invalidates — **решено**
+### 9.1 Invalidates — **решено**
 
 **Вариант D (scope-indexed):** см. §5.2. Runtime invalidation по \(\mathsf{scope}(\delta)\); явные \( E_{\mathsf{inv}} \) в графе — структурное дополнение.
 
@@ -271,17 +488,33 @@ r_i : \mathsf{pred}_i(\mathcal{S}, \pi, k) \Rightarrow t_i \in \top \setminus \{
 - **B** — только phase-driven (смешивает lifecycle и file edit);
 - **C** — phase + каталог без file/project CRUD (неполно).
 
-### 8.2 Глобальные vs локальные рёбра
+### 9.2 On-demand Build — **решено**
+
+Build / Test — subprocess over \( \varphi \), не автомат phase advance (§7, L3–L5). Phase \( \mathsf{CompileTime} \) в v0 — **политический флаг** сессии («разрешены compile-job'ы»), не триггер materialize.
+
+### 9.5 Policy as graph data — **направление зафиксировано**
+
+\( \rho \) раскладывается на \( \rho_0 \), \( \psi \), \( \lambda \), \( E_{\mathsf{gov}} \) (§2.6, §7.2). Код v0: `SessionPolicy` — временный face на \( \rho_0 \); цель — merge в граф.
+
+### 9.6 Build substrate — **направление зафиксировано**
+
+MSBuild / `dotnet` — port (`buildDriver`), не SSOT (§7.3). Свой build DAG + \( \mathcal{H} \) + incremental \( U' \) (§7.4).
+
+### 9.7 Incremental build/compile — **направление зафиксировано**
+
+§7.4: diff snapshot'ов → minimal \( U' \) on compile DAG; IL as open interchange (ECMA-335).
+
+### 9.8 Глобальные vs локальные рёбра
 
 Сейчас \( E_* \subseteq V \times V \) **глобально** на solution. Альтернатива: рёбра только внутри \( \mathrm{subgraph}(\pi) \). v0: **глобальные** (кросс-project requires возможен, напр. shared analyzer).
 
-### 8.3 Идентичность project
+### 9.9 Идентичность project
 
 v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename project на диске = новый узел. Позже: stable UUID в метаданных.
 
 ---
 
-## 9. Соответствие коду (v0)
+## 10. Соответствие коду (v0)
 
 | Математика | F# (`Modeling.Ide.Session`) |
 |------------|-----------------------------|
@@ -291,12 +524,15 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires` |
 | \( \omega \) | `SolutionGraph.FileOwnership` |
 | \( \mathcal{S} \) | `SolutionSession` |
+| \( \rho_0 \) | `SessionPolicy` (v0 face; → merge в graph) |
+| \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
 | WF1–WF6 | `GraphValidation.validate` |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
+| \( \varphi_r \), `freeze` | **ещё нет** → Phase 2 job substrate |
 
 ---
 
-## 10. Минимальный пример (для sanity)
+## 11. Минимальный пример (для sanity)
 
 Один F# project \( \pi \), capabilities \( \mathsf{CompilerServices} \), \( \mathsf{Build} \):
 
@@ -306,16 +542,32 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 
 (WF4: DAG OK.)
 
-Переход \( \mathsf{DesignTime} \to \mathsf{CompileTime} \): materialize Build → subprocess → при успехе feed/invalidate CompilerServices → refresh DesignTime context.
+Пользователь жмёт build (или LUT scheduler): \( \varphi \leftarrow \mathsf{freeze}(\pi) \) → \( \mathsf{Build}(\pi)@\varphi \) в фоне; CompilerServices остаётся в \( M \). Feed в DesignTime — только если политика / \( E_{\mathsf{feed}} \) и явный refresh.
 
 ---
 
-## 11. Эволюция документа
+## 12. Эволюция документа
 
-1. ~~Зафиксировать §8.1 (invalidates)~~ — **D scope-indexed** (§5.2).  
-2. Добавить в код: `InvalidationScope`, `MaterializedState` \( M, \mu \), `invalidate(δ)`.  
-3. Порт slnx: \( G \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
-4. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «\(\mathrm{invalidate}(\delta)\) монотонна по \(\prec\) scope».
+1. ~~Зафиксировать invalidates~~ — **D scope-indexed** (§5.2).  
+2. ~~On-demand Build over frozen snapshot~~ — §2.8–2.9, §7, L3–L5.  
+3. ~~Snapshot jobs + build substrate~~ — §2.9, §7.3, OD6, BS1–BS4.  
+4. ~~Policy as attributes / governs edges~~ — §2.6, §7.2, P1–P4.  
+5. ~~Incremental build/compile + IL cache~~ — §7.4, IB1–IC3.  
+6. Код: `InvalidationScope`, `FrozenSnapshot`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`.  
+7. Порт slnx: \( G \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
+8. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
+
+### Будущие ветки (не v0, не блокируют Dash Studio)
+
+| Ветка | Суть | Сейчас |
+|-------|------|--------|
+| **GuidersBuild** | \( \Gamma_\pi + \mathcal{H} \), incremental; emit via **Roslyn/FCS** drivers | Phase 2–4 orchestrator |
+| **GDL → IL** | declare-time GDL как frontend напрямую в ECMA-335; язык-агностичный interchange | **отдельная идея / fork**; capture: [ANUI GDL/IL rethink](../../../../../../../agent-notes/knowledge/work/projects/door-to-singularity/ai-native-ui/note-anui-gdl-il-rethink-v0.md) |
+| **Свой frontend** | полный compiler с нуля | только если GDL/Planet станет продуктом, не платформой |
+
+**v0 emit policy:** reuse Roslyn/FCS; не писать свой `csc`/`fsc` — иначе не ship'им платформу.
+
+**Теория GDL → IL:** IL как lingua franca — любой язык **в** экосистему через emit, любой **из** через metadata/reflection; F#/C# становятся optional surface, не SSOT. Заманчиво, но **после** session graph + Dash Studio vertical slice.
 
 ---
 
