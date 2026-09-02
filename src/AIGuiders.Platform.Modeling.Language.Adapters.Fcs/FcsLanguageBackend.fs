@@ -308,49 +308,9 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
             with _ ->
                 None
 
-    let tryResolveSymbolInProject (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
-        let fullName = symbol.FullName
-
-        if String.IsNullOrWhiteSpace fullName then
-            Some symbol
-        else
-            match symbol with
-            | :? FSharpEntity ->
-                projectResults.AssemblySignature.Entities
-                |> Seq.tryFind (fun entity -> entity.FullName = fullName)
-                |> Option.map (fun entity -> entity :> FSharpSymbol)
-            | _ -> None
-
-    let symbolUseMatches (target: FSharpSymbol) (use': FSharpSymbolUse) =
-        let useSymbol = use'.Symbol
-        let fullName = target.FullName
-        let displayName = target.DisplayName
-
-        (not (String.IsNullOrWhiteSpace fullName) && useSymbol.FullName = fullName)
-        || (not (String.IsNullOrWhiteSpace displayName) && useSymbol.DisplayName = displayName)
-
-    let getUsesByFullName (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
-        projectResults.GetAllUsesOfAllSymbols()
-        |> Array.filter (symbolUseMatches symbol)
-
     let getUsesInProject (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
-        let fullName = symbol.FullName
-
-        match tryResolveSymbolInProject symbol projectResults with
-        | Some projectSymbol ->
-            let direct = projectResults.GetUsesOfSymbol projectSymbol
-
-            if direct.Length > 0 then
-                direct
-            elif String.IsNullOrWhiteSpace fullName then
-                direct
-            else
-                getUsesByFullName symbol projectResults
-        | None ->
-            if String.IsNullOrWhiteSpace fullName && String.IsNullOrWhiteSpace symbol.DisplayName then
-                [||]
-            else
-                getUsesByFullName symbol projectResults
+        projectResults.GetAllUsesOfAllSymbols()
+        |> Array.filter (fun use' -> use'.Symbol.IsEffectivelySameAs symbol)
 
     let getUsesOfSymbolAcrossWorkspace (symbol: FSharpSymbol) (req: LanguageRequest) (fallbackUses: FSharpSymbolUse array) =
         task {

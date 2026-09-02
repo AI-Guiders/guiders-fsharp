@@ -183,7 +183,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | Package | Split | F# target | Status |
 |---------|-------|-----------|--------|
 | `Platform.Modeling.Language` | **M** | `Kernel.fs` — `LanguageRequest`, `LanguageDiagnostic`, `FindUsagesResult`, `RenameSymbolResult`, … | **shipped** (sibling `guiders-fsharp`) |
-| `Platform.Modeling.Language.Adapters.Fcs` | **M** | FCS backend — 7 IDE verbs (`get_diagnostics`, `get_document_symbols`, `go_to_definition`, `find_usages`, `get_completions`, `get_symbol_at_position`, `rename_symbol`); active-pattern rename blocker; workspace scan via `GetAllUsesOfAllSymbols` | **shipped** |
+| `Platform.Modeling.Language.Adapters.Fcs` | **M** | FCS backend — 7 IDE verbs; active-pattern rename blocker; workspace scan via `FSharpSymbol.IsEffectivelySameAs` per project | **shipped** |
 | `Platform.Modeling.Language.Adapters.Gdl` | **M** | GDL adapter stubs (deck pilot) | scaffold |
 | `Platform.Execution.Language` | **E** | `LanguageResolverCenter`, `ILanguageBackend` federation gateway | **shipped** (sibling `guiders-platform`) |
 
