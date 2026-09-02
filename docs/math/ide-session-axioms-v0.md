@@ -527,7 +527,7 @@ CompilerServices(π) ∈ M            job(k, π, φ_r(T), θ):
 \Gamma_\pi = (U_\pi,\ E_\pi,\ \mathsf{emit})
 \]
 
-\( U_\pi \) — **compilation units** (файл, модуль, project node — гранулярность policy); \( E_\pi \subseteq U_\pi \times U_\pi \) — зависимости; \( \mathsf{emit} : U \to \mathsf{Artifact} \).
+\( U_\pi \) — **compilation units**; гранулярность policy — от **semantic node** (method, type member, …) до файла/модуля; \( E_\pi \subseteq U_\pi \times U_\pi \) — зависимости emit; \( \mathsf{emit} : U \to \mathsf{Artifact} \).
 
 #### Artifact cache
 
@@ -574,13 +574,40 @@ DesignTime уже держит **incremental semantic model** (Roslyn/FCS) в \(
 | **IC2** | Incremental emit затрагивает минимальный \( U' \); invalidation public surface → расширить \( U' \) по \( E_\pi \) |
 | **IC3** | PDB / sequence points — часть артефакта в \( \mathcal{H} \); debug feed опционален (policy) |
 
-```text
-FileChange (live)     →  refine in Σ_π (syntax/semantic nodes)
+#### Sniper-scoped emit (semantic node → minimal \( U' \))
+
+**Цель:** emit только того, что **реально** затронуто semantic delta — как sub-file refinement (§5.2a), но на compile lane. Операционный аналог: CDP **sniper/peel** — правка и пересчёт по **якорю**, не по всему буферу/сборке.
+
+Пусть edit порождает \( \mathsf{refine}(\delta) = \Delta_{\mathsf{sem}} \subseteq N_{\mathsf{sem}} \) (напр. условие в `if` → узел выражения + enclosing symbol).
+
+\[
+\Delta_U = \{ u \in U_\pi : u \cap \mathrm{closure}_{E_{\mathsf{dep}}}(\Delta_{\mathsf{sem}}) \neq \emptyset \}
+\]
+
+\[
+U' = \Delta_U \cup \mathrm{descendants}_{E_\pi}(\Delta_U)
+\]
+
+**Пример:** смена условия в `if` без смены типов / public API → \( U' \) может свестись к **одному** method-body unit (или \( U' = \emptyset \), если IL не меняется — comment, unreachable tweak).
+
+| ID | Формулировка |
+|----|----------------|
+| **SN1** | Default incremental path: \( U' \) из \( \mathsf{refine}(\delta) \), **не** из \( \Delta_{\mathsf{files}} \) целиком, когда live \( \Sigma_\pi \) доступен |
+| **SN2** | \( U' = \emptyset \) ⇒ **no emit** (skip compile); не fallback на full \( \pi \) без policy |
+| **SN3** | Promotion file-wide / project-wide — только fallback (`FileStale`, `buildDriver=MsBuildInterop`) или broken public surface |
+| **SN4** | \( \mathsf{compile}(u, \ldots) \) вызывается **только** для \( u \in U' \); остальное — reuse \( \mathcal{H} \) |
+| **SN5** | `CodeSymbol` anchor (ADR-0063) — допустимый **ключ** \( u \) и sniper-target для emit scope |
+
+**Связь осей:** DesignTime \( \mathsf{refine} \) и CompileTime \( U' \) — **один** closure на \( E_{\mathsf{dep}} \), разные порты (semantic refresh vs IL emit).
+FileChange (live)     →  refine Δ_sem in Σ_π (syntax/semantic nodes)
                         →  FileStale(f) only as fallback
-freeze r → r'         →  Δ_files
-Build@φ_r'            →  U' = closure(Δ) on Γ_π
-                      →  compile only U' → IL → link/reuse H
+freeze r → r'         →  Δ_files (coarse) OR Δ_sem (sniper path)
+Build@φ_r'            →  U' = closure(Δ_sem) on Γ_π   [SN1–SN4]
+                      →  U' = ∅ → skip; else compile U' → IL → reuse H
 LUT                   →  TestRun on new IL subset
+
+Sniper example: edit if-condition → Δ_sem = {expr, enclosingMethod}
+                  → U' = {methodBody_u} or ∅ — not whole assembly
 ```
 
 **Следствие:** MSBuild incremental — **одна реализация** `IB*` через port; целевое состояние — наш \( \Gamma_\pi + \mathcal{H} \), IL-native pipeline.
@@ -696,7 +723,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6. ~~Capability edges local + \( E_{\mathsf{proj}} \)~~ — §2.3, §9.8, WF7–WF8.  
 6b. ~~Frozen Tree Composition~~ — §2.8b, §9.10 (shared analyzer, build closure).  
 6c. ~~Sub-file refinement (Σ_π, syntax/semantic nodes)~~ — §5.2a, I6–I8.  
-7. Код: `InvalidationScope`, `SemanticRefinement`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
+6d. ~~Sniper-scoped emit (semantic node → minimal U')~~ — §7.4, SN1–SN5.  
+7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
 10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
