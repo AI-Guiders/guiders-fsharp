@@ -58,12 +58,12 @@ New federation features **start in Modeling** (types + golden sessions), land in
 
 `Documentation.Correspondence.*` today is **pre-federation wiring**. Federation shape:
 
-1. **Nodes:** doc regions (path + stable fragment id), code symbols (\(n \in N_{\mathsf{sem}}\)), optional GDL declare entities.
-2. **Edges:** `CorrespondsTo` ⊆ (doc × code) scoped under \( \pi \) or solution via \(E_{\mathsf{proj}}\) closure — not global string search.
-3. **Invalidation:** doc `FileChange` → refine correspondence index; code `refine(δ)` → same anchor ids as ADR-0063.
-4. **Conformance:** golden session `given G + doc patch, assert edge set Sat(Q_corr)`.
+1. **Nodes:** doc regions (path + stable fragment id), code symbols (\(n \in N_{\mathsf{sem}}\)), optional GDL declare entities, **ADR lifecycle state** (L1′ per [FSHARP-0006](./GUIDERS-FSHARP-ADR-0006-adr-lifecycle-verifiable-facts.md)).
+2. **Edges:** `CorrespondsTo` ⊆ (doc × code) scoped under \( \pi \) or solution via \(E_{\mathsf{proj}}\) closure — kinds `normates`, `verified_by`, `implements` ([wire JSON](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/wire/correspondence/correspondence-kinds.v1.json)).
+3. **Invalidation:** doc `FileChange` → refine correspondence index; code `refine(δ)` → same anchor ids as ADR-0063; ADR status change → update L1′ without rescanning code.
+4. **Conformance:** golden session `given G + doc patch, assert edge set Sat(Q_corr)`; `facts:` block ↔ GS* via `verified_by`.
 
-Target packages (see [ADR-0003 matrix](./GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md)): `Modeling.Gdl.Correspondence` / `Modeling.Documentation.Correspondence` IR in F#; Execution hosts resolve; CDP exposes peek/navigate.
+Target packages (see [ADR-0003 matrix](./GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md)): `Modeling.Documentation.Correspondence` IR in F#; Execution hosts resolve; CDP exposes peek/navigate.
 
 ## Migration rules
 
