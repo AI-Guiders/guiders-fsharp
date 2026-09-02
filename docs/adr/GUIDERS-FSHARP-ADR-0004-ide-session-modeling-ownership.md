@@ -5,7 +5,7 @@
 | **Status** | Accepted |
 | **Date** | 2026-09-02 |
 | **Tags** | #guiders #fsharp #ide #solution #lifecycle #modeling |
-| **Related** | [GUIDERS-ADR-0062](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0062-ide-solution-session-orchestrator.md) · [GUIDERS-ADR-0063](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0063-anchors-federation-reincarnation.md) · [GUIDERS-FSHARP-ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) · [GUIDERS-ADR-0061](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0061-language-resolver-center.md) |
+| **Related** | [GUIDERS-ADR-0062](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0062-ide-solution-session-orchestrator.md) · [GUIDERS-ADR-0063](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0063-anchors-federation-reincarnation.md) · [GUIDERS-FSHARP-ADR-0002](./GUIDERS-FSHARP-ADR-0002-model-guild-fsharp-ownership.md) · [GUIDERS-FSHARP-ADR-0005](./GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md) · [GUIDERS-ADR-0061](https://github.com/AI-Guiders/guiders-dotnet-platform/blob/main/docs/adr/GUIDERS-ADR-0061-language-resolver-center.md) |
 
 ## Decision
 
