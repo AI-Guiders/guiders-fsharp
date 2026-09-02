@@ -9,9 +9,11 @@
   <ItemGroup>
     <Compile Include="Identifiers.fs" />
     <Compile Include="Lifecycle.fs" />
+    <Compile Include="InvalidationScope.fs" />
     <Compile Include="Topology.fs" />
     <Compile Include="Capabilities.fs" />
     <Compile Include="Projects.fs" />
+    <Compile Include="ProjectEdges.fs" />
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="SolutionGraph.fs" />
     <Compile Include="GraphValidation.fs" />

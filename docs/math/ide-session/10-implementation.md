@@ -12,13 +12,14 @@
 | \( \mathbb{P} \) | `ProjectNode` list |
 | \( \kappa_\pi \) | `ProjectNode.Capabilities` |
 | \( V \) | `GraphNodeId` = `ProjectNode` \| `CapabilityNode` |
-| \( E_{\mathsf{proj}} \) | **ещё нет** (ports slnx/csproj) |
-| \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires` (v0: validate WF7 pending) |
+| \( E_{\mathsf{proj}} \) | `ProjectEdge` list; port `Ports.DotNet.DotNetSlnxGraphPort` |
+| \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires`; WF7 local-only |
 | \( \omega \) | `SolutionGraph.FileOwnership` |
 | \( \mathcal{S} \) | `SolutionSession` |
 | \( \rho_0 \) | `SessionPolicy` (v0 face; → merge в graph) |
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
-| WF1–WF8 | `GraphValidation.validate` (WF7–WF8 Phase 1b) |
+| WF1–WF8 | `GraphValidation.validate` (WF7–WF8 shipped Phase 1b) |
+| Invalidation scope lattice | `InvalidationScope` (`promotes`, `max`) |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
 | \( \Sigma_\pi \), `refine` | **ещё нет** → port `CompilerServices` / semantic substrate (Phase 2) |
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
@@ -58,10 +59,11 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 6f. ~~Code Style & EditorConfig in G~~ — §2.11, ST1–ST5.  
 6g. ~~Revision ledger + Git subgraph + Timeline~~ — §2.12, §9.11, LD1–LD6.  
 6h. ~~Planet / Gdl как \( \tau \) без special case~~ — §1.5, §9.12, T1–T3; `ProjectCapabilityCatalog.forKind`.  
-7. Код: `InvalidationScope`, `SemanticRefinement`, `SniperEmitScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
-8. Порт slnx / gdlproj: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \leftarrow \mathcal{K}_\tau \) (`ProjectCapabilityCatalog.forKind`).  
-9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
-10. ~~Доказуемые свойства~~ — golden sessions §11 (`ConformanceGoldenSessionTests`); runtime props (FileChange/M) Phase 2+.
+7. ~~Код: `InvalidationScope`, …, `E_proj`~~ — Phase 1b (`InvalidationScope`, `ProjectEdges`, `Ports.DotNet`).  
+8. ~~Порт slnx / gdlproj~~ — `DotNetSlnxGraphPort.load` / `loadSession`; gdlproj **ещё нет**.  
+9. ~~`GraphValidation`: WF7, WF8~~ — shipped.  
+10. Orchestrator host: `Execution.Ide.Session.SolutionSessionHost.Open` (platform).  
+11. ~~Доказуемые свойства~~ — golden sessions §11 (`ConformanceGoldenSessionTests`); runtime props (FileChange/M) Phase 2+.
 
 ### Будущие ветки (не v0, не блокируют Dash Studio)
 

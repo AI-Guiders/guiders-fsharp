@@ -29,6 +29,30 @@ module GraphValidation =
             | None -> false
             | Some project -> project.Capabilities |> List.exists (fun c -> c.Kind = kind)
 
+    let private projectForNode (node: GraphNodeId) =
+        match node with
+        | GraphNodeId.ProjectNode pid -> pid
+        | GraphNodeId.CapabilityNode(pid, _) -> pid
+
+    let private detectProjectCycle (graph: SolutionGraph) =
+        let adj =
+            graph.ProjectEdges
+            |> List.groupBy (fun e -> ProjectId.value e.From)
+            |> List.map (fun (from, edges) -> from, edges |> List.map (fun e -> ProjectId.value e.To))
+            |> Map.ofList
+
+        let rec visit stack nodeKey =
+            if Set.contains nodeKey stack then
+                Some nodeKey
+            else
+                match Map.tryFind nodeKey adj with
+                | None -> None
+                | Some targets -> targets |> List.tryPick (fun t -> visit (Set.add nodeKey stack) t)
+
+        graph.ProjectEdges
+        |> List.tryPick (fun e -> visit Set.empty (ProjectId.value e.From))
+        |> Option.map id
+
     let private detectRequiresCycle (graph: SolutionGraph) =
         let requires = requiresEdges graph
 
@@ -85,8 +109,25 @@ module GraphValidation =
             if not (hasNode graph edge.To) then
                 issues.Add(issue $"Edge '{edgeKey edge}' references missing To node.")
 
+            // WF7 — capability edges local to subgraph(π)
+            if projectForNode edge.From <> projectForNode edge.To then
+                issues.Add(issue $"WF7: capability edge '{edgeKey edge}' crosses project subgraphs.")
+
         match detectRequiresCycle graph with
         | Some nodeKey -> issues.Add(issue $"Cycle detected in requires edges near node '{nodeKey}'.")
+        | None -> ()
+
+        let knownProjects = Set.ofList projectIds
+
+        for edge in graph.ProjectEdges do
+            if not (Set.contains edge.From knownProjects) then
+                issues.Add(issue $"WF8: project edge From '{ProjectId.value edge.From}' is unknown.")
+
+            if not (Set.contains edge.To knownProjects) then
+                issues.Add(issue $"WF8: project edge To '{ProjectId.value edge.To}' is unknown.")
+
+        match detectProjectCycle graph with
+        | Some nodeKey -> issues.Add(issue $"WF8: cycle detected in project edges near '{nodeKey}'.")
         | None -> ()
 
         for kv in graph.FileOwnership do

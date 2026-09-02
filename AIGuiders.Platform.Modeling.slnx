@@ -21,11 +21,13 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Fcs/AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Gdl/AIGuiders.Platform.Modeling.Language.Adapters.Gdl.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session/AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Tests/AIGuiders.Platform.Modeling.Ide.Session.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests.fsproj" />
   </Folder>
 </Solution>

@@ -9,11 +9,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SessionGraphTests.fs" />
-    <Compile Include="InvalidationScopeTests.fs" />
-    <Compile Include="ConformanceGoldenSessionTests.fs" />
+    <Compile Include="DotNetSlnxGraphPortTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
   </ItemGroup>
 </Project>

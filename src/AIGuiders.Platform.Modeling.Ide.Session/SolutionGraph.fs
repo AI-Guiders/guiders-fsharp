@@ -28,6 +28,7 @@ type SolutionGraph =
     { AnchorPath: string
       Projects: ProjectNode list
       FileOwnership: Map<string, ProjectId>
+      ProjectEdges: ProjectEdge list
       Edges: SessionEdge list }
 
 type SolutionSession =
@@ -41,13 +42,14 @@ module SolutionSession =
           Phase = Unloaded
           Policy = SessionPolicy.defaultPolicy }
 
-    let withPhase phase session = { session with Phase = phase }
+    let withPhase phase (session: SolutionSession) = { session with Phase = phase }
 
 module SolutionGraph =
-    let create anchorPath projects fileOwnership edges =
+    let create anchorPath projects fileOwnership edges projectEdges =
         { AnchorPath = anchorPath
           Projects = projects
           FileOwnership = fileOwnership
+          ProjectEdges = projectEdges
           Edges = edges }
 
     let tryFindProject id (graph: SolutionGraph) =

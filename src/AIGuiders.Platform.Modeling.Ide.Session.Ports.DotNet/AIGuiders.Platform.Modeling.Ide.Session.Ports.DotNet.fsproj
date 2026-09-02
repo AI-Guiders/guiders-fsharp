@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet</AssemblyName>
+    <Description>slnx/sln/csproj → SolutionGraph port (DotNetWorkspace.Core).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ProjectFileReader.fs" />
+    <Compile Include="DotNetSlnxGraphPort.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\guiders-core\src\DotNetWorkspace.Core\DotNetWorkspace.Core.csproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
+  </ItemGroup>
+</Project>

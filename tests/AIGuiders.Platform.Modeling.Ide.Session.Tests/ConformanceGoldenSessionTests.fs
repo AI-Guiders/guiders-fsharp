@@ -22,6 +22,7 @@ module GoldenSessions =
                 [ project ]
                 (Map.ofList [ sourcePath, id ])
                 []
+                []
 
         let contents =
             Map.ofList

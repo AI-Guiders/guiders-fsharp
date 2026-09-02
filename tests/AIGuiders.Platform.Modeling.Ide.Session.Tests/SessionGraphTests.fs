@@ -37,6 +37,7 @@ module private Samples =
                 To = compilerCap
                 Kind = Requires
                 Attributes = Map.empty } ]
+            []
 
 type SessionGraphTests() =
 
@@ -51,7 +52,7 @@ type SessionGraphTests() =
                 (ProjectId.value id)
                 (ProjectCapabilityCatalog.forKind (Gdl { ProjectFile = "deck.gdlproj" }))
 
-        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty []
+        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
         let result = GraphValidation.validate graph
         Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
 
@@ -70,7 +71,7 @@ type SessionGraphTests() =
                     :: [] }
 
         let graph =
-            SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty []
+            SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
 
         let result = GraphValidation.validate graph
         Assert.False(result.IsValid)
@@ -89,6 +90,7 @@ type SessionGraphTests() =
                 Map.empty
                 [ { From = a; To = b; Kind = Requires; Attributes = Map.empty }
                   { From = b; To = a; Kind = Requires; Attributes = Map.empty } ]
+                []
 
         let result = GraphValidation.validate graph
         Assert.False(result.IsValid)
@@ -104,7 +106,7 @@ type SessionGraphTests() =
 
         let project = { Samples.fsharpProject with Capabilities = [ cap ] }
 
-        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty []
+        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
         let result = GraphValidation.validate graph
         Assert.False(result.IsValid)
 
