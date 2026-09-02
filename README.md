@@ -19,6 +19,9 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 | `AIGuiders.Platform.Modeling.Gdl.Parse.Deck` | `*.deck.gdl` parser |
 | `AIGuiders.Platform.Modeling.Gdl.Validation` | cross-quarry project rules |
 | `AIGuiders.Platform.Modeling.Cockpit.DataBus` | event catalog, dispatch policy, projection graph |
+| `AIGuiders.Platform.Modeling.Language` | LRC kernel envelopes (`LanguageDiagnostic`, `LanguageSymbol`, …) |
+| `AIGuiders.Platform.Modeling.Language.Adapters.Fcs` | FCS backend (`.fs`) |
+| `AIGuiders.Platform.Modeling.Language.Adapters.Gdl` | GDL backend (`*.deck.gdl` pilot) |
 
 ## Build
 
@@ -26,6 +29,12 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 dotnet build AIGuiders.Platform.Modeling.slnx
 dotnet test AIGuiders.Platform.Modeling.slnx
 ```
+
+## License
+
+Software: [MIT](LICENSE) ([OSI text](https://opensource.org/license/MIT)) · Ethical use: [declaration](https://github.com/AI-Guiders/licensing/blob/main/docs/ethical-use.md)
+
+Private GitHub (org access). Consumed via sibling `ProjectReference` until public NuGet publish.
 
 ## Learn F#
 
