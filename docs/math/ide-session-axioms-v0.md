@@ -327,7 +327,7 @@ M \subseteq \mathbb{C},\quad \mu : M \to \top
 
 | Scope | CRUD / change | Примеры | Что трогаем в \( G \) | Что invalidates в \( M \) |
 |-------|----------------|---------|------------------------|---------------------------|
-| **FileChange** | содержимое файла | edit, save, watcher | dirty-bit на пути \( f \) (не обязательно менять \( G \)) | кэш диагностик / symbols **для \( f \)**; \( M \) capability **не evict** |
+| **FileChange** | содержимое файла | edit, save, watcher | dirty-bit на пути \( f \) (не обязательно менять \( G \)) | **не evict** \( M \); делегировать **sub-file** invalidation в \( \Sigma_\pi \) (§5.2a) |
 | **ProjectFileCrud** | файлы ↔ project | add/delete/rename `.fs`, glob hit | обновить \( \omega \), список sources в \( \kappa_\pi \) | \( \mathsf{CompilerServices}(\pi) \) → **stale**; evict только если stale не достаточно |
 | **ProjectCrud** | сам project | csproj/fsproj, TFM, PackageReference, restore | перечитать \( \kappa_\pi \), возможно \( \mathrm{id}(\pi) \) | \( M \cap \mathrm{subtree}(\pi) \) — evict |
 | **SolutionProjectCrud** | project ↔ solution | add/remove в slnx, rename project path | \( \mathbb{P} \), \( \omega \), рёбра на затронутых \( \pi \) | removed \( \pi \): evict subtree; added \( \pi \): lazy warm |
@@ -353,7 +353,59 @@ Solution ── Project CRUD     (slnx graph, membership)
     │
     └── Project ── File CRUD   (ω, sources, ownership)
             │
-            └── File ── Changes   (dirty, per-file diag cache)
+            └── File ── Changes   (dirty; sub-file refine в Σ — §5.2a)
+```
+
+#### 5.2a Sub-file refinement (semantic substrate)
+
+**FileChange** — **верхняя граница** session-scope, не нижняя. Внутри materialized \( \mathsf{CompilerServices}(\pi) \in M \) живёт **семантический субстрат**:
+
+\[
+\Sigma_\pi = (N_{\mathsf{syn}},\ N_{\mathsf{sem}},\ E_{\mathsf{dep}},\ \mathcal{D})
+\]
+
+| Компонент | Смысл |
+|-----------|--------|
+| \( N_{\mathsf{syn}} \) | syntax-узлы (деревья по файлам, green/red nodes) |
+| \( N_{\mathsf{sem}} \) | semantic handles: symbols, types, binding entries |
+| \( E_{\mathsf{dep}} \subseteq (N_{\mathsf{syn}} \cup N_{\mathsf{sem}})^2 \) | «зависит от» (parse → bind → type) |
+| \( \mathcal{D} \) | кэш диагностик, keyed по узлам / spans |
+
+**Две оси** события \( \delta \):
+
+\[
+\mathsf{scope}(\delta) \in \{\mathsf{FileChange}, \ldots\},\qquad
+\mathsf{refine}(\delta) \subseteq N_{\mathsf{syn}} \cup N_{\mathsf{sem}}
+\]
+
+Оркестратор сессии знает **только** \( \mathsf{scope} \); \( \mathsf{refine} \) — зона ответственности порта \( \mathsf{CompilerServices} \) (Roslyn/FCS incremental).
+
+**Уровни refinement** (от мелкого к крупному внутри FileChange):
+
+| Level | Событие | \( \mathsf{refine}(\delta) \) |
+|-------|---------|---------------------------|
+| **TextEdit** | вставка/удаление в \( f \) @ span | затронутые syntax nodes + их \( E_{\mathsf{dep}} \)-потомки |
+| **SyntaxStale** | reparsed subtree | \( N' \subseteq N_{\mathsf{syn}}(f) \) |
+| **SemanticStale** | смена public surface, unresolved → resolved | \( \mathrm{closure}_{E_{\mathsf{dep}}}(N') \cap N_{\mathsf{sem}} \); может **выйти за файл** внутри \( \pi \) |
+| **FileStale** | fallback / policy | весь \( N_{\mathsf{syn}}(f) \cup N_{\mathsf{sem}}(f) \) — грубый потолок, не evict \( M \) |
+
+\[
+\mathsf{TextEdit} \prec \mathsf{SyntaxStale} \prec \mathsf{SemanticStale} \prec \mathsf{FileStale}
+\]
+
+**Связь с Anchors** ([ADR-0063](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0063-anchors-federation-reincarnation.md)): `TextRange` → span / syntax node; `CodeSymbol` → \( n \in N_{\mathsf{sem}} \); invalidation и navigation на **одних** идентификаторах.
+
+| ID | Формулировка |
+|----|----------------|
+| **I6** | \( \mathsf{scope}(\delta)=\mathsf{FileChange} \Rightarrow \Delta \cap M = \emptyset \); инвалидация только \( \mathsf{refine}(\delta) \subseteq \Sigma_\pi \) |
+| **I7** | Cross-file spread **внутри** \( \pi \) (semantic deps A→B) — refinement, **не** promotion до \( \mathsf{ProjectFileCrud} \) |
+| **I8** | Promotion scope вверх только при CRUD (add/remove file, rename path, …), не при semantic closure |
+
+```text
+Session orchestrator          CompilerServices port (inside M)
+────────────────────          ────────────────────────────────
+FileChange(f)  ────────────→  TextEdit → SyntaxStale → SemanticStale
+  dirty(f)                      Σ_π refine only; M stays
 ```
 
 **Ответ на вопрос «invalidates когда?»** — когда пришло событие с известным scope; orchestrator выбирает \(\Delta\) по таблице выше + транзитивное замыкание по \( E_{\mathsf{inv}} \) **внутри** blast radius, не по всему \( V \).
@@ -407,7 +459,7 @@ CompileTime / TestTime / transform capability **не привязаны** к inv
 ```text
 Live session (DesignTime)          Snapshot job lane
 ─────────────────────────          ──────────────────
-FileChange → per-file stale        freeze_tree(m, Π₀) → φ_r(T)
+FileChange → refine Σ_π (nodes)   freeze_tree(m, Π₀) → φ_r(T)
 CompilerServices(π) ∈ M            job(k, π, φ_r(T), θ):
   (continues uninterrupted)          Build      → artifacts
                                    TestRun    → report
@@ -523,7 +575,8 @@ DesignTime уже держит **incremental semantic model** (Roslyn/FCS) в \(
 | **IC3** | PDB / sequence points — часть артефакта в \( \mathcal{H} \); debug feed опционален (policy) |
 
 ```text
-FileChange (live)     →  stale semantic cache (per-file)
+FileChange (live)     →  refine in Σ_π (syntax/semantic nodes)
+                        →  FileStale(f) only as fallback
 freeze r → r'         →  Δ_files
 Build@φ_r'            →  U' = closure(Δ) on Γ_π
                       →  compile only U' → IL → link/reuse H
@@ -613,6 +666,7 @@ v0: \( \mathrm{id}(\pi) = \mathsf{fullpath}(\pi.\mathsf{path}) \). Rename projec
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |
 | WF1–WF8 | `GraphValidation.validate` (WF7–WF8 Phase 1b) |
 | \( M, \mu \) | **ещё нет** → `Execution.Ide.Session` Phase 2 |
+| \( \Sigma_\pi \), `refine` | **ещё нет** → port `CompilerServices` / semantic substrate (Phase 2) |
 | \( \varphi_r \), `freeze` / `freeze_tree` | **ещё нет** → `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode` (Phase 2) |
 | \( \pi_{\mathsf{ws}} \) | **ещё нет** → port `WorkspaceView` / materialize facade (Phase 2) |
 
@@ -641,7 +695,8 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 5. ~~Incremental build/compile + IL cache~~ — §7.4, IB1–IC3.  
 6. ~~Capability edges local + \( E_{\mathsf{proj}} \)~~ — §2.3, §9.8, WF7–WF8.  
 6b. ~~Frozen Tree Composition~~ — §2.8b, §9.10 (shared analyzer, build closure).  
-7. Код: `InvalidationScope`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
+6c. ~~Sub-file refinement (Σ_π, syntax/semantic nodes)~~ — §5.2a, I6–I8.  
+7. Код: `InvalidationScope`, `SemanticRefinement`, `MaterializedState`, `FrozenSnapshot`, `FrozenTreeComposition`, `FreezeMode`, `CompileGraph`, `ArtifactCache`, `SnapshotJob`, `E_proj`.  
 8. Порт slnx: \( G \) + \( E_{\mathsf{proj}} \) из парсера + \( \kappa \) из `CapabilityCatalog`.  
 9. `GraphValidation`: WF7 (local capability edges), WF8 (project DAG).  
 10. Доказуемые свойства (опционально): «\(\mathsf{FileChange}\) не evict \( M \)»; «build @ \( \varphi_r \) не invalidate при edit @ \( r' > r \)».
