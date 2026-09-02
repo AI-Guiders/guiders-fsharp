@@ -58,8 +58,7 @@ module FcsProjectOptions =
     let createDefault () =
         let chain =
             FallbackFcsProjectOptionsSource(
-                [| IonideInProcessFcsProjectOptionsSource() :> IFcsProjectOptionsSource
-                   ProbeFcsProjectOptionsSource() :> IFcsProjectOptionsSource |]
+                [| SdkAssetsFcsProjectOptionsSource() :> IFcsProjectOptionsSource |]
             )
 
         CachingFcsProjectOptionsSource(chain) :> IFcsProjectOptionsSource
