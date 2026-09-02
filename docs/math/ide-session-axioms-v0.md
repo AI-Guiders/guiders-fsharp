@@ -402,7 +402,9 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 | **RF5** | Semantic work на \( \varphi \), не на dirty live (v0 default); sniper scope из \( \theta.\mathsf{anchor} \) (§7.4) |
 | **RF6** | **Hoare:** \( \mathsf{Sat}(P,G,Q) \Rightarrow \mathsf{Sat}(P,G',Q) \) после \( \mathsf{apply}(\mathsf{plan}) \); preview обязан **отклонить** \( \Delta \), если checker не может установить сохранение \( Q \) |
 
---- Аксиомы структурной корректности (static WF)
+---
+
+## 3. Аксиомы структурной корректности (static WF)
 
 Эти аксиомы проверяет `GraphValidation.validate` (Phase 1).
 
