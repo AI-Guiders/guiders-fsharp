@@ -42,6 +42,17 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
         else
             ""
 
+    let sourceIndexOf (path: string) (projectOptions: FSharpProjectOptions) =
+        let full = Path.GetFullPath path
+
+        match
+            projectOptions.SourceFiles
+            |> Array.tryFindIndex (fun f ->
+                String.Equals(Path.GetFullPath f, full, StringComparison.OrdinalIgnoreCase))
+        with
+        | Some index -> index
+        | None -> 0
+
     let toDiagnostic (path: string) (d: FSharpDiagnostic) =
         { Id = d.Subcategory
           Severity = toSeverity d.Severity
@@ -365,7 +376,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                 with
                 | Some projectOptions ->
                     let! projectResults = checker.ParseAndCheckProject(projectOptions)
-                    let! parseResults, checkAnswer = checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                    let! parseResults, checkAnswer = checker.ParseAndCheckFileInProject(path, sourceIndexOf path projectOptions, sourceText, projectOptions)
                     return Some(projectOptions, projectResults, parseResults, checkAnswer)
                 | None -> return None
         }
@@ -396,7 +407,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                             checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
 
                         let! parseResults, checkAnswer =
-                            checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                            checker.ParseAndCheckFileInProject(path, sourceIndexOf path projectOptions, sourceText, projectOptions)
 
                         let diagnostics = getDiagnosticsFromCheck parseResults checkAnswer path
                         return { Diagnostics = diagnostics }
@@ -410,7 +421,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                         with
                         | Some projectOptions ->
                             let! parseResults, checkAnswer =
-                                checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                                checker.ParseAndCheckFileInProject(path, sourceIndexOf path projectOptions, sourceText, projectOptions)
 
                             let diagnostics = getDiagnosticsFromCheck parseResults checkAnswer path
                             return { Diagnostics = diagnostics }
@@ -471,7 +482,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                     checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
 
                                 let! _, checkAnswer =
-                                    checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                                    checker.ParseAndCheckFileInProject(path, sourceIndexOf path projectOptions, sourceText, projectOptions)
 
                                 return tryNavigationFromCheck path checkAnswer req.Line req.Column source
                             }
@@ -486,7 +497,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                             | Some projectOptions ->
                                 task {
                                     let! _, checkAnswer =
-                                        checker.ParseAndCheckFileInProject(path, 0, sourceText, projectOptions)
+                                        checker.ParseAndCheckFileInProject(path, sourceIndexOf path projectOptions, sourceText, projectOptions)
 
                                     return tryNavigationFromCheck path checkAnswer req.Line req.Column source
                                 }

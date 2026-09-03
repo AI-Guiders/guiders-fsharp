@@ -340,6 +340,44 @@ module LanguageAdapterSmokeTests =
             Assert.Contains(result.Files, fun f -> f.EndsWith("Kernel.fs"))
 
     [<Fact>]
+    let ``Fcs diagnostics clean on FcsLanguageBackend with guiders slnx`` () =
+        let repoRoot =
+            System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let slnx = System.IO.Path.Combine(repoRoot, "AIGuiders.Platform.Modeling.slnx")
+
+        let backendFs =
+            System.IO.Path.Combine(
+                repoRoot,
+                "src",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs",
+                "FcsLanguageBackend.fs")
+
+        if not (System.IO.File.Exists slnx) then
+            Assert.Fail(sprintf "slnx fixture missing: %s" slnx)
+        else
+            let resolved = FcsProjectResolver.resolveFsproj backendFs slnx
+
+            Assert.True(
+                resolved.IsSome,
+                sprintf "fsproj should resolve via slnx graph for %s" backendFs)
+
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(backendFs, 1, 1, null, slnx)
+
+            let result =
+                backend.GetDiagnosticsAsync(req, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            let errors =
+                result.Diagnostics
+                |> Array.filter (fun d -> d.Severity = AIGuiders.Platform.Modeling.Language.Severity.Error)
+
+            Assert.Empty(errors)
+
+    [<Fact>]
     let ``FcsProjectResolver resolves fsproj via graph ownership`` () =
         let root =
             System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-omega-" + System.Guid.NewGuid().ToString("N"))
@@ -427,3 +465,31 @@ module LanguageAdapterSmokeTests =
                     |> Array.exists (fun o -> o.StartsWith("-r:", System.StringComparison.Ordinal))
 
                 Assert.True(hasRef, "FSharpWarmOptions should yield -r: reference assemblies")
+
+    [<Fact>]
+    let ``FcsProjectOptions warm loads project references for adapters fsproj`` () =
+        let repoRoot =
+            System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let fsproj =
+            System.IO.Path.Combine(
+                repoRoot,
+                "src",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj")
+
+        if not (System.IO.File.Exists fsproj) then
+            Assert.Fail(sprintf "fixture missing: %s" fsproj)
+        else
+            FcsProjectOptions.warm fsproj
+
+            match FcsProjectOptions.tryGet fsproj with
+            | None -> Assert.Fail("expected F# project options for adapters fsproj")
+            | Some options ->
+                let hasModelingLanguage =
+                    options.OtherOptions
+                    |> Array.exists (fun o ->
+                        o.Contains("AIGuiders.Platform.Modeling.Language.dll", System.StringComparison.OrdinalIgnoreCase))
+
+                Assert.True(hasModelingLanguage, "adapters fsproj should reference Modeling.Language.dll")
