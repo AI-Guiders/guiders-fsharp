@@ -11,7 +11,8 @@ type CompilerServicesMaterialization =
       Topology: ExecutionTopology
       TopologyWire: string
       LanguageId: string
-      Revision: int64 }
+      Revision: int64
+      WorkspaceView: WorkspaceView }
 
 type CompilerServicesEnsureResult =
     | Ensured of CompilerServicesMaterialization * SessionRuntime
@@ -45,7 +46,7 @@ module CompilerServicesMaterialization =
         | Gdl _ -> "gdl"
         | Planet { LanguageId = lid } -> lid
 
-    let private resolveTopology (attrs: CapabilityAttributes) =
+    let resolveTopology (attrs: CapabilityAttributes) =
         match attrs.Topology with
         | Adaptive ->
             attrs.AdaptiveRules
@@ -57,39 +58,3 @@ module CompilerServicesMaterialization =
 
     let tryGetCompilerServices (project: ProjectNode) =
         project.Capabilities |> List.tryFind (fun c -> c.Kind = CompilerServices)
-
-    let ensure (runtime: SessionRuntime) (filePath: string) =
-        let graph = runtime.Session.Graph
-
-        match tryResolveProjectId graph filePath with
-        | None -> Failed "file_not_owned_by_session_graph"
-        | Some projectId ->
-            match SolutionGraph.tryFindProject projectId graph with
-            | None -> Failed "project_not_in_graph"
-            | Some project ->
-                match tryGetCompilerServices project with
-                | None -> Failed "compiler_services_capability_missing"
-                | Some cap ->
-                    let node = GraphNodeId.capability projectId CompilerServices
-                    let revision = runtime.Ledger.NextRevision
-
-                    let materialized =
-                        runtime.Materialized |> MaterializedState.mark node revision
-
-                    let session' =
-                        runtime.Session |> SolutionSession.withPhase DesignTime
-
-                    let runtime' =
-                        { runtime with
-                            Session = session'
-                            Materialized = materialized }
-
-                    Ensured(
-                        { ProjectId = projectId
-                          CapabilityNode = node
-                          Topology = resolveTopology cap.Attributes
-                          TopologyWire = ExecutionTopology.toWire (resolveTopology cap.Attributes)
-                          LanguageId = languageIdForProject project
-                          Revision = revision },
-                        runtime'
-                    )

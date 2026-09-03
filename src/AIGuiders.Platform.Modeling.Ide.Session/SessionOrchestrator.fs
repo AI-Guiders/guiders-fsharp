@@ -45,7 +45,3 @@ module SessionOrchestrator =
         let revision = RevisionLedger.currentRevision runtime.Ledger + 1L
 
         FrozenSnapshot.freezeTree revision runtime.Session.Graph runtime.Contents mode
-
-    /// <summary>ADR-0062 §5 — materialize <c>CompilerServices</c> for the owning project of <paramref name="filePath"/>.</summary>
-    let ensureCompilerServices (runtime: SessionRuntime) (filePath: string) =
-        CompilerServicesMaterialization.ensure runtime filePath

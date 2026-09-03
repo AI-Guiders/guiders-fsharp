@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open Xunit
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 type SessionOrchestratorTests() =
 
@@ -102,10 +103,11 @@ type SessionOrchestratorTests() =
                 (SolutionSession.create graph.AnchorPath graph)
                 (Map.ofList [ sourcePath, "let foo = 1" ])
 
-        match SessionOrchestrator.ensureCompilerServices runtime sourcePath with
+        match DesignTimeCompilerServicesPort.materialize runtime sourcePath with
         | Failed reason -> Assert.Fail(reason)
         | Ensured(mat, applied) ->
             Assert.Equal("fsharp", mat.LanguageId)
             Assert.Equal(InProcess, mat.Topology)
             Assert.Equal(1, applied.Materialized.Entries.Count)
             Assert.Equal(DesignTime, applied.Session.Phase)
+            Assert.Equal(1, mat.WorkspaceView.Projects.Length)

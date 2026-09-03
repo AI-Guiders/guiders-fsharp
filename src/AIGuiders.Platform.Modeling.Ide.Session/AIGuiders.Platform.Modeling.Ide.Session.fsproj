@@ -21,6 +21,7 @@
     <Compile Include="RefactorPlan.fs" />
     <Compile Include="MaterializedState.fs" />
     <Compile Include="FrozenSnapshot.fs" />
+    <Compile Include="WorkspaceView.fs" />
     <Compile Include="RevisionLedger.fs" />
     <Compile Include="SessionRuntime.fs" />
     <Compile Include="CompilerServicesMaterialization.fs" />

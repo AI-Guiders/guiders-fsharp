@@ -8,6 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ProjectFileReader.fs" />
+    <Compile Include="WorkspaceViewPort.fs" />
+    <Compile Include="DesignTimeCompilerServicesPort.fs" />
     <Compile Include="DotNetSlnxGraphPort.fs" />
   </ItemGroup>
   <ItemGroup>

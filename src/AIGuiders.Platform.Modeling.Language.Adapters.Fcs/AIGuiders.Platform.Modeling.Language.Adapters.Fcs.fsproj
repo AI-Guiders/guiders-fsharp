@@ -17,6 +17,13 @@
   <ItemGroup>
 
     <PackageReference Include="FSharp.Compiler.Service" Version="43.12.400" />
+    <PackageReference Include="Ionide.ProjInfo" Version="0.74.2" />
+    <PackageReference Include="Ionide.ProjInfo.FCS" Version="0.74.2" />
+    <PackageReference Include="Microsoft.Build" Version="17.14.8" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.8" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.14.0" ExcludeAssets="runtime" PrivateAssets="all" />
 
   </ItemGroup>
 
@@ -24,8 +31,10 @@
 
     <Compile Include="IFcsProjectOptionsSource.fs" />
     <Compile Include="FcsProjectResolver.fs" />
+    <Compile Include="FcsProjInfoProjectOptionsSource.fs" />
     <Compile Include="FcsProjectOptionsSdkSource.fs" />
     <Compile Include="FcsProjectOptionsPipeline.fs" />
+    <Compile Include="FcsCompilerServicesHost.fs" />
     <Compile Include="FcsSessionPatchBridge.fs" />
     <Compile Include="FcsLanguageBackend.fs" />
 
