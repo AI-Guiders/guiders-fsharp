@@ -24,7 +24,8 @@ module WorkspaceViewPort =
                 |> Option.map (fun project ->
                     { ProjectId = snap.ProjectId
                       ProjectPath = project.AbsolutePath
-                      LanguageId = languageId project }))
+                      LanguageId = languageId project
+                      CompileFiles = [] }))
 
         { Revision = frozen.Revision
           AnchorPath = graph.AnchorPath

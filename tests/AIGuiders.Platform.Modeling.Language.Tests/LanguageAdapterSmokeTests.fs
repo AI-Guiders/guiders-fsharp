@@ -8,6 +8,24 @@ open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open AIGuiders.Platform.Modeling.Language.Adapters.Gdl
 
 module LanguageAdapterSmokeTests =
+    let private projInfoBackend () =
+        FcsLanguageBackend(FcsProjInfoProjectOptionsSource() :> IFcsProjectOptionsSource)
+        :> ILanguageBackend
+
+    let private materializeGuidersSlnx (slnx: string) (anchorFs: string) =
+        FcsCompilerServicesHost.invalidate (Some slnx)
+
+        let ensure =
+            AIGuiders.Platform.Execution.Ide.Session.FederationSessionRuntime.TryEnsureCompilerServices(
+                slnx,
+                anchorFs)
+
+        Assert.True(ensure.Ok, ensure.Reason)
+
+        match ensure.WorkspaceView with
+        | null -> Assert.Fail "WorkspaceView missing after EnsureCompilerServices"
+        | view -> FcsCompilerServicesHost.materialize view |> ignore
+
     [<Fact>]
     let ``Fcs parses simple fs source`` () =
         let backend = FcsLanguageBackend() :> ILanguageBackend
@@ -80,7 +98,7 @@ module LanguageAdapterSmokeTests =
         System.IO.File.WriteAllText(fs, "module Sem\nlet x = totallyUnknownIdentifier\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 1, 1, null, null)
 
             let result =
@@ -118,7 +136,7 @@ module LanguageAdapterSmokeTests =
             "module Goto\n\nlet answer = 42\n\nlet useIt () = answer\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 5, 16, null, fsproj)
 
             let nav =
@@ -155,7 +173,7 @@ module LanguageAdapterSmokeTests =
             "module Usage\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 5, 18, null, fsproj)
 
             let usages =
@@ -189,7 +207,7 @@ module LanguageAdapterSmokeTests =
         System.IO.File.WriteAllText(fs, "module Sym\n\nlet answer = 42\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 3, 5, null, fsproj)
 
             let symbol =
@@ -222,7 +240,7 @@ module LanguageAdapterSmokeTests =
         System.IO.File.WriteAllText(fs, "module Complete\n\nlet answer = 42\n\nlet useIt () = ans\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 5, 18, null, fsproj)
 
             let completions =
@@ -256,7 +274,7 @@ module LanguageAdapterSmokeTests =
             "module Rename\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 5, 18, null, fsproj)
             let renameReq = RenameSymbolRequest(req, "renamed", false)
 
@@ -296,7 +314,7 @@ module LanguageAdapterSmokeTests =
             "module Ap\n\nlet (|Even|Odd|) v = if v % 2 = 0 then Even else Odd\n\nlet _ = (|Even|Odd|) 2\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 3, 10, null, fsproj)
             let renameReq = RenameSymbolRequest(req, "Renamed", false)
 
@@ -325,6 +343,7 @@ module LanguageAdapterSmokeTests =
         if not (System.IO.File.Exists slnx) then
             Assert.Fail(sprintf "slnx fixture missing: %s" slnx)
         else
+            materializeGuidersSlnx slnx kernelFs
             let backend = FcsLanguageBackend() :> ILanguageBackend
             let req = LanguageRequest(kernelFs, 87, 10, null, slnx)
             let renameReq = RenameSymbolRequest(req, "LanguageRequestPreview", false)
@@ -340,10 +359,12 @@ module LanguageAdapterSmokeTests =
             Assert.Contains(result.Files, fun f -> f.EndsWith("Kernel.fs"))
 
     [<Fact>]
-    let ``SdkAssets includes framework refs for Adapters.Fcs`` () =
+    let ``Materialized compile order matches ProjInfo for Adapters.Fcs`` () =
         let repoRoot =
             System.IO.Path.GetFullPath(
                 System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let slnx = System.IO.Path.Combine(repoRoot, "AIGuiders.Platform.Modeling.slnx")
 
         let fsproj =
             System.IO.Path.Combine(
@@ -352,17 +373,47 @@ module LanguageAdapterSmokeTests =
                 "AIGuiders.Platform.Modeling.Language.Adapters.Fcs",
                 "AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj")
 
-        if not (System.IO.File.Exists fsproj) then
-            Assert.Fail(sprintf "fixture missing: %s" fsproj)
-        else
-            let source = SdkAssetsFcsProjectOptionsSource() :> IFcsProjectOptionsSource
+        let backendFs =
+            System.IO.Path.Combine(
+                repoRoot,
+                "src",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs",
+                "FcsLanguageBackend.fs")
 
-            match source.TryLoad fsproj with
-            | Result.Ok options ->
-                Assert.True(
-                    FcsProjectOptionsGuards.hasFrameworkReference options,
-                    "SdkAssets fallback must include System.Runtime framework reference.")
-            | Result.Error err -> Assert.Fail err.Message
+        if not (System.IO.File.Exists slnx) then
+            Assert.Fail(sprintf "slnx fixture missing: %s" slnx)
+        else
+            materializeGuidersSlnx slnx backendFs
+
+            let enriched =
+                match FcsCompilerServicesHost.tryGetView slnx with
+                | Some view -> view
+                | None -> Assert.Fail "materialized view missing"; failwith "unreachable"
+
+            let project =
+                enriched.Projects
+                |> List.find (fun p ->
+                    System.String.Equals(p.ProjectPath, fsproj, System.StringComparison.OrdinalIgnoreCase))
+
+            Assert.NotEmpty(project.CompileFiles)
+
+            Assert.True(
+                List.exists (fun (f: string) -> f.EndsWith("IFcsProjectOptionsSource.fs", System.StringComparison.OrdinalIgnoreCase)) project.CompileFiles,
+                "CompileFiles must come from MSBuild @(Compile) order.")
+
+            Assert.True(
+                List.exists (fun (f: string) -> f.EndsWith("FcsLanguageBackend.fs", System.StringComparison.OrdinalIgnoreCase)) project.CompileFiles,
+                "CompileFiles must include FcsLanguageBackend.fs.")
+
+            let ifcsIndex =
+                project.CompileFiles
+                |> List.findIndex (fun (f: string) -> f.EndsWith("IFcsProjectOptionsSource.fs", System.StringComparison.OrdinalIgnoreCase))
+
+            let backendIndex =
+                project.CompileFiles
+                |> List.findIndex (fun (f: string) -> f.EndsWith("FcsLanguageBackend.fs", System.StringComparison.OrdinalIgnoreCase))
+
+            Assert.True(ifcsIndex < backendIndex, "IFcsProjectOptionsSource must precede FcsLanguageBackend in frozen compile order.")
 
     [<Fact>]
     let ``Fcs diagnostics clean on FcsLanguageBackend with guiders slnx`` () =
@@ -387,6 +438,8 @@ module LanguageAdapterSmokeTests =
             Assert.True(
                 resolved.IsSome,
                 sprintf "fsproj should resolve via slnx graph for %s" backendFs)
+
+            materializeGuidersSlnx slnx backendFs
 
             let backend = FcsLanguageBackend() :> ILanguageBackend
             let req = LanguageRequest(backendFs, 1, 1, null, slnx)
@@ -451,7 +504,7 @@ module LanguageAdapterSmokeTests =
             "module Apply\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
 
         try
-            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let backend = projInfoBackend ()
             let req = LanguageRequest(fs, 5, 18, null, fsproj)
             let renameReq = RenameSymbolRequest(req, "renamed", true)
 
@@ -483,9 +536,7 @@ module LanguageAdapterSmokeTests =
         if not (System.IO.File.Exists fsproj) then
             Assert.Fail(sprintf "fixture missing: %s" fsproj)
         else
-            FcsProjectOptions.warm fsproj
-
-            match FcsProjectOptions.tryGet fsproj with
+            match FcsProjectOptions.tryLoadViaProjInfo fsproj with
             | None -> Assert.Fail("expected F# project options")
             | Some options ->
                 let hasRef =
@@ -510,9 +561,7 @@ module LanguageAdapterSmokeTests =
         if not (System.IO.File.Exists fsproj) then
             Assert.Fail(sprintf "fixture missing: %s" fsproj)
         else
-            FcsProjectOptions.warm fsproj
-
-            match FcsProjectOptions.tryGet fsproj with
+            match FcsProjectOptions.tryLoadViaProjInfo fsproj with
             | None -> Assert.Fail("expected F# project options for adapters fsproj")
             | Some options ->
                 let hasModelingLanguage =

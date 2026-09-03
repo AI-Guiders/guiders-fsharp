@@ -4,7 +4,9 @@ namespace AIGuiders.Platform.Modeling.Ide.Session
 type WorkspaceProjectView =
     { ProjectId: ProjectId
       ProjectPath: string
-      LanguageId: string }
+      LanguageId: string
+      /// <summary>MSBuild @(Compile) order frozen @ revision (from ProjInfo at materialize).</summary>
+      CompileFiles: string list }
 
 type WorkspaceView =
     { Revision: SessionRevision
