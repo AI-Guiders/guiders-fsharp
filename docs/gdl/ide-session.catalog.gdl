@@ -2,6 +2,8 @@
 # Grammar: catalog quarry extension v0 (operations + gates blocks)
 # Readable layer for agents and humans; math notation stays in ide-session/06-transforms.md
 # Code harness reads this once → HoareChecker · GraphValidation · StyleConformance · SessionPatch.scope
+# TODO(Correspondence): columns gates.code + implementation.* must become normates edges (ADR-0028)
+#   so rename/move refactor updates GDL refs with code — not hand-maintained strings (M3 pilot).
 # Related: GUIDERS-FSHARP-ADR-0004 · GUIDERS-ADR-0062 · GUIDERS-ADR-0047 (catalog block style)
 
 catalog ide-session

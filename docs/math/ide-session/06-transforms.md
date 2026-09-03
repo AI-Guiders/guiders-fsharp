@@ -137,7 +137,7 @@ Q = Q_{\mathsf{wf}} \land Q_{\mathsf{types}} \land Q_{\mathsf{obs}}
 | \( \Theta_{\mathsf{style}} \) **CodeStyle** | формат / naming / style rules | см. §2.11 | обычно сохраняем; не обязано |
 | \( \Theta_{\mathsf{cfg}} \) **Config** | `.editorconfig`, analyzer props, rule sets | \( Q_{\mathsf{wf}} \); меняется \( \psi \), не обязательно sources | n/a |
 
-**Читаемый SSOT (GDL):** тот же каталог операций и gates — без \( \theta \), \( Q_* \) — в [`docs/gdl/ide-session.catalog.gdl`](../../gdl/ide-session.catalog.gdl). Harness и агенты читают GDL; математика здесь остаётся нормативной ссылкой (RF6–RF8).
+**Читаемый SSOT (GDL):** тот же каталог операций и gates — без \( \theta \), \( Q_* \) — в [`docs/gdl/ide-session.catalog.gdl`](../../gdl/ide-session.catalog.gdl). Harness и агенты читают GDL; математика здесь остаётся нормативной ссылкой (RF6–RF8). Колонки `code` / `implementation` в GDL — **временно строки**; целевое состояние — `normates` в Correspondence (ADR-0028), чтобы рефакторинг переименовывал и их.
 
 **Fix** — отдельная операция: \( \theta.\mathsf{diagnosticId} \), цель \( Q_{\mathsf{diag}} \) («этот diagnostic исчез»), **не** ослабленный refactor.
 
