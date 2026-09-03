@@ -400,3 +400,30 @@ module LanguageAdapterSmokeTests =
         finally
             if System.IO.Directory.Exists root then
                 System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``FcsProjectOptions warm loads compile references for fsproj`` () =
+        let repoRoot =
+            System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let fsproj =
+            System.IO.Path.Combine(
+                repoRoot,
+                "src",
+                "AIGuiders.Platform.Modeling.Language",
+                "AIGuiders.Platform.Modeling.Language.fsproj")
+
+        if not (System.IO.File.Exists fsproj) then
+            Assert.Fail(sprintf "fixture missing: %s" fsproj)
+        else
+            FcsProjectOptions.warm fsproj
+
+            match FcsProjectOptions.tryGet fsproj with
+            | None -> Assert.Fail("expected F# project options")
+            | Some options ->
+                let hasRef =
+                    options.OtherOptions
+                    |> Array.exists (fun o -> o.StartsWith("-r:", System.StringComparison.Ordinal))
+
+                Assert.True(hasRef, "FSharpWarmOptions should yield -r: reference assemblies")

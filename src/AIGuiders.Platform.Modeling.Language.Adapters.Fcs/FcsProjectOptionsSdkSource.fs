@@ -40,13 +40,13 @@ type SdkAssetsFcsProjectOptionsSource(?checker: FSharpChecker, ?loader: ISdkProj
     interface IFcsProjectOptionsSource with
         member _.TryLoad projectPath =
             try
-                let ctx = loader.Load(projectPath)
+                let ctx = loader.Load(projectPath, WorkspaceProjectWarm.FSharpWarmOptions)
                 Ok(toFcsOptions ctx)
             with ex ->
                 Error { Message = ex.Message }
 
         member _.Warm projectPath =
-            loader.Warm(projectPath)
+            loader.Warm(projectPath, WorkspaceProjectWarm.FSharpWarmOptions)
 
         member _.Invalidate fsprojPath =
             match fsprojPath with
