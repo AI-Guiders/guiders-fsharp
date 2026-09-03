@@ -49,7 +49,7 @@ New federation features **start in Modeling** (types + golden sessions), land in
 | Solution / slnx load | \( G = (\mathbb{P}, E_{\mathsf{proj}}, \omega, \kappa) \) (ADR-0062) | parser port → graph |
 | GDL / Planet workspaces | \( \tau \in \mathbb{T} \); same orchestrator (§1.5 T1–T3) | not a second IDE session |
 | Build / test / LUT | on-demand `job(k, π, φ_r, θ)`; live \(M\) not evicted (§7) | `cdp_build` / scheduler triggers |
-| Refactor / fix / style | \( \Theta \) classes + Hoare + `StylePath` (§2.10–2.11) | preview/apply verbs |
+| Refactor / fix / style | \( \Theta \) classes + Hoare + `StylePath` (§2.10–2.11); **readable gates:** [`ide-session.catalog.gdl`](../gdl/ide-session.catalog.gdl) | preview/apply verbs |
 | **Correspondence** (doc ↔ code) | typed edges in \(G\): doc fragment ↔ anchor / symbol id; shared resolve with sniper & LRC | UI projection + MCP read; **not** ad-hoc string match SSOT |
 | Cockpit / deck / rules | typed cockpit circuit graph IR (ADR-0002) | mount + bus; rules eval on IR |
 | Conformance / vectors | golden sessions per shipped axiom (§11 GS*) | CI gate on Modeling packages |

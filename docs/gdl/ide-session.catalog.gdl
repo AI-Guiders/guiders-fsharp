@@ -1,0 +1,58 @@
+# IDE Session — federation operation catalog (apply gates SSOT)
+# Grammar: catalog quarry extension v0 (operations + gates blocks)
+# Readable layer for agents and humans; math notation stays in ide-session/06-transforms.md
+# Code harness reads this once → HoareChecker · GraphValidation · StyleConformance · SessionPatch.scope
+# Related: GUIDERS-FSHARP-ADR-0004 · GUIDERS-ADR-0062 · GUIDERS-ADR-0047 (catalog block style)
+
+catalog ide-session
+
+based on adr:GUIDERS-FSHARP-ADR-0004
+based on math:ide-session/06-transforms
+
+defaults
+  operation.apply_via = SessionOrchestrator.applyPatch
+  operation.preview   = plan without apply
+end defaults
+
+helps table
+  | target                    | field   | text                                                                 |
+  | gate graph-valid          | summary | После патча граф решения остаётся структурно корректным (WF)         |
+  | gate types-check          | summary | После патча исходники проходят проверку типов                        |
+  | gate behavior-preserved   | summary | Рефактор не меняет наблюдаемое поведение программы                   |
+  | gate diagnostic-resolved  | summary | Целевой diagnostic исчезает после фикса                              |
+  | gate scope-file-change    | summary | Инвалидация не шире одного файла (FileChange)                        |
+  | blocker active-pattern    | summary | F# active pattern нельзя переименовать семантически                    |
+  | class refactor            | summary | Меняем структуру/имена; поведение сохраняем                          |
+  | class fix                 | summary | Закрываем diagnostic; поведение может измениться                     |
+  | class edit                | summary | Прямое редактирование текста; только файловый scope                  |
+end helps
+
+gates table
+  | gate                  | reject-when                              | code                         |
+  | graph-valid           | GraphValidation reports issue            | GraphValidation.validate     |
+  | types-check           | typecheck failed or not run when required | HoareChecker.checkTypes      |
+  | behavior-preserved    | rename obs predicate violated            | ObsChecker.checkRename       |
+  | diagnostic-resolved   | target diagnostic still present          | (fix port — future)          |
+  | scope-file-change     | SessionPatch.scope wider than FileChange | GraphPatch.scope             |
+  | not-active-pattern    | symbol is F# active pattern              | FcsLanguageBackend blocker   |
+end gates
+
+operations table
+  | operation       | class    | before-apply gates                                      | invalidation-scope |
+  | rename-symbol   | refactor | graph-valid, types-check, behavior-preserved, not-active-pattern | file-change        |
+  | apply-fix       | fix      | graph-valid, types-check, diagnostic-resolved           | file-change        |
+  | buffer-edit     | edit     | scope-file-change                                       | file-change        |
+  | style-apply     | style    | graph-valid, types-check-if-proven-path                 | file-change        |
+end operations
+
+lrc table
+  | verb                  | operation     |
+  | language.rename_symbol | rename-symbol |
+  | buffer.apply          | buffer-edit   |
+end lrc
+
+implementation table
+  | operation     | plan                         | apply                         |
+  | rename-symbol | FcsSessionPatchBridge        | FcsSessionPatchBridge.tryApplyPatch |
+  | buffer-edit   | SessionPatch from buffer     | SessionOrchestrator.applyPatch  |
+end implementation
