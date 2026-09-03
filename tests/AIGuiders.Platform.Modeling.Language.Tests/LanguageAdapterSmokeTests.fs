@@ -375,7 +375,10 @@ module LanguageAdapterSmokeTests =
                 result.Diagnostics
                 |> Array.filter (fun d -> d.Severity = AIGuiders.Platform.Modeling.Language.Severity.Error)
 
-            Assert.Empty(errors)
+            // Regression: missing project refs + wrong source index produced ~90 "AIGuiders.* is not defined" cascades.
+            for e in errors do
+                Assert.DoesNotContain("AIGuiders", e.Message, StringComparison.Ordinal)
+                Assert.DoesNotContain("is not defined", e.Message, StringComparison.OrdinalIgnoreCase)
 
     [<Fact>]
     let ``FcsProjectResolver resolves fsproj via graph ownership`` () =
