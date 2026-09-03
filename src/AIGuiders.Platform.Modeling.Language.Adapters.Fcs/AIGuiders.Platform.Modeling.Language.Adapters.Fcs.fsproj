@@ -26,6 +26,7 @@
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProjectOptionsSdkSource.fs" />
     <Compile Include="FcsProjectOptionsPipeline.fs" />
+    <Compile Include="FcsSessionPatchBridge.fs" />
     <Compile Include="FcsLanguageBackend.fs" />
 
   </ItemGroup>

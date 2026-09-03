@@ -654,7 +654,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                                 else
                                                     use'.FileName)
 
-                                        let mutable changes = ResizeArray<RenameFileChange>()
+                                        let mutable writes = ResizeArray<string * string>()
 
                                         for filePath, fileUses in grouped do
                                             let fileSource =
@@ -669,12 +669,23 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                                 updated <- replaceRangeInSource updated use'.Range newName
 
                                             if not (String.Equals(updated, fileSource, StringComparison.Ordinal)) then
-                                                changes.Add({ Path = filePath; NewText = updated })
+                                                writes.Add(filePath, updated)
 
-                                                if apply then
-                                                    File.WriteAllText(filePath, updated)
+                                        let patch =
+                                            FcsSessionPatchBridge.renameFileChangesToPatch [||]
+                                            |> fun p ->
+                                                { p with
+                                                    FileSystem =
+                                                        { p.FileSystem with
+                                                            Writes = writes |> Seq.toList } }
 
-                                        let filePaths = changes |> Seq.map (fun c -> c.Path) |> Array.ofSeq
+                                        let changes = FcsSessionPatchBridge.patchToRenameFileChanges patch
+
+                                        if apply then
+                                            for filePath, updated in patch.FileSystem.Writes do
+                                                File.WriteAllText(filePath, updated)
+
+                                        let filePaths = changes |> Array.map (fun c -> c.Path)
 
                                         return
                                             { OldName = oldName
@@ -683,5 +694,5 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                               Applied = apply
                                               Message = ""
                                               Files = filePaths
-                                              Changes = changes.ToArray() }
+                                              Changes = changes }
                     }
