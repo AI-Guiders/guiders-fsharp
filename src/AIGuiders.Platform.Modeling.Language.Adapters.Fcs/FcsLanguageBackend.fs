@@ -681,9 +681,21 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
 
                                         let changes = FcsSessionPatchBridge.patchToRenameFileChanges patch
 
-                                        if apply then
-                                            for filePath, updated in patch.FileSystem.Writes do
-                                                File.WriteAllText(filePath, updated)
+                                        let applied, message =
+                                            if not apply then
+                                                false, ""
+                                            else
+                                                let overrides =
+                                                    Map.empty |> Map.add (Path.GetFullPath path) source
+
+                                                match
+                                                    FcsSessionPatchBridge.tryApplyPatch
+                                                        req.SolutionOrProjectPath
+                                                        patch
+                                                        overrides
+                                                with
+                                                | Ok () -> true, ""
+                                                | Result.Error reason -> false, reason
 
                                         let filePaths = changes |> Array.map (fun c -> c.Path)
 
@@ -691,8 +703,8 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                             { OldName = oldName
                                               NewName = newName
                                               SymbolKind = kind
-                                              Applied = apply
-                                              Message = ""
+                                              Applied = applied
+                                              Message = message
                                               Files = filePaths
                                               Changes = changes }
                     }

@@ -338,3 +338,65 @@ module LanguageAdapterSmokeTests =
             Assert.False(result.Applied)
             Assert.NotEmpty(result.Changes)
             Assert.Contains(result.Files, fun f -> f.EndsWith("Kernel.fs"))
+
+    [<Fact>]
+    let ``FcsProjectResolver resolves fsproj via graph ownership`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-omega-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "OmegaProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Omega.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Omega.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(fs, "module Omega\n\nlet value = 1\n")
+
+        try
+            let resolved = FcsProjectResolver.resolveFsproj fs fsproj
+            Assert.Equal(Some fsproj, resolved)
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
+
+    [<Fact>]
+    let ``Fcs rename apply persists through SessionOrchestrator`` () =
+        let root =
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "fcs-apply-" + System.Guid.NewGuid().ToString("N"))
+
+        System.IO.Directory.CreateDirectory root |> ignore
+        let fsproj = System.IO.Path.Combine(root, "ApplyProj.fsproj")
+        let fs = System.IO.Path.Combine(root, "Apply.fs")
+
+        System.IO.File.WriteAllText(
+            fsproj,
+            """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup><Compile Include="Apply.fs" /></ItemGroup>
+</Project>""")
+
+        System.IO.File.WriteAllText(
+            fs,
+            "module Apply\n\nlet answer = 42\n\nlet useIt () = answer + 1\n")
+
+        try
+            let backend = FcsLanguageBackend() :> ILanguageBackend
+            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+            let renameReq = RenameSymbolRequest(req, "renamed", true)
+
+            let result =
+                backend.RenameSymbolAsync(renameReq, CancellationToken.None)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            Assert.True(result.Applied, result.Message)
+            Assert.Empty(result.Message)
+            Assert.Contains("renamed", System.IO.File.ReadAllText(fs))
+        finally
+            if System.IO.Directory.Exists root then
+                System.IO.Directory.Delete(root, true)
