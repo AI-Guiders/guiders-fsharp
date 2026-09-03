@@ -22,6 +22,8 @@
     <Compile Include="MaterializedState.fs" />
     <Compile Include="FrozenSnapshot.fs" />
     <Compile Include="RevisionLedger.fs" />
+    <Compile Include="SessionRuntime.fs" />
+    <Compile Include="CompilerServicesMaterialization.fs" />
     <Compile Include="SessionOrchestrator.fs" />
     <Compile Include="Hoare.fs" />
     <Compile Include="Conformance.fs" />

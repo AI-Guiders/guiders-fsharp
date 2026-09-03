@@ -7,6 +7,14 @@ type ExecutionTopology =
     | SubprocessTool
     | Adaptive
 
+module ExecutionTopology =
+    let toWire =
+        function
+        | InProcess -> "in-process"
+        | OutOfProcess -> "out-of-process"
+        | SubprocessTool -> "subprocess-tool"
+        | Adaptive -> "adaptive"
+
 type WarmthHint =
     | Cold
     | Warm
