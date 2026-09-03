@@ -340,6 +340,31 @@ module LanguageAdapterSmokeTests =
             Assert.Contains(result.Files, fun f -> f.EndsWith("Kernel.fs"))
 
     [<Fact>]
+    let ``SdkAssets includes framework refs for Adapters.Fcs`` () =
+        let repoRoot =
+            System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(System.AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
+
+        let fsproj =
+            System.IO.Path.Combine(
+                repoRoot,
+                "src",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs",
+                "AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj")
+
+        if not (System.IO.File.Exists fsproj) then
+            Assert.Fail(sprintf "fixture missing: %s" fsproj)
+        else
+            let source = SdkAssetsFcsProjectOptionsSource() :> IFcsProjectOptionsSource
+
+            match source.TryLoad fsproj with
+            | Result.Ok options ->
+                Assert.True(
+                    FcsProjectOptionsGuards.hasFrameworkReference options,
+                    "SdkAssets fallback must include System.Runtime framework reference.")
+            | Result.Error err -> Assert.Fail err.Message
+
+    [<Fact>]
     let ``Fcs diagnostics clean on FcsLanguageBackend with guiders slnx`` () =
         let repoRoot =
             System.IO.Path.GetFullPath(

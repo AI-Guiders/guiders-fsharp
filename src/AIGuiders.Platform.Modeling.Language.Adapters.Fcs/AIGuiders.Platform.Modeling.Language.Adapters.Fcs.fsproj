@@ -30,6 +30,7 @@
   <ItemGroup>
 
     <Compile Include="IFcsProjectOptionsSource.fs" />
+    <Compile Include="FcsProjectOptionsGuards.fs" />
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProjInfoProjectOptionsSource.fs" />
     <Compile Include="FcsProjectOptionsSdkSource.fs" />

@@ -21,6 +21,7 @@ type SdkAssetsFcsProjectOptionsSource(?checker: FSharpChecker, ?loader: ISdkProj
                 yield "--target:library"
                 yield "--noframework"
                 yield "--simpleresolution"
+                yield "--targetprofile:netcore"
             |]
 
         let sourceFiles =

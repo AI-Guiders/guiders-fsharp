@@ -2,23 +2,17 @@ namespace AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 
 open System
 open System.IO
+open DotNetWorkspace.Core
 open Ionide.ProjInfo
 open Ionide.ProjInfo.FCS
-open Microsoft.Build.Locator
 open FSharp.Compiler.CodeAnalysis
 
 /// <summary>MSBuild design-time F# project options (Ionide.ProjInfo port — §7.3 buildDriver family).</summary>
 type FcsProjInfoProjectOptionsSource(?checker: FSharpChecker) =
     let checker = defaultArg checker (FSharpChecker.Create())
 
-    static let ensureMsBuild () =
-        try
-            MSBuildLocator.RegisterDefaults() |> ignore
-        with :? InvalidOperationException ->
-            ()
-
     let loadOptions (projectPath: string) =
-        ensureMsBuild ()
+        MsBuildLocatorOnce.EnsureRegistered()
         let full = Path.GetFullPath projectPath
         let projectDir = DirectoryInfo(Path.GetDirectoryName full)
         let toolsPath = Init.init projectDir None
@@ -29,7 +23,7 @@ type FcsProjInfoProjectOptionsSource(?checker: FSharpChecker) =
         | Some projectOptions ->
             match FCS.mapManyOptions [ projectOptions ] |> Seq.tryHead with
             | None -> Error { Message = $"Ionide.ProjInfo could not map FCS options for '{full}'." }
-            | Some fcsOptions -> Ok fcsOptions
+            | Some fcsOptions -> FcsProjectOptionsGuards.requireFrameworkReferences fcsOptions
 
     interface IFcsProjectOptionsSource with
         member _.TryLoad projectPath =
