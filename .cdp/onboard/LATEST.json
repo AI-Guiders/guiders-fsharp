@@ -1,0 +1,21 @@
+{
+  "schema": "onboard/v0",
+  "title": "onboard \u00B7 guiders-fsharp",
+  "project_name": "guiders-fsharp",
+  "root": "D:\\Experiments\\Personal Cursor Folder\\Financial\\software\\open\\guiders-fsharp",
+  "updated_utc": "2026-09-03T20:49:08.8818867+00:00",
+  "profile_hint": "unknown",
+  "docs": {
+    "has_readme": true,
+    "has_docs_dir": true,
+    "adr_count": 14,
+    "readme_path": "README.md"
+  },
+  "entrypoints": [],
+  "top_folders": [],
+  "verticals": [],
+  "solutions": [],
+  "csproj_count": 0,
+  "files_scanned": 0,
+  "truncated": false
+}
