@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Agent</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Agent</AssemblyName>
+
+    <Description>GDL agent modeling: response envelope, detail tier, next hints (IR.Agent port; IntentOutcome stays execution-side).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Agent</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="AgentModel.fs" />
+
+  </ItemGroup>
+
+</Project>
