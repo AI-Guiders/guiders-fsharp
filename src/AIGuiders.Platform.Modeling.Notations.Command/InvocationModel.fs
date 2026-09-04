@@ -1,6 +1,5 @@
-namespace AIGuiders.Platform.Modeling.Gdl.Invocation
+namespace AIGuiders.Platform.Modeling.Notations.Command
 
-open System
 open System.Collections.Generic
 
 /// <summary>Post-resolve command path (catalog longest-prefix or explicit console path).</summary>

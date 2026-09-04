@@ -12,6 +12,6 @@
     <Compile Include="GdlBindingConformanceTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Binding\AIGuiders.Platform.Modeling.Gdl.Binding.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Command.Binding\AIGuiders.Platform.Modeling.Gdl.Command.Binding.fsproj" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
-module AIGuiders.Platform.Modeling.Gdl.Binding.Tests.ConformanceTests
+module AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests.ConformanceTests
 
 open System
 open System.Collections.Generic
 open Xunit
 open AIGuiders.Platform.Modeling.Notations.Keyboard
-open AIGuiders.Platform.Modeling.Gdl.Binding
+open AIGuiders.Platform.Modeling.Gdl.Command.Binding
 
 [<Fact>]
 let ``FromFlatEntry: command key keeps Command target and trims`` () =

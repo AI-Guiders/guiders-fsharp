@@ -4,13 +4,13 @@
 
     <TargetFramework>net10.0</TargetFramework>
 
-    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Melody</RootNamespace>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Command.Melody</RootNamespace>
 
-    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Melody</AssemblyName>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Command.Melody</AssemblyName>
 
     <Description>GDL melody modeling: articulation, line profiles, steps, descriptor (IR.Melody port).</Description>
 
-    <PackageId>AIGuiders.Platform.Modeling.Gdl.Melody</PackageId>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Command.Melody</PackageId>
 
   </PropertyGroup>
 

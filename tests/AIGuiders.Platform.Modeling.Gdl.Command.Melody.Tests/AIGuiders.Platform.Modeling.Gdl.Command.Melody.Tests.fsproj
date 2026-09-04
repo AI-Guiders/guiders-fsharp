@@ -12,6 +12,6 @@
     <Compile Include="GdlMelodyConformanceTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Melody\AIGuiders.Platform.Modeling.Gdl.Melody.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Command.Melody\AIGuiders.Platform.Modeling.Gdl.Command.Melody.fsproj" />
   </ItemGroup>
 </Project>

@@ -22,6 +22,10 @@
 
     <Compile Include="NotationCore.fs" />
 
+    <Compile Include="InvocationModel.fs" />
+
+    <Compile Include="InvocationNotation.fs" />
+
   </ItemGroup>
 
 </Project>

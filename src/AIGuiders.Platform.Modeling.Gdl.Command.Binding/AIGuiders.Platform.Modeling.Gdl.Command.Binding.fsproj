@@ -4,13 +4,13 @@
 
     <TargetFramework>net10.0</TargetFramework>
 
-    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Binding</RootNamespace>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Command.Binding</RootNamespace>
 
-    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Binding</AssemblyName>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Command.Binding</AssemblyName>
 
     <Description>GDL binding modeling: descriptor, target kinds, well-known keys, normalized gesture entry (IR.Binding port).</Description>
 
-    <PackageId>AIGuiders.Platform.Modeling.Gdl.Binding</PackageId>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Command.Binding</PackageId>
 
   </PropertyGroup>
 

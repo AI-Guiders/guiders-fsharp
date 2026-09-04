@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Gdl.Binding
+namespace AIGuiders.Platform.Modeling.Gdl.Command.Binding
 
 open System
 open AIGuiders.Platform.Modeling.Notations.Keyboard

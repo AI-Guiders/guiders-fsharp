@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Gdl.Melody
+namespace AIGuiders.Platform.Modeling.Gdl.Command.Melody
 
 open System
 open System.Collections.Generic

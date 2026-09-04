@@ -1,8 +1,8 @@
-module AIGuiders.Platform.Modeling.Gdl.Melody.Tests.ConformanceTests
+module AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests.ConformanceTests
 
 open System.Collections.Generic
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Melody
+open AIGuiders.Platform.Modeling.Gdl.Command.Melody
 
 [<Fact>]
 let ``FromSlug: PureByNote default, empty steps, help passthrough`` () =

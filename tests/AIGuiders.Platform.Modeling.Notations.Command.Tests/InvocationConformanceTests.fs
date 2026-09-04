@@ -1,8 +1,8 @@
-module AIGuiders.Platform.Modeling.Gdl.Invocation.Tests.ConformanceTests
+module AIGuiders.Platform.Modeling.Notations.Command.Tests.InvocationConformanceTests
 
 open System.Collections.Generic
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Invocation
+open AIGuiders.Platform.Modeling.Notations.Command
 
 [<Fact>]
 let ``FromPathSegments: filters blanks and joins with single space`` () =
