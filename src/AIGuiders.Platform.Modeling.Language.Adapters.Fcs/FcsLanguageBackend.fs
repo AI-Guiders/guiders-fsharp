@@ -145,43 +145,67 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                             Some { Definition = span; Declarations = [| span |] }
         | FSharpCheckFileAnswer.Aborted -> None
 
+    let symbolNameOfPat (pat: SynPat) =
+        let rec walk (p: SynPat) =
+            match p with
+            | SynPat.Named(ident = SynIdent(ident = ident)) -> Some ident.idText
+            | SynPat.LongIdent(longDotId = longId) -> Some (List.last longId.LongIdent).idText
+            | SynPat.Paren (inner, _) -> walk inner
+            | _ -> None
+
+        walk pat
+
     let collectSymbols (path: string) (parseResults: FSharpParseFileResults) =
         let collected = ResizeArray<LanguageSymbol>()
 
-        let visitBinding (container: string) (binding: SynBinding) =
+        let visitBinding (target: ResizeArray<LanguageSymbol>) (container: string) (binding: SynBinding) =
             match binding with
-            | SynBinding(headPat = SynPat.Named(ident = SynIdent(ident = ident)); range = range) ->
-                collected.Add(symbol ident.idText "let" path range container)
+            | SynBinding(headPat = headPat; range = range) ->
+                match symbolNameOfPat headPat with
+                | Some name -> target.Add(symbol name "let" path range container)
+                | None -> ()
             | _ -> ()
 
-        let rec visitDecl (container: string) (decl: SynModuleDecl) =
+        let rec visitDecl (target: ResizeArray<LanguageSymbol>) (container: string) (decl: SynModuleDecl) =
             match decl with
             | SynModuleDecl.Let(bindings = bindings) ->
-                bindings |> List.iter (visitBinding container)
-            | SynModuleDecl.NestedModule(decls = decls) ->
-                decls |> List.iter (visitDecl container)
+                bindings |> List.iter (visitBinding target container)
+            | SynModuleDecl.NestedModule(moduleInfo = SynComponentInfo(longId = idents); decls = nested; range = range) ->
+                let name =
+                    match idents with
+                    | [] -> "_"
+                    | ids -> (List.last ids).idText
+
+                let childContainer =
+                    if String.IsNullOrEmpty container then name
+                    else container + "." + name
+
+                let inner = ResizeArray<LanguageSymbol>()
+                nested |> List.iter (visitDecl inner childContainer)
+                target.Add({ symbol name "module" path range container with Children = inner.ToArray() })
             | SynModuleDecl.Types(typeDefns = typeDefns) ->
                 typeDefns
-                |> List.iter (fun (SynTypeDefn(typeInfo = SynComponentInfo(longId = idents; range = range))) ->
+                |> List.iter (fun (SynTypeDefn(typeInfo = SynComponentInfo(longId = idents); range = range)) ->
                     let name =
                         match idents with
                         | [] -> "_"
                         | id :: _ -> id.idText
 
-                    collected.Add(symbol name "type" path range container))
+                    target.Add(symbol name "type" path range container))
             | _ -> ()
 
         match parseResults.ParseTree with
         | ParsedInput.ImplFile(ParsedImplFileInput(contents = modules)) ->
-            for SynModuleOrNamespace(longId = idents; decls = decls) in modules do
-                let container =
-                    match idents with
-                    | [] -> Path.GetFileNameWithoutExtension path |> Option.ofObj |> Option.defaultValue path
-                    | head :: _ -> head.idText
+            for SynModuleOrNamespace(longId = idents; decls = decls; range = range) in modules do
+                let fullName = idents |> List.map (fun i -> i.idText) |> String.concat "."
 
+                let inner = ResizeArray<LanguageSymbol>()
                 for decl in decls do
-                    visitDecl container decl
+                    visitDecl inner fullName decl
+                collected.Add({ symbol fullName "module" path range "" with Children = inner.ToArray() })
         | ParsedInput.SigFile _ -> ()
+
+        collected.ToArray()
 
         collected.ToArray()
 
