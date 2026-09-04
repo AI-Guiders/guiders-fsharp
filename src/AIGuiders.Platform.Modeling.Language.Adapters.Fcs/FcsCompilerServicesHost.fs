@@ -8,7 +8,7 @@ open FSharp.Compiler.CodeAnalysis
 
 /// <summary>Materialize F# CompilerServices from <c>WorkspaceView</c> @ revision — MSBuild/ProjInfo once, then frozen.</summary>
 module FcsCompilerServicesHost =
-    let private projInfo = FcsProjInfoProjectOptionsSource()
+    let private projInfo = FcsProbeProjectOptionsSource()
 
     let private views =
         ConcurrentDictionary<string, WorkspaceView>(StringComparer.OrdinalIgnoreCase)

@@ -9,7 +9,7 @@ open AIGuiders.Platform.Modeling.Language.Adapters.Gdl
 
 module LanguageAdapterSmokeTests =
     let private projInfoBackend () =
-        FcsLanguageBackend(FcsProjInfoProjectOptionsSource() :> IFcsProjectOptionsSource)
+        FcsLanguageBackend(FcsProbeProjectOptionsSource() :> IFcsProjectOptionsSource)
         :> ILanguageBackend
 
     let private materializeGuidersSlnx (slnx: string) (anchorFs: string) =

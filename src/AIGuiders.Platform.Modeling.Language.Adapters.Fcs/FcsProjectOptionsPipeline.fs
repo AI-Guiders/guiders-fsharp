@@ -24,7 +24,7 @@ module FcsProjectOptions =
         if String.IsNullOrWhiteSpace fsprojPath || not (File.Exists fsprojPath) then
             None
         else
-            let loader = FcsProjInfoProjectOptionsSource() :> IFcsProjectOptionsSource
+            let loader = FcsProbeProjectOptionsSource() :> IFcsProjectOptionsSource
 
             match loader.TryLoad fsprojPath with
             | Ok options -> Some options

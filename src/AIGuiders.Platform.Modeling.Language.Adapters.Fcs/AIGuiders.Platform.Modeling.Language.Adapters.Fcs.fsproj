@@ -33,6 +33,7 @@
     <Compile Include="FcsProjectOptionsGuards.fs" />
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProjInfoProjectOptionsSource.fs" />
+    <Compile Include="FcsProbeProjectOptionsSource.fs" />
     <Compile Include="FcsCompilerServicesHost.fs" />
     <Compile Include="FcsWorkspaceMaterializedOptionsSource.fs" />
     <Compile Include="FcsProjectOptionsPipeline.fs" />
@@ -56,4 +57,3 @@
   </ItemGroup>
 
 </Project>
-
