@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Language</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Language</AssemblyName>
+
+    <Description>GDL language modeling: resolve tiers, loci, anchor spans, text edits, buffer outcomes, sniper scopes (IR.Language port).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Language</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="BracketSpanModel.fs" />
+
+    <Compile Include="LanguageModel.fs" />
+
+  </ItemGroup>
+
+</Project>

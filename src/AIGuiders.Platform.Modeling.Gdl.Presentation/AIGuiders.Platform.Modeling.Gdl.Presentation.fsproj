@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="ScreenBinding.fs" />
     <Compile Include="TopologyNotation.fs" />
   </ItemGroup>
 </Project>
