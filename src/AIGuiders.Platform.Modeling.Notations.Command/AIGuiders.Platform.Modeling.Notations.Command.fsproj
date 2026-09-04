@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Notations.Command</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Notations.Command</AssemblyName>
+
+    <Description>Command notation wire: slash body, KV atom, bracket-aware list split (GUIDERS-ADR-0021 port).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Notations.Command</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="CommandWire.fs" />
+
+    <Compile Include="SlashNotation.fs" />
+
+    <Compile Include="NotationCore.fs" />
+
+  </ItemGroup>
+
+</Project>
