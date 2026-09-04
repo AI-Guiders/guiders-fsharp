@@ -44,6 +44,8 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Command.Tests/AIGuiders.Platform.Modeling.Notations.Command.Tests.fsproj" />
   </Folder>
 </Solution>
