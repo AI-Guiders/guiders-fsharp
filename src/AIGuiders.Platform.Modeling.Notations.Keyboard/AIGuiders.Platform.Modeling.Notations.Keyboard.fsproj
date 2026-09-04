@@ -1,12 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+
     <TargetFramework>net10.0</TargetFramework>
+
     <RootNamespace>AIGuiders.Platform.Modeling.Notations.Keyboard</RootNamespace>
+
     <AssemblyName>AIGuiders.Platform.Modeling.Notations.Keyboard</AssemblyName>
-    <Description>Normalized keyboard chord/key sequence IR.</Description>
+
+    <Description>Keyboard notation wire model: normalized key sequences, chord steps (Neutral port; normalizer stays execution-side).</Description>
+
     <PackageId>AIGuiders.Platform.Modeling.Notations.Keyboard</PackageId>
+
   </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="KeyboardTypes.fs" />
+
+    <Compile Include="KeyboardModel.fs" />
+
   </ItemGroup>
+
 </Project>

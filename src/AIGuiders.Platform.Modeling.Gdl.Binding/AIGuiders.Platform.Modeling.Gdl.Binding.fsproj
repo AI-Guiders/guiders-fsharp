@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Binding</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Binding</AssemblyName>
+
+    <Description>GDL binding modeling: descriptor, target kinds, well-known keys, normalized gesture entry (IR.Binding port).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Binding</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="BindingModel.fs" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Notations.Keyboard\AIGuiders.Platform.Modeling.Notations.Keyboard.fsproj" />
+
+  </ItemGroup>
+
+</Project>
