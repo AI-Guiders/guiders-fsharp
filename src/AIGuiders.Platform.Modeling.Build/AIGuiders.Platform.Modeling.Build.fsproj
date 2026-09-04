@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Build</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Build</AssemblyName>
+
+    <Description>Neutral build-result model: diagnostics with anchor wires (GUIDERS-ADR-0021 line_literal).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Build</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="BuildResultModel.fs" />
+
+  </ItemGroup>
+
+</Project>

@@ -11,6 +11,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Core/AIGuiders.Platform.Modeling.Core.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Paths/AIGuiders.Platform.Modeling.Paths.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Routing/AIGuiders.Platform.Modeling.Routing.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Build/AIGuiders.Platform.Modeling.Build.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Catalog/AIGuiders.Platform.Modeling.Catalog.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Expression/AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
