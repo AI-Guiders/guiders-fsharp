@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Solution</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Solution</AssemblyName>
+
+    <Description>Solution (slnx) model: projects, dependencies, folders, configurations — parse/author per vs-solutionpersistence spec.</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Solution</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="SolutionModel.fs" />
+
+    <Compile Include="SolutionNotation.fs" />
+
+  </ItemGroup>
+
+</Project>
