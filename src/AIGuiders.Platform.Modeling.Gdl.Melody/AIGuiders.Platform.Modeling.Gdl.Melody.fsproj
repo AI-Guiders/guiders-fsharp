@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Melody</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Melody</AssemblyName>
+
+    <Description>GDL melody modeling: articulation, line profiles, steps, descriptor (IR.Melody port).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Melody</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="MelodyModel.fs" />
+
+  </ItemGroup>
+
+</Project>
