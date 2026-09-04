@@ -40,19 +40,19 @@ let ``WellKnownKeys: cascade chord wire constant`` () =
 
 [<Fact>]
 let ``NormalizedKeySequence: empty has no steps; chord and plain steps compose`` () =
-    Assert.Empty NormalizedKeySequence.empty.Steps
+    Assert.Equal(0, Seq.length NormalizedKeySequence.Empty.Steps)
     let seq =
-        { Steps =
-            [ ChordStep (ChordModifierKeys.Control ||| ChordModifierKeys.Shift, "p")
-              PlainKeyStep "escape" ]
-            :> IReadOnlyList<NormalizedSequenceStep> }
+        NormalizedKeySequence(
+            [| NormalizedChordStep(ChordModifierKeys.Control ||| ChordModifierKeys.Shift, "p") :> NormalizedSequenceStep
+               NormalizedPlainKeyStep "escape" :> NormalizedSequenceStep |]
+            :> IReadOnlyList<NormalizedSequenceStep>)
     Assert.Equal(2, Seq.length seq.Steps)
 
 [<Fact>]
 let ``BindingEntry: descriptor with optional normalized gesture`` () =
     let d = BindingDescriptor.fromFlatEntry "desk/op" "ctrl+p"
-    let withGesture = { Descriptor = d; NormalizedGesture = Some NormalizedKeySequence.empty }
-    Assert.Equal(Some NormalizedKeySequence.empty, withGesture.NormalizedGesture)
+    let withGesture = { Descriptor = d; NormalizedGesture = Some NormalizedKeySequence.Empty }
+    Assert.Same(NormalizedKeySequence.Empty, withGesture.NormalizedGesture.Value)
     let bare = { Descriptor = d; NormalizedGesture = None }
     Assert.True bare.NormalizedGesture.IsNone
 

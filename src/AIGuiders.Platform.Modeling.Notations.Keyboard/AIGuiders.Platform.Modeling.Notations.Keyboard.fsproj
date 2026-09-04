@@ -16,7 +16,7 @@
 
   <ItemGroup>
 
-    <Compile Include="KeyboardModel.fs" />
+    <Compile Include="KeyboardTypes.fs" />
 
   </ItemGroup>
 

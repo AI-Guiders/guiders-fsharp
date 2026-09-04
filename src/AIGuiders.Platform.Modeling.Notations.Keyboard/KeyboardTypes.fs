@@ -43,4 +43,5 @@ type NormalizedPlainKeyStep(keySymbol: string) =
 type NormalizedKeySequence(steps: IReadOnlyList<NormalizedSequenceStep>) =
     member val Steps = steps with get, set
 
-    static member Empty = NormalizedKeySequence([||] :> IReadOnlyList<_>)
+    /// <summary>Empty sequence singleton (C# NormalizedKeySequence.Empty). val = initialized once.</summary>
+    static member val Empty = NormalizedKeySequence([||] :> IReadOnlyList<NormalizedSequenceStep>)
