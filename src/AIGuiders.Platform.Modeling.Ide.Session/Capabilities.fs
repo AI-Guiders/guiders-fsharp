@@ -68,6 +68,10 @@ module CapabilityCatalog =
     let defaultPlanet () =
         [ compilerServices () ]
 
+    let defaultDoc () =
+        []
+
+/// <summary>Address in the unified session graph (project or capability under project).</summary>
 /// <summary>Address in the unified session graph (project or capability under project).</summary>
 [<StructuralEquality; StructuralComparison>]
 type GraphNodeId =

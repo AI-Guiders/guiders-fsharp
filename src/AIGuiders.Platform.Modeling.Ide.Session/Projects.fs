@@ -14,11 +14,15 @@ type PlanetProject =
     { LanguageId: string
       AnchorPath: string }
 
+/// Standalone document unit (md/json/toml/yaml) fed by file-graph providers.
+type DocProject = { Extension: string }
+
 type ProjectKind =
     | DotNet of DotNetProject
     | Node of NodeProject
     | Gdl of GdlProject
     | Planet of PlanetProject
+    | Doc of DocProject
 
 type ProjectNode =
     { Id: ProjectId
