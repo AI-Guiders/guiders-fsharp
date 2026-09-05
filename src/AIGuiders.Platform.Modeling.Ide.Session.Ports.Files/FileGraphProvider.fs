@@ -99,3 +99,14 @@ type FileGraphProvider(rootPath: string) =
         member _.Entries() = FileGraph.entries rootPath
 
         member _.Relations() = FileGraph.relations rootPath
+
+/// Provider self-registration (ADR-0210 stage 1) — explicit composition-root init.
+module Registration =
+    /// Catalog name of this provider.
+    let name = "file-graph"
+
+    /// Registers this provider in the SolutionProviderRegistry (idempotent overwrite).
+    let init () =
+        SolutionProviderRegistry.register
+            name
+            (fun anchor -> FileGraphProvider(anchor) :> ISolutionInfoProvider)

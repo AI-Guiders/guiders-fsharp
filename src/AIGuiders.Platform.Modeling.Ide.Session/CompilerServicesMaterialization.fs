@@ -45,6 +45,8 @@ module CompilerServicesMaterialization =
         | Node _ -> "typescript"
         | Gdl _ -> "gdl"
         | Planet { LanguageId = lid } -> lid
+        | Doc { Extension = ext } -> ext.TrimStart('.')
+
 
     let resolveTopology (attrs: CapabilityAttributes) =
         match attrs.Topology with

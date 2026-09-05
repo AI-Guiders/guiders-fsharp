@@ -14,6 +14,7 @@
     <Compile Include="SessionPatchTests.fs" />
     <Compile Include="SessionOrchestratorTests.fs" />
     <Compile Include="ConformanceGoldenSessionTests.fs" />
+    <Compile Include="SolutionProviderRegistryTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />

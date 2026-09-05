@@ -81,3 +81,11 @@ type FileGraphProviderTests() =
             Assert.Equal(provider.Fingerprint(), provider.Fingerprint())
         finally
             Directory.Delete(root, true)
+    [<Fact>]
+    member _.``Provider self-registered in the plugin catalog (ADR-0210 stage 1)``() =
+        Assert.Equal("file-graph", Registration.name)
+
+        Registration.init ()
+
+        Assert.Contains("file-graph", SolutionProviderRegistry.names ())
+

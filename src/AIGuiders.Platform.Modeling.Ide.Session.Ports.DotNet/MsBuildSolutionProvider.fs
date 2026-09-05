@@ -36,3 +36,14 @@ type MsBuildSolutionProvider(anchorPath: string) =
         member _.Relations() =
             entries ()
             |> DotNetSlnxGraphPort.buildProjectEdges
+
+/// Provider self-registration (ADR-0210 stage 1) — explicit composition-root init.
+module Registration =
+    /// Catalog name of this provider.
+    let name = "msbuild"
+
+    /// Registers this provider in the SolutionProviderRegistry (idempotent overwrite).
+    let init () =
+        SolutionProviderRegistry.register
+            name
+            (fun anchor -> MsBuildSolutionProvider(anchor) :> ISolutionInfoProvider)
