@@ -11,6 +11,7 @@
     <Compile Include="WorkspaceViewPort.fs" />
     <Compile Include="DesignTimeCompilerServicesPort.fs" />
     <Compile Include="DotNetSlnxGraphPort.fs" />
+    <Compile Include="MsBuildSolutionProvider.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\guiders-core\src\DotNetWorkspace.Core\DotNetWorkspace.Core.csproj" />

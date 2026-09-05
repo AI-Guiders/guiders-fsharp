@@ -7,13 +7,13 @@ module DotNetSlnxGraphPort =
     open DotNetWorkspace.Core
     open ProjectFileReader
 
-    let private toProjectKind (entry: DotNetProjectEntry) =
+    let toProjectKind (entry: DotNetProjectEntry) =
         match entry.Kind with
         | DotNetProjectKind.CSharp -> DotNet { Language = CSharp }
         | DotNetProjectKind.FSharp -> DotNet { Language = FSharp }
         | DotNetProjectKind.Unknown -> failwith $"Unsupported managed project '{entry.AbsolutePath}'."
 
-    let private buildProjectNodes (entries: DotNetProjectEntry list) =
+    let buildProjectNodes (entries: DotNetProjectEntry list) =
         entries
         |> List.map (fun entry ->
             let id = ProjectId.create entry.AbsolutePath
@@ -24,7 +24,7 @@ module DotNetSlnxGraphPort =
                 entry.AbsolutePath
                 (ProjectCapabilityCatalog.forKind (toProjectKind entry)))
 
-    let private buildProjectEdges (entries: DotNetProjectEntry list) =
+    let buildProjectEdges (entries: DotNetProjectEntry list) =
         let byPath =
             entries
             |> List.map (fun e -> e.AbsolutePath, ProjectId.create e.AbsolutePath)
@@ -41,7 +41,7 @@ module DotNetSlnxGraphPort =
                         { From = ProjectId.create entry.AbsolutePath
                           To = toId }))
 
-    let private buildFileOwnership (entries: DotNetProjectEntry list) =
+    let buildFileOwnership (entries: DotNetProjectEntry list) =
         entries
         |> List.collect (fun entry ->
             let owner = ProjectId.create entry.AbsolutePath
