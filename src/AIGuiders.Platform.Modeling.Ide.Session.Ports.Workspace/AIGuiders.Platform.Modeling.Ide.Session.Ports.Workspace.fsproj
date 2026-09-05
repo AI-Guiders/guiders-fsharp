@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace</AssemblyName>
+    <Description>md/json/toml/yaml document tree + navigation links → WorkspaceGraph (physical layer port).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="WorkspaceGraphPort.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
+  </ItemGroup>
+</Project>

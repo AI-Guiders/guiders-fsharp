@@ -9,9 +9,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileGraphProviderTests.fs" />
+    <Compile Include="WorkspaceGraphPortTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.Files\AIGuiders.Platform.Modeling.Ide.Session.Ports.Files.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace\AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.fsproj" />
   </ItemGroup>
 </Project>
