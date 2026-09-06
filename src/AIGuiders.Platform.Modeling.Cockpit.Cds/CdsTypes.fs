@@ -3,13 +3,14 @@ namespace AIGuiders.Platform.Modeling.Cockpit.Cds
 open System.Collections.Generic
 open System.Text.Json
 
-/// <summary>CDS input: normalize MFD/go attention before channel dispatch (ADR 0036/0097).</summary>
+/// <summary>CDS input: normalize MFD/go attention before channel dispatch (ADR 0036/0097).
+/// Nullability mirrors C# `string?` inputs.</summary>
 [<CLIMutable>]
 type AttentionRoutingInput =
-    { MfdExplicit: string
-      GoVerb: string
+    { MfdExplicit: string | null
+      GoVerb: string | null
       SeatsMode: bool
-      DefaultMfd: string }
+      DefaultMfd: string | null }
 
 /// <summary>CDS decision after attention routing.</summary>
 [<CLIMutable>]

@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CdsTypes.fs" />
+    <Compile Include="CdsRouting.fs" />
   </ItemGroup>
 </Project>

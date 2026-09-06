@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Cockpit.Channels\AIGuiders.Platform.Modeling.Cockpit.Channels.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Cockpit.Cds\AIGuiders.Platform.Modeling.Cockpit.Cds.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Cockpit.Ids\AIGuiders.Platform.Modeling.Cockpit.Ids.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Cockpit.Composition\AIGuiders.Platform.Modeling.Cockpit.Composition.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Cockpit.DataBus\AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />

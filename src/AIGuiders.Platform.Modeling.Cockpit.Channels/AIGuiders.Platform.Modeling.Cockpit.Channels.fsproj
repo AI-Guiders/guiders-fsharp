@@ -10,6 +10,7 @@
     <Compile Include="LampAlgebra.fs" />
     <Compile Include="EnvironmentReadiness.fs" />
     <Compile Include="IdeHealth.fs" />
+    <Compile Include="CdpInstruments.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Cockpit.DataBus\AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />

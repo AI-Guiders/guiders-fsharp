@@ -146,7 +146,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 |---------|-------|-----------|-----------------|
 | `Cockpit.Abstractions` | S | — | `IChannel`, `ICockpitComputeUnit` seams |
 | `Cockpit.Ids` | M | `Modeling.Cockpit.Ids` | — |
-| `Cockpit.Cds` | M | `Modeling.Cockpit.Cds` | — |
+| `Cockpit.Cds` | M | `Modeling.Cockpit.Cds` ✓ (decision shapes + routing/desk-detail eval — the Circuit) | — |
 | `Cockpit.DataBus` | M/E | `Modeling.Cockpit.DataBus` — events, policy, projection graph | `Execution.Cockpit.DataBus` — `InMemoryDataBus` |
 | `Cockpit.Channels` | M/E | CCU **decision/snapshot** records in `Modeling.Cockpit.Channels` ✓ (lamp algebra + ER/IdeHealth forms; CCU units stay E) | CCU **units** with IO, composers calling Modeling |
 | `Cockpit.Transport` | E | — | ingress, bounded bus |
