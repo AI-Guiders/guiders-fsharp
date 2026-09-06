@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</AssemblyName>
+    <Description>GDL catalog quarry parser — F# mirror of Platform Authoring.Command.Catalog (phase 1: structure + spine mapping).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="CatalogParser.fs" />
+    <Compile Include="CatalogMapping.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Command\AIGuiders.Platform.Modeling.Gdl.Command.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Core\AIGuiders.Platform.Modeling.Gdl.Core.fsproj" />
+  </ItemGroup>
+</Project>
