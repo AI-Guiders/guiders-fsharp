@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="CatalogGrammarValidator.fs" />
     <Compile Include="CatalogParser.fs" />
     <Compile Include="CatalogMapping.fs" />
   </ItemGroup>

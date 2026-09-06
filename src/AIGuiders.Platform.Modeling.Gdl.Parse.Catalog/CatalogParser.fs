@@ -367,6 +367,16 @@ module CatalogParser =
 
         loop 0
 
-    let parse (text: string) : CatalogParseResult = parseLines (AuthoringSource.fromText text)
+    let private postValidate (result: CatalogParseResult) : CatalogParseResult =
+        match result.Document with
+        | Some doc ->
+            { result with
+                Diagnostics =
+                    result.Diagnostics
+                    @ CatalogGrammarValidator.validate None doc
+                    @ CatalogGrammarValidator.validateChannels doc }
+        | None -> result
 
-    let parseFile (path: string) : CatalogParseResult = parseLines (AuthoringSource.fromFile path)
+    let parse (text: string) : CatalogParseResult = postValidate (parseLines (AuthoringSource.fromText text))
+
+    let parseFile (path: string) : CatalogParseResult = postValidate (parseLines (AuthoringSource.fromFile path))
