@@ -25,6 +25,8 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Bracket/AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Command/AIGuiders.Platform.Modeling.Notations.Command.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Keyboard/AIGuiders.Platform.Modeling.Notations.Keyboard.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Navigation.Policy/AIGuiders.Platform.Modeling.Navigation.Policy.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Navigation/AIGuiders.Platform.Modeling.Navigation.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Argument/AIGuiders.Platform.Modeling.Notations.Argument.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language/AIGuiders.Platform.Modeling.Language.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Fcs/AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
@@ -48,6 +50,7 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Navigation.Tests/AIGuiders.Platform.Modeling.Navigation.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Command.Tests/AIGuiders.Platform.Modeling.Notations.Command.Tests.fsproj" />

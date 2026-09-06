@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Navigation.Policy</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Navigation.Policy</AssemblyName>
+    <Description>Navigation policy — related kinds, presets, merge, kind filter, profile (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Navigation.Policy</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Navigation\AIGuiders.Platform.Modeling.Navigation.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RelatedKinds.fs" />
+    <Compile Include="Presets.fs" />
+    <Compile Include="PresetMerge.fs" />
+  </ItemGroup>
+</Project>
