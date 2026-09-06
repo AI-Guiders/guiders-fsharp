@@ -101,9 +101,9 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 
 | Package | Split | F# target |
 |---------|-------|-----------|
-| `Notations` | M | `Modeling.Notations.Core` |
+| `Notations` | M | `Modeling.Notations.Core` ✓ |
 | `Notations.Keyboard.*` | M | `Modeling.Notations.Keyboard.*` |
-| `Notations.Command.*` | M | `Modeling.Notations.Command.*` |
+| `Notations.Command.*` | M | `Modeling.Notations.Command.*` ✓ (Slash merged as nested ns) |
 | `Notations.Argument.*` | M | `Modeling.Notations.Argument.*` |
 | `Notations.Bracket` | M | `Modeling.Notations.Bracket` |
 | `Notations.Presentation.Topology` | M | `Modeling.Gdl.Presentation` ✓ |

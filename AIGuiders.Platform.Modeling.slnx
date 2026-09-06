@@ -26,6 +26,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Bracket/AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Command/AIGuiders.Platform.Modeling.Notations.Command.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Notations.Core/AIGuiders.Platform.Modeling.Notations.Core.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Keyboard/AIGuiders.Platform.Modeling.Notations.Keyboard.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Navigation.Policy/AIGuiders.Platform.Modeling.Navigation.Policy.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Navigation/AIGuiders.Platform.Modeling.Navigation.fsproj" />
@@ -58,5 +59,6 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests/AIGuiders.Platform.Modeling.Notations.Argument.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Command.Tests/AIGuiders.Platform.Modeling.Notations.Command.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Core.Tests/AIGuiders.Platform.Modeling.Notations.Core.Tests.fsproj" />
   </Folder>
 </Solution>

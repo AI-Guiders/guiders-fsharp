@@ -20,8 +20,6 @@
 
     <Compile Include="SlashNotation.fs" />
 
-    <Compile Include="NotationCore.fs" />
-
     <Compile Include="InvocationModel.fs" />
 
     <Compile Include="InvocationNotation.fs" />

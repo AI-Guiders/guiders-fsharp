@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <RootNamespace>AIGuiders.Platform.Modeling.Notations</RootNamespace>
+
+    <AssemblyName>AIGuiders.Platform.Modeling.Notations.Core</AssemblyName>
+
+    <Description>Notations shared primitives — KV atom, bracket-aware list split (GUIDERS-ADR-0021 port, ADR-0003 §4.4).</Description>
+
+    <PackageId>AIGuiders.Platform.Modeling.Notations.Core</PackageId>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <Compile Include="NotationCore.fs" />
+
+  </ItemGroup>
+
+</Project>
