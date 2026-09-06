@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Correspondence</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Correspondence</AssemblyName>
+    <Description>Correspondence wire shapes — CRS model, anchor graph nodes, forward/reverse map shapes (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Correspondence</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Correspondence.fs" />
+  </ItemGroup>
+</Project>

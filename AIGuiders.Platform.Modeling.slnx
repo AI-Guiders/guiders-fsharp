@@ -16,6 +16,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Routing/AIGuiders.Platform.Modeling.Routing.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Build/AIGuiders.Platform.Modeling.Build.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Catalog/AIGuiders.Platform.Modeling.Catalog.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Correspondence/AIGuiders.Platform.Modeling.Gdl.Correspondence.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Expression/AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
   
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Language/AIGuiders.Platform.Modeling.Gdl.Language.fsproj" />
@@ -41,6 +42,7 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.Tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Tests/AIGuiders.Platform.Modeling.Ide.Session.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests/AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.fsproj" />
   
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Language.Tests/AIGuiders.Platform.Modeling.Gdl.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests.fsproj" />
