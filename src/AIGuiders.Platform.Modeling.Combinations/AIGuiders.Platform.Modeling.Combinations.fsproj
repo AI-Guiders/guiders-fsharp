@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Combinations</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Combinations</AssemblyName>
+    <Description>Combinations — merge semantics DU, combinator alias, ordered fold laws (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Combinations</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Combinations.fs" />
+  </ItemGroup>
+</Project>

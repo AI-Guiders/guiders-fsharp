@@ -11,6 +11,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.DataBus/AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Cds/AIGuiders.Platform.Modeling.Cockpit.Cds.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Rules/AIGuiders.Platform.Modeling.Cockpit.Rules.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Combinations/AIGuiders.Platform.Modeling.Combinations.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Core/AIGuiders.Platform.Modeling.Core.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Paths/AIGuiders.Platform.Modeling.Paths.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Routing/AIGuiders.Platform.Modeling.Routing.fsproj" />
@@ -37,6 +38,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Combinations.Tests/AIGuiders.Platform.Modeling.Combinations.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests.fsproj" />
