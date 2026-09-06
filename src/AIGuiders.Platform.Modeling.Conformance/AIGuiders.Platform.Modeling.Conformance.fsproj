@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Conformance</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Conformance</AssemblyName>
+    <Description>Conformance spec wire shapes — navigation/policy spec documents and expectation vectors (F# SSOT, ADR-0003 §4.9).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Conformance</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="SpecModels.fs" />
+  </ItemGroup>
+</Project>

@@ -135,9 +135,9 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `CommandPlane.Binding.Sources.*` | E | — | sources |
 | `CommandPlane.Melody` | M/E | melody graph in `Modeling.Gdl.Command.Melody` | capture stack SM, UI |
 | `CommandPlane.Slash` | M/E | `Modeling.Notations.Command.Slash` — `SlashLineResolver` | completion UI, execute hook |
-| `CommandPlane.PrefixArmed` | M/E | phrase-slot index algebra | armed state machine |
-| `CommandPlane.PrefixArmed.Locale` | M | locale tables | — |
-| `CommandPlane.Constructors` | M/E | constructor schema IR | WPF/UI constructors |
+| `CommandPlane.PrefixArmed` | M/E | prefix-arm match algebra in `Modeling.CommandPlane` ✓ (shapes; profiles/coordinator stay E) | armed state machine |
+| `CommandPlane.PrefixArmed.Locale` | M | locale date parse algebra in `Modeling.CommandPlane` ✓ (fromPattern/completeness; culture adapter stays E) | — |
+| `CommandPlane.Constructors` | M/E | constructor definitions + completion rows in `Modeling.CommandPlane` ✓ (navigator/session stay E) | WPF/UI constructors |
 | `CommandPlane.ArgSuggestions` | E | — | live suggest (Roslyn/query) |
 
 #### 4.7 Cockpit
@@ -170,9 +170,9 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | Package | Split | F# target | Execution keeps |
 |---------|-------|-----------|-----------------|
 | `MCPlane` | M/E | `Modeling.Gdl.Agent` — tier/truncate rules | envelope dispatch host |
-| `Conformance.Navigation` | M | `Modeling.Conformance.Navigation` | runner |
-| `Conformance.Policies` | M | `Modeling.Conformance.Policies` | runner |
-| `Conformance.Schemas` | M | `Modeling.Conformance.Schemas` | runner |
+| `Conformance.Navigation` | M | `Modeling.Conformance` ✓ (spec wire shapes + expectation algebra; runner stays E) | runner |
+| `Conformance.Policies` | M | `Modeling.Conformance` ✓ (policy spec wire shapes; combinators resolve via Modeling.Combinations) | runner |
+| `Conformance.Schemas` | M | embedded JSON Schema texts stay E (mechanics); spec shapes in `Modeling.Conformance` ✓ | runner |
 | `LanguageIntelligence` | E | — | orchestration |
 | `LanguageIntelligence.Adapters.Roslyn` | E | — | Roslyn |
 | `LanguageIntelligence.*` | M/E | `Modeling.Gdl.Language` for neutral edits | adapters |
