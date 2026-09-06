@@ -1,5 +1,8 @@
 namespace AIGuiders.Platform.Modeling.Gdl.Core
 
+open System.Collections.Generic
+open AIGuiders.Platform.Modeling.Gdl.Command
+open AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic
 open AIGuiders.Platform.Modeling.Gdl.Presentation
 
 /// Stable reference to one GDL document in a project directory.
@@ -8,9 +11,11 @@ type GdlDocumentRef =
     { LogicalPath: string
       Quarry: string }
 
-/// Command catalog quarry payload (v0 stub — grows with Authoring.Command.Catalog IR).
+/// Command catalog quarry payload — planet + resolved route rows (row IR: Gdl.Command).
 [<NoComparison>]
-type CatalogPayload = { Planet: string }
+type CatalogPayload =
+    { Planet: string
+      Routes: IReadOnlyList<CatalogRouteEntry> }
 
 /// One attention preset from <c>*.deck.gdl</c>.
 type DeckPreset =
@@ -20,19 +25,17 @@ type DeckPreset =
       MfdZoneIds: string list
       EicasPolicy: string option }
 
-/// Deck quarry payload — zones + presets from <c>*.deck.gdl</c>.
+/// Deck quarry payload — zones + presets from <c>*.deck.gdl</c> (SSOT; Parse.Deck maps into it).
 type DeckPayload =
     { Planet: string
       Presets: DeckPreset list
       ZoneBindings: Map<string, string> }
 
-/// Physical screen binding quarry (proposed <c>*.display.gdl</c>).
-type DisplayBindingPayload =
-    { ProfileName: string
-      Bindings: (int * string) list }
+/// Display quarry payload — profile IR from Gdl.Presentation (HostIndex → screen).
+type DisplayBindingPayload = DisplayBindingProfile
 
-/// Cockpit annunciation quarry (proposed <c>*.cockpit.logic.gdl</c>).
-type CockpitLogicPayload = { Planet: string }
+/// Cockpit logic quarry payload — rule graph IR from Gdl.Parse.CockpitLogic.
+type CockpitLogicPayload = CockpitRuleGraph
 
 /// Closed set of GDL quarry payloads — federation spine discriminated union.
 type GdlFragment =

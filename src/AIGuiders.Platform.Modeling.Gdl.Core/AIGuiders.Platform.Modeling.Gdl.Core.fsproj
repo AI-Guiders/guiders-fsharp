@@ -11,5 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Presentation\AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Command\AIGuiders.Platform.Modeling.Gdl.Command.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic\AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
   </ItemGroup>
 </Project>
