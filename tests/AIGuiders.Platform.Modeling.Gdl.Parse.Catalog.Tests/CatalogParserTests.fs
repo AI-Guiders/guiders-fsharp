@@ -16,9 +16,9 @@ defaults
 end defaults
 
 commands table
-  | command | args     | help        |
-  | open    | <path>   | Open a doc  |
-  | sec.add | <heading>| Add section |
+  | command | args      | help        | domain | object | intent |
+  | open    | <path>    | Open a doc  |        |        |        |
+  | sec.add | <heading> | Add section | sec    | add    | set    |
 end commands
 
 phrases table
@@ -80,10 +80,13 @@ let ``Maps document to spine payload with route rows`` () =
     Assert.Equal("open", first.CommandId)
     Assert.Equal(CommandArgTailKind.Optional, first.ArgTailKind)
     Assert.Equal("Open a doc", first.Help)
+    Assert.Equal("", first.Domain)
+    Assert.Equal("", first.Object)
+    Assert.Equal("", first.Intent)
 
     let second = routes.[1]
     Assert.Equal("sec.add", second.CommandId)
     Assert.Equal("sec", second.Domain)
     Assert.Equal("add", second.Object)
-    Assert.Equal("", second.Intent)
+    Assert.Equal("set", second.Intent)
     Assert.Equal(CatalogPathRole.Canonical, second.PathRole)
