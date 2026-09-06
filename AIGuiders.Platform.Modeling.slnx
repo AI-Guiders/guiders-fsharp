@@ -10,6 +10,9 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Deck/AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.DataBus/AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Cds/AIGuiders.Platform.Modeling.Cockpit.Cds.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Channels/AIGuiders.Platform.Modeling.Cockpit.Channels.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Composition/AIGuiders.Platform.Modeling.Cockpit.Composition.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Ids/AIGuiders.Platform.Modeling.Cockpit.Ids.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Cockpit.Rules/AIGuiders.Platform.Modeling.Cockpit.Rules.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Combinations/AIGuiders.Platform.Modeling.Combinations.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Core/AIGuiders.Platform.Modeling.Core.fsproj" />
@@ -46,6 +49,7 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests/AIGuiders.Platform.Modeling.Cockpit.DataBus.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Cockpit.Channels.Tests/AIGuiders.Platform.Modeling.Cockpit.Channels.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.Tests/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Ide.Session.Tests/AIGuiders.Platform.Modeling.Ide.Session.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests/AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.fsproj" />

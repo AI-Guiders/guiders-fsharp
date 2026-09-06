@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Channels</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Channels</AssemblyName>
+    <Description>Cockpit channel M-shapes — annunciator lamp algebra, ER/IdeHealth CCU decision/snapshot forms (F# SSOT, CIDE ADR 0036/0063/0089).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Cockpit.Channels</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="LampAlgebra.fs" />
+    <Compile Include="EnvironmentReadiness.fs" />
+    <Compile Include="IdeHealth.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Cockpit.DataBus\AIGuiders.Platform.Modeling.Cockpit.DataBus.fsproj" />
+  </ItemGroup>
+</Project>

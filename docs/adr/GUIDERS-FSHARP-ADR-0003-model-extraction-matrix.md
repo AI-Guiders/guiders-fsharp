@@ -148,9 +148,9 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `Cockpit.Ids` | M | `Modeling.Cockpit.Ids` | — |
 | `Cockpit.Cds` | M | `Modeling.Cockpit.Cds` | — |
 | `Cockpit.DataBus` | M/E | `Modeling.Cockpit.DataBus` — events, policy, projection graph | `Execution.Cockpit.DataBus` — `InMemoryDataBus` |
-| `Cockpit.Channels` | M/E | CCU **decision/snapshot** records, lamp row algebra | CCU **units** with IO, composers calling Modeling |
+| `Cockpit.Channels` | M/E | CCU **decision/snapshot** records in `Modeling.Cockpit.Channels` ✓ (lamp algebra + ER/IdeHealth forms; CCU units stay E) | CCU **units** with IO, composers calling Modeling |
 | `Cockpit.Transport` | E | — | ingress, bounded bus |
-| `Cockpit.Composition` | M/E | slot/instrument descriptor schema | compositor host, mount registry |
+| `Cockpit.Composition` | M/E | seats/tiles scene descriptors in `Modeling.Cockpit.Composition` ✓ | compositor host, mount registry |
 
 #### 4.8 Graph, Navigation, Correspondence
 

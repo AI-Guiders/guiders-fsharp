@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Composition</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Composition</AssemblyName>
+    <Description>Cockpit composition M-schema — seats/tiles surface scene descriptors (F# SSOT, CIDE ADR 0036).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Cockpit.Composition</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="SurfaceScene.fs" />
+  </ItemGroup>
+</Project>
