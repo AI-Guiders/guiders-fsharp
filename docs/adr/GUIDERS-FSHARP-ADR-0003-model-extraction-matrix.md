@@ -76,9 +76,9 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `Authoring.Core` | M | `Modeling.Gdl.Authoring` ✓ | — |
 | `Authoring.Deck` | M | `Modeling.Gdl.Parse.Deck` ✓ (mirror) | shim until cutover |
 | `Authoring.Command.Catalog` | M | `Modeling.Gdl.Parse.Catalog` | — |
-| `Authoring.Command.Bundles` | M | `Modeling.Gdl.Parse.Bundles` | — |
+| `Authoring.Command.Bundles` | M | `Modeling.Gdl.Parse.Catalog` ✓ absorbed (profiles section already in F# import path; embedded-bundle mechanics stay C#) | — |
 | `Authoring.Conformance` | M | `Modeling.Conformance.Authoring` | runner host in Execution |
-| `Authoring.Display.Binding` | M | `Modeling.Gdl.Parse.Display` | — |
+| `Authoring.Display.Binding` | M | `Modeling.Gdl.Presentation` ✓ absorbed (ScreenBinding.fs — DisplayBindingProfile) | — |
 | `Authoring.Cockpit.Logic` | M | `Modeling.Gdl.Parse.CockpitLogic` | — |
 | `Authoring.Expression` | M | `Modeling.Gdl.Expression` | — |
 
