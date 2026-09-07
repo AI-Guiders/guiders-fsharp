@@ -16,6 +16,8 @@
 
   <ItemGroup>
 
+    <Compile Include="FrozenTreeModel.fs" />
+
     <Compile Include="BuildResultModel.fs" />
 
   </ItemGroup>
