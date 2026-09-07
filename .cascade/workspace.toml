@@ -28,3 +28,7 @@ id_regex = '(?:^|/)docs/adr/(?<id>GUIDERS-FSHARP-ADR-\d{4})-'
 "Modeling." = [
   "../docs/adr/GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md",
 ]
+
+"src/AIGuiders.Modeling.Build/FrozenTreeModel.fs" = [
+  "docs/math/ide-session/03-frozen-snapshots.md",
+]
