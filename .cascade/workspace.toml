@@ -1,0 +1,30 @@
+# GUIDERS-FSHARP habitat correspondence — Explore full-a substrate (ADR map)
+# ResolveAdrMap = longest prefix match. Формат зеркален cdp-mcp/.cascade/workspace.toml.
+
+[workspace.adr]
+auto_include = "linked"
+max_related = 8
+root_dir = "docs/adr"
+id_regex = '(?:^|/)docs/adr/(?<id>GUIDERS-FSHARP-ADR-\d{4})-'
+
+[workspace.adr.map]
+# --- Ide Session (federation, revision ledger, frozen snapshots, WorkspaceView) ---
+# Модель ADR-0007 L1; math-серия — SSOT семантики, не справка.
+
+"Ide.Session/" = [
+  "../docs/math/ide-session/README.md",
+  "../docs/math/ide-session/03-frozen-snapshots.md",
+  "../docs/adr/GUIDERS-FSHARP-ADR-0007-open-build-ssot-ftc-correspondence.md",
+  "../docs/adr/GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md",
+]
+
+# --- Build domain (diagnostics, FTC consumer side) ---
+"Modeling.Build/" = [
+  "../docs/math/ide-session/03-frozen-snapshots.md",
+  "../docs/adr/GUIDERS-FSHARP-ADR-0007-open-build-ssot-ftc-correspondence.md",
+]
+
+# --- Общая матрица расслоения Platform (любая новая Modeling поверхность) ---
+"Modeling." = [
+  "../docs/adr/GUIDERS-FSHARP-ADR-0003-model-extraction-matrix.md",
+]
