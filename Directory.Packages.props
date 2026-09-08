@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="FSharp.Compiler.Service" Version="43.12.400" />
+    <PackageVersion Include="Ionide.ProjInfo" Version="0.74.2" />
+    <PackageVersion Include="Ionide.ProjInfo.FCS" Version="0.74.2" />
+    <PackageVersion Include="Microsoft.Build" Version="18.9.6" />
+    <PackageVersion Include="Microsoft.Build.Framework" Version="18.9.6" />
+    <PackageVersion Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.9.6" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="NuGet.Frameworks" Version="6.14.0" />
+    <PackageVersion Include="TruePath" Version="1.12.0" />
+    <PackageVersion Include="TruePath.SystemIo" Version="1.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+</Project>
