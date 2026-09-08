@@ -11,6 +11,7 @@ type FreezeMode =
 type FrozenProjectSnapshot =
     { ProjectId: ProjectId
       Revision: SessionRevision
+      Capabilities: CapabilityNode list
       Ownership: Map<string, ProjectId>
       Contents: Map<string, string> }
 
@@ -56,6 +57,12 @@ module FrozenSnapshot =
         (contents: Map<string, string>)
         (projectId: ProjectId)
         =
+        let capabilities =
+            graph.Projects
+            |> List.tryFind (fun p -> p.Id = projectId)
+            |> Option.map (fun n -> n.Capabilities)
+            |> Option.defaultValue []
+
         let ownership =
             graph.FileOwnership
             |> Map.filter (fun _ owner -> owner = projectId)
@@ -71,6 +78,7 @@ module FrozenSnapshot =
 
         { ProjectId = projectId
           Revision = revision
+          Capabilities = capabilities
           Ownership = ownership
           Contents = projectContents }
 

@@ -73,9 +73,10 @@ type SessionOrchestratorTests() =
                 (SolutionSession.create graph.AnchorPath graph |> SolutionSession.withPhase DesignTime)
                 contents
 
-        let frozen = SessionOrchestrator.freeze runtime (Local id)
+        let frozen, runtime' = SessionOrchestrator.freeze runtime (Local id)
         Assert.Equal(1, frozen.Projects.Length)
         Assert.True(Map.containsKey sourcePath frozen.Projects.[0].Contents)
+        Assert.Equal(frozen.Revision + 1L, runtime'.Ledger.NextRevision)
 
     [<Fact>]
     member _.``EnsureCompilerServices marks in-process compiler capability``() =

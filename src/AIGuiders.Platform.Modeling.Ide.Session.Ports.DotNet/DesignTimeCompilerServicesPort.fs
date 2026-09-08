@@ -16,19 +16,21 @@ module DesignTimeCompilerServicesPort =
                 match CompilerServicesMaterialization.tryGetCompilerServices project with
                 | None -> Failed "compiler_services_capability_missing"
                 | Some cap ->
+                    let revision, ledger' = RevisionLedger.reserve runtime.Ledger
+
                     let frozen =
                         FrozenSnapshot.freezeTree
-                            (RevisionLedger.currentRevision runtime.Ledger + 1L)
+                            revision
                             graph
                             runtime.Contents
                             (ProjClosure projectId)
 
                     let view = WorkspaceViewPort.emit graph projectId frozen
                     let node = GraphNodeId.capability projectId CompilerServices
-                    let revision = frozen.Revision
+                    let revision' = frozen.Revision
 
                     let materialized =
-                        runtime.Materialized |> MaterializedState.mark node revision
+                        runtime.Materialized |> MaterializedState.mark node revision'
 
                     let session' =
                         runtime.Session |> SolutionSession.withPhase DesignTime
@@ -36,7 +38,8 @@ module DesignTimeCompilerServicesPort =
                     let runtime' =
                         { runtime with
                             Session = session'
-                            Materialized = materialized }
+                            Materialized = materialized
+                            Ledger = ledger' }
 
                     Ensured(
                         { ProjectId = projectId
@@ -46,7 +49,7 @@ module DesignTimeCompilerServicesPort =
                               CompilerServicesMaterialization.resolveTopology cap.Attributes
                               |> ExecutionTopology.toWire
                           LanguageId = CompilerServicesMaterialization.languageIdForProject project
-                          Revision = revision
+                          Revision = revision'
                           WorkspaceView = view },
                         runtime'
                     )

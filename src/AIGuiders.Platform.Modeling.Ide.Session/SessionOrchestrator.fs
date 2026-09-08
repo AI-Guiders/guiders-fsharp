@@ -41,7 +41,10 @@ module SessionOrchestrator =
                     Materialized = materialized'
                     Ledger = ledger' }
 
-    let freeze (runtime: SessionRuntime) (mode: FreezeMode) =
-        let revision = RevisionLedger.currentRevision runtime.Ledger + 1L
+    let freeze (runtime: SessionRuntime) (mode: FreezeMode) : FrozenTreeSnapshot * SessionRuntime =
+        let revision, ledger' = RevisionLedger.reserve runtime.Ledger
 
-        FrozenSnapshot.freezeTree revision runtime.Session.Graph runtime.Contents mode
+        let snapshot =
+            FrozenSnapshot.freezeTree revision runtime.Session.Graph runtime.Contents mode
+
+        snapshot, { runtime with Ledger = ledger' }

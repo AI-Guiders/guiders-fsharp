@@ -27,6 +27,11 @@ module RevisionLedger =
         { NextRevision = ledger.NextRevision + 1L
           Entries = ledger.Entries @ [ entry ] }
 
+    /// Freeze is not a Δ (§2.12 Λ = Δ-stream of applied patches), but its revision
+    /// must still come from the same monotonic counter — reserve it atomically.
+    let reserve (ledger: RevisionLedger) : SessionRevision * RevisionLedger =
+        ledger.NextRevision, { ledger with NextRevision = ledger.NextRevision + 1L }
+
     let currentRevision (ledger: RevisionLedger) =
         if List.isEmpty ledger.Entries then
             0L
