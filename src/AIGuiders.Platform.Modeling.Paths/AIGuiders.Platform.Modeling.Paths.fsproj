@@ -7,6 +7,10 @@
     <PackageId>AIGuiders.Platform.Modeling.Paths</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <!-- TruePath = implementation detail (ADR-0050): публичная поверхность Modeling.Paths —
+         LogicalPath/PathBoundary (string + LogicalPath), TruePath-типы наружу не экспонируются.
+         Зависимость рантаймная — НЕ PrivateAssets (иначе у потребителя MissingAssembly);
+         граница держится культурой: `open TruePath` только внутри Modeling.Paths. -->
     <PackageReference Include="TruePath" Version="1.12.0" />
     <PackageReference Include="TruePath.SystemIo" Version="1.12.0" />
   </ItemGroup>
