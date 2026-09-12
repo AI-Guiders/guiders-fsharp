@@ -52,8 +52,6 @@
 
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
 
-    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.Language\AIGuiders.Platform.Execution.Language.csproj" />
-
   </ItemGroup>
 
 </Project>

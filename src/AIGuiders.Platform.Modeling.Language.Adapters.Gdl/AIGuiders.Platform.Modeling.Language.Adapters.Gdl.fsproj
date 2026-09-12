@@ -13,6 +13,5 @@
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Parse.Deck\AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
-    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.Language\AIGuiders.Platform.Execution.Language.csproj" />
   </ItemGroup>
 </Project>

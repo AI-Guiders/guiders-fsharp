@@ -13,7 +13,6 @@ open FSharp.Compiler.Text
 open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 open AIGuiders.Platform.Modeling.Language
-open AIGuiders.Platform.Execution.Language
 
 type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
     let projectOptionsSource =

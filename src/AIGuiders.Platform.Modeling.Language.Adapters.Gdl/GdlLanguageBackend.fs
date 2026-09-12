@@ -5,7 +5,6 @@ open System.IO
 open System.Threading
 open System.Threading.Tasks
 open AIGuiders.Platform.Modeling.Language
-open AIGuiders.Platform.Execution.Language
 open AIGuiders.Platform.Modeling.Gdl.Authoring
 open AIGuiders.Platform.Modeling.Gdl.Parse.Deck
 

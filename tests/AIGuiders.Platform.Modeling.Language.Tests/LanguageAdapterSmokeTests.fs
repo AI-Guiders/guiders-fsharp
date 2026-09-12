@@ -3,7 +3,7 @@ namespace AIGuiders.Platform.Modeling.Language.Tests
 open System
 open System.Threading
 open Xunit
-open AIGuiders.Platform.Execution.Language
+open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open AIGuiders.Platform.Modeling.Language.Adapters.Gdl
 
