@@ -61,7 +61,9 @@ type AdrReference =
 [<CLIMutable>]
 type ForwardDoc =
     { Path: string
-      Title: string }
+      Title: string
+      Abs: string option
+      Kind: string option }
 
 [<CLIMutable>]
 type ReverseAnchor =
