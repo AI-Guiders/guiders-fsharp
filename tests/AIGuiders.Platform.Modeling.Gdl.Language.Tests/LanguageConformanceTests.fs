@@ -76,3 +76,8 @@ let ``BracketAnchorSpan: equality and nested anchors`` () =
 let ``AnchorWire: carries raw value`` () =
     let w = { Value = "[F:a.fs;M:Foo]" }
     Assert.Equal("[F:a.fs;M:Foo]", w.Value)
+
+[<Fact>]
+let ``BracketAnchorSpan: TypeKey axis for code family`` () =
+    let span = { BracketAnchorSpan.empty with File = Some "P.cs"; TypeKey = Some "MyType" }
+    Assert.Equal(Some "MyType", span.TypeKey)

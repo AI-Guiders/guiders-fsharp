@@ -24,7 +24,8 @@ type BracketAnchorSpan =
       Command: string option
       Go: string option
       NestedAnchor: BracketAnchorSpan option
-      TextNeedle: string option }
+      TextNeedle: string option
+      TypeKey: string option }
 
 module BracketAnchorSpan =
 
@@ -43,4 +44,5 @@ module BracketAnchorSpan =
           Command = None
           Go = None
           NestedAnchor = None
-          TextNeedle = None }
+          TextNeedle = None
+          TypeKey = None }
