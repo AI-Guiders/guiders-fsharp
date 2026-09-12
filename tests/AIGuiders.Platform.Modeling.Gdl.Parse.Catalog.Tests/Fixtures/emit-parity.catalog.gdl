@@ -1,0 +1,31 @@
+# Minimal catalog fixture for CatalogCatalogEmitter input parity (F# parse vs C# authoring).
+
+catalog emit-parity
+
+defaults
+  command.scope = test-scope
+  command.surfaces = slash.bar, palette
+  command.flavor = console
+end defaults
+
+executors
+  open = OpenExecutor
+  sec.add = AddSectionExecutor
+end executors
+
+commands table
+  | command | args      | help        | domain | object | intent |
+  | open    | <path>    | Open file   |        |        |        |
+  | sec.add | <heading> | Add section | sec    | add    | set    |
+end commands
+
+phrases table
+  | name     | phrase        |
+  | open-doc | open {path}   |
+end phrases
+
+mcp table
+  | command | expose |
+  | open    | yes    |
+  | sec.add | no     |
+end mcp

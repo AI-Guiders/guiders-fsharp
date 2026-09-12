@@ -3,7 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</AssemblyName>
-    <Description>GDL catalog quarry parser — F# mirror of Platform Authoring.Command.Catalog (phase 1: structure + spine mapping).</Description>
+    <Description>GDL catalog quarry parser — F# mirror of Platform Authoring.Command.Catalog (phase 1: structure + spine mapping). Parity gaps vs C# authoring emit path: profile bundle resolution (ICatalogBundleLibrary / CatalogProfileResolver), command-profile cross-validation, import-alias bundle path resolution, full notation grammar wire validation (C# injects keyboard parsers), CatalogPhraseSlotIndex codegen inputs.</Description>
     <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.Catalog</PackageId>
   </PropertyGroup>
   <ItemGroup>

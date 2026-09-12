@@ -9,9 +9,17 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Fixtures\**\*.catalog.gdl" CopyToOutputDirectory="PreserveNewest" Link="Fixtures\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="..\..\..\guiders-platform\tests\AIGuiders.Platform.Authoring.Tests\Fixtures\Authoring\dash.catalog.gdl" CopyToOutputDirectory="PreserveNewest" Link="Fixtures\Authoring\dash.catalog.gdl" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="CatalogParserTests.fs" />
+    <Compile Include="CatalogAuthoringParityTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Parse.Catalog\AIGuiders.Platform.Modeling.Gdl.Parse.Catalog.fsproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Authoring.Command.Bundles\AIGuiders.Platform.Authoring.Command.Bundles.csproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen.csproj" />
   </ItemGroup>
 </Project>
