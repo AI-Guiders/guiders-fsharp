@@ -13,6 +13,7 @@
     <Compile Include="InvalidationScopeTests.fs" />
     <Compile Include="SessionPatchTests.fs" />
     <Compile Include="SessionOrchestratorTests.fs" />
+    <Compile Include="SnapshotJobTests.fs" />
     <Compile Include="FrozenSnapshotTests.fs" />
     <Compile Include="ConformanceGoldenSessionTests.fs" />
     <Compile Include="SolutionProviderRegistryTests.fs" />

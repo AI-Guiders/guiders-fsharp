@@ -28,6 +28,7 @@
     <Compile Include="SessionRuntime.fs" />
     <Compile Include="CompilerServicesMaterialization.fs" />
     <Compile Include="SessionOrchestrator.fs" />
+    <Compile Include="SnapshotJob.fs" />
     <Compile Include="Hoare.fs" />
     <Compile Include="Conformance.fs" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+/// <summary>Capability kinds 𝕂 — docs/math/ide-session/01-core-graph.md §1.3.</summary>
 [<StructuralEquality; StructuralComparison>]
 type CapabilityKind =
     | CompilerServices
@@ -7,6 +8,8 @@ type CapabilityKind =
     | Build
     | TestDiscovery
     | TestRun
+    | CodeTransform
+    | CodeStyle
     | LspBridge
 
 type CapabilityNode =
@@ -21,6 +24,8 @@ module CapabilityKind =
         | Build -> "build"
         | TestDiscovery -> "test-discovery"
         | TestRun -> "test-run"
+        | CodeTransform -> "code-transform"
+        | CodeStyle -> "code-style"
         | LspBridge -> "lsp-bridge"
 
 module CapabilityCatalog =
@@ -49,6 +54,14 @@ module CapabilityCatalog =
     let testDiscovery () =
         { Kind = TestDiscovery
           Attributes = CapabilityAttributes.defaults OutOfProcess TestTime }
+
+    let codeTransform () =
+        { Kind = CodeTransform
+          Attributes = CapabilityAttributes.defaults InProcess DesignTime }
+
+    let codeStyle () =
+        { Kind = CodeStyle
+          Attributes = CapabilityAttributes.defaults InProcess DesignTime }
 
     let lspBridge () =
         { Kind = LspBridge

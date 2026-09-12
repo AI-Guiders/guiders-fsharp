@@ -51,3 +51,28 @@ type SessionPatchTests() =
         Assert.False(Map.containsKey oldPath graph'.FileOwnership)
         Assert.Equal(Some owner, Map.tryFind newPath graph'.FileOwnership)
         Assert.Equal("module App", Map.find newPath contents')
+
+    [<Fact>]
+    member _.``Project metadata patch scope is ProjectCrud``() =
+        let owner = ProjectId.create @"D:\repo\App.fsproj"
+
+        let project =
+            ProjectNode.create owner (DotNet { Language = FSharp }) (ProjectId.value owner) (CapabilityCatalog.defaultDotNet ())
+
+        let updated = { project with AbsolutePath = @"D:\repo\App.v2.fsproj" }
+
+        let patch =
+            { SessionPatch.empty with
+                Graph = { GraphStructurePatch.empty with ProjectMetadataUpdates = [ updated ] } }
+
+        Assert.Equal(ProjectCrud, SessionPatch.scope patch)
+
+    [<Fact>]
+    member _.``Solution project removal scope is SolutionProjectCrud``() =
+        let owner = ProjectId.create @"D:\repo\App.fsproj"
+
+        let patch =
+            { SessionPatch.empty with
+                Graph = { GraphStructurePatch.empty with ProjectsRemoved = [ owner ] } }
+
+        Assert.Equal(SolutionProjectCrud, SessionPatch.scope patch)

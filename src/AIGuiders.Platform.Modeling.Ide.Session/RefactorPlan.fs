@@ -47,7 +47,8 @@ module RefactorPlan =
                   spec.TargetPath, spec.ExtractedContents ]
               Deletes = [] }
           Graph =
-            { FileOwnershipUpdates = [ spec.TargetPath, spec.Owner ] } }
+            { GraphStructurePatch.empty with
+                FileOwnershipUpdates = [ spec.TargetPath, spec.Owner ] } }
 
     /// Physical path rename within solution: ω follows via PathRenames in apply.
     let planMovePath (spec: MovePath) : SessionPatch =

@@ -18,11 +18,20 @@ module FileSystemPatch =
           Writes = []
           Deletes = [] }
 
+/// <summary>Graph structure mutations beyond file ownership — §5.2 operational CRUD ladder.</summary>
+/// based on adr: docs/math/ide-session/02-invalidation.md §5.2
 type GraphStructurePatch =
-    { FileOwnershipUpdates: (string * ProjectId) list }
+    { FileOwnershipUpdates: (string * ProjectId) list
+      ProjectsAdded: ProjectNode list
+      ProjectsRemoved: ProjectId list
+      ProjectMetadataUpdates: ProjectNode list }
 
 module GraphStructurePatch =
-    let empty = { FileOwnershipUpdates = [] }
+    let empty =
+        { FileOwnershipUpdates = []
+          ProjectsAdded = []
+          ProjectsRemoved = []
+          ProjectMetadataUpdates = [] }
 
 type SessionPatch =
     { FileSystem: FileSystemPatch
@@ -34,22 +43,79 @@ module SessionPatch =
           Graph = GraphStructurePatch.empty }
 
     /// §5.2 scope for orchestrator invalidation after apply.
+    /// based on adr: docs/math/ide-session/02-invalidation.md §5.2
     let scope (patch: SessionPatch) : InvalidationScope =
         let fs = patch.FileSystem
         let g = patch.Graph
 
-        let fileCrud =
-            not (List.isEmpty fs.PathRenames)
-            || not (List.isEmpty fs.Writes)
-            || not (List.isEmpty fs.Deletes)
-            || not (List.isEmpty g.FileOwnershipUpdates)
-
-        if fileCrud then
-            ProjectFileCrud
-        elif not (List.isEmpty fs.Replacements) then
-            FileChange
+        if not (List.isEmpty g.ProjectsAdded) || not (List.isEmpty g.ProjectsRemoved) then
+            SolutionProjectCrud
+        elif not (List.isEmpty g.ProjectMetadataUpdates) then
+            ProjectCrud
         else
-            FileChange
+            let fileCrud =
+                not (List.isEmpty fs.PathRenames)
+                || not (List.isEmpty fs.Writes)
+                || not (List.isEmpty fs.Deletes)
+                || not (List.isEmpty g.FileOwnershipUpdates)
+
+            if fileCrud then
+                ProjectFileCrud
+            elif not (List.isEmpty fs.Replacements) then
+                FileChange
+            else
+                FileChange
+
+    let private projectForNode (graph: SolutionGraph) (node: GraphNodeId) =
+        match node with
+        | GraphNodeId.ProjectNode pid -> Some pid
+        | GraphNodeId.CapabilityNode(pid, _) -> Some pid
+
+    let private applyProjectMutations (graph: SolutionGraph) (patch: GraphStructurePatch) =
+        let removed = patch.ProjectsRemoved |> Set.ofList
+
+        let graphAfterRemoval =
+            if Set.isEmpty removed then
+                graph
+            else
+                { graph with
+                    Projects = graph.Projects |> List.filter (fun p -> not (Set.contains p.Id removed))
+                    FileOwnership =
+                        graph.FileOwnership
+                        |> Map.filter (fun _ owner -> not (Set.contains owner removed))
+                    ProjectEdges =
+                        graph.ProjectEdges
+                        |> List.filter (fun e -> not (Set.contains e.From removed || Set.contains e.To removed))
+                    Edges =
+                        graph.Edges
+                        |> List.filter (fun e ->
+                            match projectForNode graph e.From, projectForNode graph e.To with
+                            | Some fromPid, Some toPid ->
+                                not (Set.contains fromPid removed || Set.contains toPid removed)
+                            | _ -> true) }
+
+        let graphAfterAdds =
+            if List.isEmpty patch.ProjectsAdded then
+                graphAfterRemoval
+            else
+                { graphAfterRemoval with
+                    Projects = graphAfterRemoval.Projects @ patch.ProjectsAdded }
+
+        if List.isEmpty patch.ProjectMetadataUpdates then
+            graphAfterAdds
+        else
+            let updates =
+                patch.ProjectMetadataUpdates
+                |> List.map (fun p -> p.Id, p)
+                |> Map.ofList
+
+            { graphAfterAdds with
+                Projects =
+                    graphAfterAdds.Projects
+                    |> List.map (fun p ->
+                        match Map.tryFind p.Id updates with
+                        | None -> p
+                        | Some updated -> updated) }
 
     let apply (graph: SolutionGraph) (contents: Map<string, string>) (patch: SessionPatch) =
         let contentsAfterReplacements =
@@ -81,9 +147,10 @@ module SessionPatch =
             (contentsAfterRenames, patch.FileSystem.Deletes)
             ||> List.fold (fun acc path -> Map.remove path acc)
 
-        let ownership' =
+        let ownershipAfterFileUpdates =
             (ownershipAfterRenames, patch.Graph.FileOwnershipUpdates)
             ||> List.fold (fun acc (path, owner) -> Map.add path owner acc)
 
-        let graph' = { graph with FileOwnership = ownership' }
+        let graphAfterFileUpdates = { graph with FileOwnership = ownershipAfterFileUpdates }
+        let graph' = applyProjectMutations graphAfterFileUpdates patch.Graph
         graph', contents'

@@ -30,7 +30,7 @@ module SessionOrchestrator =
         | result when not result.IsValid ->
             PatchRejected(result.Issues |> List.map (fun i -> i.Message))
         | _ ->
-            let materialized' = MaterializedState.Invalidation.forScope scope graph' runtime.Materialized
+            let materialized' = MaterializedState.Invalidation.forScope scope graph' patch runtime.Materialized
             let ledger' = RevisionLedger.append scope "refactor" patch gitPin runtime.Ledger
             let session' = { runtime.Session with Graph = graph' }
 
