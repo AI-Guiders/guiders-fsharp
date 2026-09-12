@@ -1,18 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-open System.IO
-
 module SessionOrchestrator =
-    let loadContentsFromDisk (graph: SolutionGraph) =
-        graph.FileOwnership
-        |> Map.keys
-        |> Seq.choose (fun path ->
-            if File.Exists path then
-                Some(path, File.ReadAllText path)
-            else
-                None)
-        |> Map.ofSeq
-
     let create (session: SolutionSession) (contents: Map<string, string>) =
         { Session = session
           Contents = contents

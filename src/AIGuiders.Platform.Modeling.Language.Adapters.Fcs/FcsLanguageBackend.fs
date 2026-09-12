@@ -727,6 +727,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                                                         req.SolutionOrProjectPath
                                                         patch
                                                         overrides
+                                                        FcsSessionPatchBridge.hostLoadContentsFromDisk
                                                 with
                                                 | Ok () -> true, ""
                                                 | Result.Error reason -> false, reason

@@ -32,6 +32,17 @@ module FcsSessionPatchBridge =
         overrides
         |> Map.fold (fun acc path text -> Map.add (normalizePath path) text acc) contents
 
+    /// Host IO for adapter callers until Execution wires patch apply (slice A seam).
+    let hostLoadContentsFromDisk (graph: SolutionGraph) =
+        graph.FileOwnership
+        |> Map.keys
+        |> Seq.choose (fun path ->
+            if File.Exists path then
+                Some(path, File.ReadAllText path)
+            else
+                None)
+        |> Map.ofSeq
+
     let private flushWrites (patch: SessionPatch) (contents: Map<string, string>) =
         for path, _ in patch.FileSystem.Writes do
             let full = normalizePath path
@@ -47,8 +58,13 @@ module FcsSessionPatchBridge =
                 | Some key -> File.WriteAllText(normalizePath key, contents.[key])
                 | None -> ()
 
-    /// Apply Δ through <c>SessionOrchestrator</c>, then flush touched files to disk (host IO).
-    let tryApplyPatch (anchorPath: string) (patch: SessionPatch) (sourceOverrides: Map<string, string>) : Result<unit, string> =
+    /// Apply Δ through <c>SessionOrchestrator</c>; disk read via host <paramref name="loadContents" />.
+    let tryApplyPatch
+        (anchorPath: string)
+        (patch: SessionPatch)
+        (sourceOverrides: Map<string, string>)
+        (loadContents: SolutionGraph -> Map<string, string>)
+        : Result<unit, string> =
         if List.isEmpty patch.FileSystem.Writes && List.isEmpty patch.FileSystem.Replacements then
             Ok()
         elif String.IsNullOrWhiteSpace anchorPath || not (File.Exists anchorPath) then
@@ -57,7 +73,7 @@ module FcsSessionPatchBridge =
             try
                 let session = DotNetSlnxGraphPort.loadSession anchorPath
                 let graph = session.Graph
-                let baseContents = SessionOrchestrator.loadContentsFromDisk graph
+                let baseContents = loadContents graph
                 let contents = mergeSourceOverrides baseContents sourceOverrides
                 let runtime = SessionOrchestrator.create session contents
 
