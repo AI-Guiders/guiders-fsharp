@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="CorrespondenceWireTests.fs" />
     <Compile Include="AdrFactsParserTests.fs" />
+    <Compile Include="HoareCatalogTests.fs" />
+    <Compile Include="GoldenEvidenceTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Correspondence\AIGuiders.Platform.Modeling.Gdl.Correspondence.fsproj" />
