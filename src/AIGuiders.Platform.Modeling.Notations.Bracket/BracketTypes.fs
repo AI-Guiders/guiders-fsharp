@@ -92,6 +92,18 @@ module BracketProfiles =
           RespectBracketDepthOnListSplit = true
           NestedAxisKeys = null }
 
+    /// <summary>Forge compound wire: FRG path + CDP square-kv tail (GUIDERS-ADR-0026 §2.1).</summary>
+    let ForgeFrg =
+        { Id = "bracket.forge-frg-compound"
+          StartTerminal = "["
+          EndTerminal = "]"
+          ListSeparator = ';'
+          KvSign = ':'
+          AxisShape = BracketAxisShape.KeyValue
+          StripOuterTerminals = true
+          RespectBracketDepthOnListSplit = true
+          NestedAxisKeys = [| "Anchor" |] :> IReadOnlyList<_> }
+
 [<RequireQualifiedAccess>]
 module BracketAxisValuePlans =
     let private readOnlyDict (pairs: (string * string) list) =
@@ -123,7 +135,12 @@ module BracketAxisValuePlans =
           DefaultValueKvSign = ':' }
 
     let ForgeFrgCompound =
-        { ByAxisKey = readOnlyDict [ "FRG", BracketAxisValueClasses.CommandPath ]
+        let tailKeys =
+            CdpCode.ByAxisKey
+            |> Seq.map (fun kv -> kv.Key, kv.Value)
+            |> Seq.toList
+        { ByAxisKey =
+            readOnlyDict ([ "FRG", BracketAxisValueClasses.CommandPath ] |> List.append tailKeys)
           DefaultValueKvSign = ':' }
 
     let DocSymbol =
