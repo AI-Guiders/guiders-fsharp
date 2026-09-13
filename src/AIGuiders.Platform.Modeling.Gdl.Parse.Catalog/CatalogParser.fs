@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Gdl.Parse.Catalog
 
 open System
 open AIGuiders.Platform.Modeling.Gdl.Authoring
+open AIGuiders.Platform.Modeling.Invocation
 
 /// F# mirror of Platform Authoring.Command.Catalog parser (phase 1: structure, tables,
 /// channels tree, defaults, profiles, diagnostics). Grammar cross-validation
@@ -162,10 +163,18 @@ module CatalogParser =
             if key = "variable.kind" then { defaults with VariableKind = Some value }
             elif key = "command.scope" then { defaults with CommandScope = Some value }
             elif key = "command.surfaces" then
-                { defaults with
-                    CommandSurfaces =
-                        value.Split(',', StringSplitOptions.TrimEntries ||| StringSplitOptions.RemoveEmptyEntries)
-                        |> Array.toList }
+                let wires = value.Split(',', StringSplitOptions.TrimEntries) |> Array.toList
+
+                match SurfaceRegistry.validateGdlSurfaces wires with
+                | Error e ->
+                    diagnostics.Value <-
+                        AuthoringDiagnostic.create UnknownInvocationSurface $"defaults command.surfaces: {e}" line.LineNumber
+                        :: diagnostics.Value
+
+                    defaults
+                | Ok _ ->
+                    { defaults with
+                        CommandSurfaces = wires |> List.filter (fun s -> not (String.IsNullOrWhiteSpace s)) }
             elif key = "grammar.keyboard.binding" then { defaults with GrammarKeyboardBinding = Some value }
             elif key = "grammar.keyboard.melody" then { defaults with GrammarKeyboardMelody = Some value }
             elif key = "binding.chord-root" then { defaults with BindingChordRoot = Some value }
@@ -374,7 +383,8 @@ module CatalogParser =
                 Diagnostics =
                     result.Diagnostics
                     @ CatalogGrammarValidator.validate None doc
-                    @ CatalogGrammarValidator.validateChannels doc }
+                    @ CatalogGrammarValidator.validateChannels doc
+                    @ CatalogGrammarValidator.validateInvocationSurfaces None doc }
         | None -> result
 
     let parse (text: string) : CatalogParseResult = postValidate (parseLines (AuthoringSource.fromText text))

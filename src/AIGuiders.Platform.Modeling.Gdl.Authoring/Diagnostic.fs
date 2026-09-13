@@ -15,6 +15,7 @@ type AuthoringDiagnosticCode =
     | UnknownProfile
     | EntryFileNotFound
     | EntryOutsideWorkspace
+    | UnknownInvocationSurface
 
 type AuthoringDiagnostic =
     { Code: AuthoringDiagnosticCode

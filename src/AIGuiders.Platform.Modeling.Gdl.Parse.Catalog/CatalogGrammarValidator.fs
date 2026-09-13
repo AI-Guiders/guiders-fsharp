@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Gdl.Parse.Catalog
 
 open System
 open AIGuiders.Platform.Modeling.Gdl.Authoring
+open AIGuiders.Platform.Modeling.Invocation
 
 /// Phase 2 port of Platform CatalogGrammarValidator + CatalogParseContext.ValidateChannels.
 /// Keyboard/melody wire checks take pluggable predicates — the wire parsers live
@@ -80,6 +81,37 @@ module CatalogGrammarValidator =
 
                     if not ok then diags.Add(mismatch (i + 1) $"melodies row {i + 1}" mg wire looks))
         | _ -> ()
+
+        List.ofSeq diags
+
+    let private parseSurfaceWires (raw: string) : string list =
+        raw.Split(',', StringSplitOptions.TrimEntries) |> Array.toList
+
+    let private surfaceDiag line message =
+        AuthoringDiagnostic.create UnknownInvocationSurface message line
+
+    /// <summary>Validate catalog defaults + per-command <c>surfaces</c> via SurfaceRegistry (ADR-0008 I1).</summary>
+    let validateInvocationSurfaces (defaultsSurfacesRaw: string option) (doc: CatalogDocument) : AuthoringDiagnostic list =
+        let diags = ResizeArray<AuthoringDiagnostic>()
+
+        match defaultsSurfacesRaw with
+        | Some raw when not (String.IsNullOrWhiteSpace raw) ->
+            match SurfaceRegistry.validateGdlSurfaces (parseSurfaceWires raw) with
+            | Error e -> diags.Add(surfaceDiag 1 $"defaults command.surfaces: {e}")
+            | Ok _ -> ()
+        | _ ->
+            match SurfaceRegistry.validateGdlSurfaces doc.Defaults.CommandSurfaces with
+            | Error e -> diags.Add(surfaceDiag 1 $"defaults command.surfaces: {e}")
+            | Ok _ -> ()
+
+        doc.Commands
+        |> List.iteri (fun i row ->
+            match row.Columns |> Map.tryFind "surfaces" with
+            | Some col when not (String.IsNullOrWhiteSpace col) ->
+                match SurfaceRegistry.validateGdlSurfaces (parseSurfaceWires col) with
+                | Error e -> diags.Add(surfaceDiag (i + 1) $"command `{row.Command}` surfaces: {e}")
+                | Ok _ -> ()
+            | _ -> ())
 
         List.ofSeq diags
 

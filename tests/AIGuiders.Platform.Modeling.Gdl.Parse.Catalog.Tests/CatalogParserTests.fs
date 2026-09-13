@@ -164,3 +164,53 @@ let ``Melody slug passes for key-gesture grammar and mismatch surfaces otherwise
 
     Assert.Equal(1, diagsVim.Length)
     Assert.Equal(GrammarWireMismatch, diagsVim.[0].Code)
+
+[<Fact>]
+let ``Federation defaults surfaces validate on dash catalog fixture`` () =
+    let path = System.IO.Path.Combine(System.AppContext.BaseDirectory, "Fixtures", "Authoring", "dash.catalog.gdl")
+    let text = System.IO.File.ReadAllText(path)
+    let result = CatalogParser.parse text
+
+    Assert.DoesNotContain(result.Diagnostics, fun d -> d.Code = UnknownInvocationSurface)
+
+    let doc = Option.get result.Document
+    Assert.Contains("slash.bar", doc.Defaults.CommandSurfaces)
+    Assert.Contains("ccl.filter", doc.Defaults.CommandSurfaces)
+
+[<Fact>]
+let ``Blank surface wire in defaults is rejected`` () =
+    let text =
+        """catalog bad
+
+defaults
+  command.surfaces = slash.bar, , palette
+end defaults
+
+commands table
+  | command |
+  | ping    |
+end commands
+"""
+
+    let result = CatalogParser.parse text
+
+    Assert.Contains(
+        result.Diagnostics,
+        fun d -> d.Code = UnknownInvocationSurface && d.Message.Contains("defaults command.surfaces"))
+
+[<Fact>]
+let ``Blank surface wire in command row is rejected`` () =
+    let text =
+        """catalog bad
+
+commands table
+  | command | surfaces              |
+  | ping    | slash.bar, , palette  |
+end commands
+"""
+
+    let result = CatalogParser.parse text
+
+    Assert.Contains(
+        result.Diagnostics,
+        fun d -> d.Code = UnknownInvocationSurface && d.Message.Contains("command `ping` surfaces"))
