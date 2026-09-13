@@ -81,7 +81,7 @@ let ``hot_l0_sections_present passes when manifest l0 ids exist in agent-notes``
     writeManifest personalRoot [| "alpha-l0"; "beta-l0" |]
     writeHotNotes personalRoot [| "alpha-l0"; "beta-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent(workspace, emptyDocument ())
+    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (emptyDocument ())
 
     Assert.True(result.Satisfied)
     Assert.Contains("hot_l0_sections_present", result.Note)
@@ -100,7 +100,7 @@ let ``hot_l0_sections_present fails when l0 section missing`` () =
     writeManifest personalRoot [| "alpha-l0"; "beta-l0" |]
     writeHotNotes personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent(workspace, emptyDocument ())
+    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (emptyDocument ())
 
     Assert.False(result.Satisfied)
     Assert.Equal("config-l0-sections-missing", result.Diagnostic.Code)
@@ -119,7 +119,7 @@ let ``hot_l0_sections_present uses pilot sources table paths`` () =
     writeManifest personalRoot [| "alpha-l0" |]
     writeHotNotes personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent(workspace, pilotDocument ())
+    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (pilotDocument ())
 
     Assert.True(result.Satisfied)
 
@@ -151,7 +151,7 @@ l0_manifest: knowledge/META/memory-architecture-v1.json
     File.WriteAllText(Path.Combine(personalRoot, "agent-notes.md"), notes)
     writeManifest personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent(workspace, pilotDocument ())
+    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (pilotDocument ())
 
     Assert.True(result.Satisfied)
 

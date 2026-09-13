@@ -108,14 +108,13 @@ module ConfigParser =
         =
         let tableLines = ResizeArray<AuthoringLine>()
         let mutable i = startIndex
+        let mutable finished = false
 
-        while i < lines.Length do
+        while i < lines.Length && not finished do
             let text = lines.[i].Text.Trim()
 
-            if String.IsNullOrWhiteSpace text then
-                i <- i + 1
-            elif not (text.StartsWith "|") then
-                i <- lines.Length
+            if String.IsNullOrWhiteSpace text || not (text.StartsWith "|") then
+                finished <- true
             else
                 tableLines.Add lines.[i] |> ignore
                 i <- i + 1
@@ -208,14 +207,13 @@ module ConfigParser =
 
     let private skipTableBody (lines: AuthoringLine list) (startIndex: int) =
         let mutable i = startIndex
+        let mutable finished = false
 
-        while i < lines.Length do
+        while i < lines.Length && not finished do
             let text = lines.[i].Text.Trim()
 
-            if String.IsNullOrWhiteSpace text then
-                i <- i + 1
-            elif not (text.StartsWith "|") then
-                i <- lines.Length
+            if String.IsNullOrWhiteSpace text || not (text.StartsWith "|") then
+                finished <- true
             else
                 i <- i + 1
 
