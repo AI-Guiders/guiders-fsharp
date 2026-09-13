@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.IdeSession.GateCatalog</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.IdeSession.GateCatalog</AssemblyName>
+    <Description>IDE session gate catalog IR — *.catalog.gdl gates table (F# SSOT).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.IdeSession.GateCatalog</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Schema.fs" />
+  </ItemGroup>
+</Project>

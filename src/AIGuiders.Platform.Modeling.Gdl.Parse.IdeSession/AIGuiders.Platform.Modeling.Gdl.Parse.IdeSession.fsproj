@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession</AssemblyName>
+    <Description>ide-session *.catalog.gdl gates table parser — F# SSOT mirror of Sat.IdeSession quarry.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="IdeSessionCatalogParser.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.IdeSession.GateCatalog\AIGuiders.Platform.Modeling.IdeSession.GateCatalog.fsproj" />
+  </ItemGroup>
+</Project>
