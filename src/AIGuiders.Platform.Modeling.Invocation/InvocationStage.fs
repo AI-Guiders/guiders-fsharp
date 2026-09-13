@@ -25,9 +25,9 @@ module InvocationStage =
         | Ok wire -> Ok(SurfaceProjected(surface, wire))
         | Error e -> Error e
 
-    let advanceToWireParsed surface path args (SurfaceProjected(surface', wire)) =
+    let advanceToWireParsed surface path args (SurfaceProjected(surface', _)) =
         if surface <> surface' then Error "Surface id mismatch in pipeline."
         else Ok(WireParsed(surface, path, args))
 
-    let advanceToResolved (WireParsed(surface, path, args)) commandId =
+    let advanceToResolved (WireParsed(_, path, args)) commandId =
         Ok(Resolved(CanonicalInvocation.create commandId path args))
