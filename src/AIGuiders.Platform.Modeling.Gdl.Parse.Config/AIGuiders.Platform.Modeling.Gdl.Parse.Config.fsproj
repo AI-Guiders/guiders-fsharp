@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Parse.Config</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Parse.Config</AssemblyName>
+    <Description>*.config.gdl parser — F# SSOT mirror of config quarry SAT pilot.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Gdl.Parse.Config</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ConfigParser.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Config\AIGuiders.Platform.Modeling.Config.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
+  </ItemGroup>
+</Project>

@@ -9,10 +9,9 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CorrespondenceWireTests.fs" />
-    <Compile Include="AdrFactsParserTests.fs" />
+    <Compile Include="ConfigParserTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Correspondence\AIGuiders.Platform.Modeling.Gdl.Correspondence.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Parse.Config\AIGuiders.Platform.Modeling.Gdl.Parse.Config.fsproj" />
   </ItemGroup>
 </Project>

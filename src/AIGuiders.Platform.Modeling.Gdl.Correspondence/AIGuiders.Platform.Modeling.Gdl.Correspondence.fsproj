@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Correspondence.fs" />
+    <Compile Include="AdrFacts.fs" />
   </ItemGroup>
 </Project>
