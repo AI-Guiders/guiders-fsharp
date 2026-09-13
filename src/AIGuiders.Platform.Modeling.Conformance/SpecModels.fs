@@ -21,6 +21,15 @@ type NavigationSpecDocument =
       Source: string
       Vectors: NavigationSpecVector list }
 
+/// <summary>Navigation profile wire row (parity: Conformance.Navigation NavigationProfileWire).</summary>
+[<CLIMutable>]
+type NavigationProfileWire =
+    { Preset: string option
+      MaxRelated: int option
+      MaxNodes: int option
+      MaxEdges: int option
+      WithUsages: bool option }
+
 /// <summary>Expected scene shape after navigation walk (parity: NavigationExpectWire).</summary>
 [<CLIMutable>]
 type NavigationExpectation =

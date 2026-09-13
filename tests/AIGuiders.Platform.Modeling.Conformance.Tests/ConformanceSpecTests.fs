@@ -31,6 +31,19 @@ let ``Navigation expectation: max kind count exceeded`` () =
     Assert.Contains("exceeds max 1", List.head errors)
 
 [<Fact>]
+let ``Navigation profile wire: optional fields round-trip`` () =
+    let profile =
+        { Preset = Some "minimal"
+          MaxRelated = Some 8
+          MaxNodes = Some 64
+          MaxEdges = Some 128
+          WithUsages = Some true }
+
+    Assert.Equal(Some "minimal", profile.Preset)
+    Assert.Equal(Some 8, profile.MaxRelated)
+    Assert.True profile.WithUsages.Value
+
+[<Fact>]
 let ``Policy shapes: slash row + binding row round-trip`` () =
     let row = { Path = "build"; CommandId = "cmd.build" }
     let binding = { Key = "ctrl+b"; Gesture = "Ctrl+B" }
