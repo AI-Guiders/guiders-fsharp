@@ -46,6 +46,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session/AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Invocation/AIGuiders.Platform.Modeling.Invocation.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
@@ -74,5 +75,6 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests/AIGuiders.Platform.Modeling.Notations.Bracket.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Command.Tests/AIGuiders.Platform.Modeling.Notations.Command.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Notations.Core.Tests/AIGuiders.Platform.Modeling.Notations.Core.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Invocation.Tests/AIGuiders.Platform.Modeling.Invocation.Tests.fsproj" />
   </Folder>
 </Solution>

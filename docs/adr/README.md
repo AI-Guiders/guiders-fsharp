@@ -13,6 +13,7 @@
 | [0005](./GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md) | Federation reframe CDP | Accepted · In progress | CDP `cdp_ide_session_scene` dogfood; Correspondence + Navigation modeling shipped |
 | [0006](./GUIDERS-FSHARP-ADR-0006-adr-lifecycle-verifiable-facts.md) | ADR lifecycle as Correspondence | Accepted | Correspondence L1′/L3; kinds in wire JSON |
 | [0007](./GUIDERS-FSHARP-ADR-0007-open-build-ssot-ftc-correspondence.md) | Open build SSOT — FTC + Correspondence | Draft | P0 F# first-class; MSBuild as legacy port |
+| [0008](./GUIDERS-FSHARP-ADR-0008-invocation-surfaces-model.md) | Invocation surfaces F# model | Accepted · I0 | `Modeling.Invocation` — SurfaceId, registry, pipeline DU |
 
 ## Related
 

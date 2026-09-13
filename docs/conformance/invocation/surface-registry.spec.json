@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "surface": "invocation-surface-registry",
+  "source": "GUIDERS-FSHARP-ADR-0008 federation GDL defaults",
+  "vectors": [
+    {
+      "id": "dash-defaults",
+      "wires": ["slash.bar", "palette", "console.filter", "ccl.filter"],
+      "expect": { "count": 4, "includesConsolePath": true }
+    },
+    {
+      "id": "mcp-projection",
+      "wire": "mcp.tool",
+      "expect": { "requiresSurfaceProjection": true, "wireKind": "none" }
+    }
+  ]
+}

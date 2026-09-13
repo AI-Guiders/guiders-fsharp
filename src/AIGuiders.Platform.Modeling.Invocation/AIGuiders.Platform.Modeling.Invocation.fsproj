@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>AIGuiders.Platform.Modeling.Invocation</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Invocation</AssemblyName>
+    <Description>Invocation surfaces SSOT — typed ids, wire kinds, projection pipeline (GUIDERS-FSHARP-ADR-0008).</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Invocation</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="InvocationSurfaceId.fs" />
+    <Compile Include="InvocationWireKind.fs" />
+    <Compile Include="InvocationSurfaceSpec.fs" />
+    <Compile Include="CanonicalInvocation.fs" />
+    <Compile Include="InvocationStage.fs" />
+    <Compile Include="SurfaceRegistry.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Notations.Command\AIGuiders.Platform.Modeling.Notations.Command.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Notations.Argument\AIGuiders.Platform.Modeling.Notations.Argument.fsproj" />
+  </ItemGroup>
+
+</Project>
