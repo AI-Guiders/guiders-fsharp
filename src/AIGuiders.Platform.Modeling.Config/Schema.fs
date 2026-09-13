@@ -11,8 +11,24 @@ type ConfigContractRow =
       Line: int }
 
 [<CLIMutable>]
+type ConfigSourceRow =
+    { Id: string
+      Kind: string
+      Path: string
+      Slice: string
+      Line: int }
+
+[<CLIMutable>]
+type ConfigFactRow =
+    { Contract: string
+      VerifiedBy: string
+      Line: int }
+
+[<CLIMutable>]
 type ConfigDocument =
     { Name: string
       BasedOnAdr: string option
       Defaults: System.Collections.Generic.IDictionary<string, string>
-      Contracts: ConfigContractRow array }
+      Sources: ConfigSourceRow array
+      Contracts: ConfigContractRow array
+      Facts: ConfigFactRow array }

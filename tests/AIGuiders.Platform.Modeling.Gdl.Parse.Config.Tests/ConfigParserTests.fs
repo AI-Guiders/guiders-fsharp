@@ -39,3 +39,28 @@ let ``parse reports missing config header`` () =
     let result = ConfigParser.parseText "based on adr:X\n"
     Assert.Null(result.Document)
     Assert.Contains(result.Diagnostics, fun d -> d.Code = "config-missing-header")
+
+[<Fact>]
+let ``parse pilot sources and facts tables`` () =
+    let sample =
+        """
+config cdp-newcomer
+
+sources table
+  | id           | kind              | path                                      | slice            |
+  | personal-hot | markdown_sections | {personal}/agent-notes.md                 | above_public_cut |
+  | l0-manifest  | json              | {personal}/knowledge/META/memory-architecture-v1.json | key:l0 |
+
+facts table
+  | contract        | verified_by                              |
+  | hot.personal.l0 | install-cdp.personal-seed@e1417c4        |
+"""
+
+    let result = ConfigParser.parseText sample
+    Assert.Empty(result.Diagnostics)
+
+    let doc = result.Document.Value
+    Assert.Equal(2, doc.Sources.Length)
+    Assert.Equal("personal-hot", doc.Sources.[0].Id)
+    Assert.Single(doc.Facts).VerifiedBy.StartsWith("install-cdp.personal-seed@")
+    |> Assert.True

@@ -97,11 +97,14 @@ module ConfigParser =
 
         loop startIndex
 
-    let private parseContractsTable
+    let private parseTableRows
         (lines: AuthoringLine list)
         (startIndex: int)
-        (contracts: ResizeArray<ConfigContractRow>)
+        (requireId: bool)
+        (onRow: Map<string, string> -> int -> unit)
         (diagnostics: ResizeArray<ConfigParseDiagnostic>)
+        (missingIdCode: string)
+        (missingIdMessage: string)
         =
         let tableLines = ResizeArray<AuthoringLine>()
         let mutable i = startIndex
@@ -122,21 +125,11 @@ module ConfigParser =
         for map in maps do
             match Map.tryFind "id" map with
             | Some id when not (String.IsNullOrWhiteSpace id) ->
-                contracts.Add(
-                    { Id = id
-                      Requires = map |> Map.tryFind "requires" |> Option.defaultValue ""
-                      Ensures = map |> Map.tryFind "ensures" |> Option.defaultValue ""
-                      Line =
-                          if tableLines.Count > 0 then
-                              tableLines.[0].LineNumber
-                          else
-                              startIndex + 1 }
-                )
-                |> ignore
-            | _ ->
+                onRow map (if tableLines.Count > 0 then tableLines.[0].LineNumber else startIndex + 1)
+            | _ when requireId ->
                 diagnostics.Add(
-                    { Code = "config-contract-missing-id"
-                      Message = "Contracts table row is missing `id`."
+                    { Code = missingIdCode
+                      Message = missingIdMessage
                       Line =
                           if tableLines.Count > 0 then
                               tableLines.[tableLines.Count - 1].LineNumber
@@ -144,8 +137,74 @@ module ConfigParser =
                               startIndex + 1 }
                 )
                 |> ignore
+            | _ -> onRow map (if tableLines.Count > 0 then tableLines.[0].LineNumber else startIndex + 1)
 
         max startIndex (i - 1)
+
+    let private parseContractsTable
+        (lines: AuthoringLine list)
+        (startIndex: int)
+        (contracts: ResizeArray<ConfigContractRow>)
+        (diagnostics: ResizeArray<ConfigParseDiagnostic>)
+        =
+        parseTableRows
+            lines
+            startIndex
+            true
+            (fun map line ->
+                contracts.Add(
+                    { Id = map |> Map.find "id"
+                      Requires = map |> Map.tryFind "requires" |> Option.defaultValue ""
+                      Ensures = map |> Map.tryFind "ensures" |> Option.defaultValue ""
+                      Line = line }
+                )
+                |> ignore)
+            diagnostics
+            "config-contract-missing-id"
+            "Contracts table row is missing `id`."
+
+    let private parseSourcesTable
+        (lines: AuthoringLine list)
+        (startIndex: int)
+        (sources: ResizeArray<ConfigSourceRow>)
+        (diagnostics: ResizeArray<ConfigParseDiagnostic>)
+        =
+        parseTableRows
+            lines
+            startIndex
+            true
+            (fun map line ->
+                sources.Add(
+                    { Id = map |> Map.find "id"
+                      Kind = map |> Map.tryFind "kind" |> Option.defaultValue ""
+                      Path = map |> Map.tryFind "path" |> Option.defaultValue ""
+                      Slice = map |> Map.tryFind "slice" |> Option.defaultValue ""
+                      Line = line }
+                )
+                |> ignore)
+            diagnostics
+            "config-source-missing-id"
+            "Sources table row is missing `id`."
+
+    let private parseFactsTable
+        (lines: AuthoringLine list)
+        (startIndex: int)
+        (facts: ResizeArray<ConfigFactRow>)
+        (diagnostics: ResizeArray<ConfigParseDiagnostic>)
+        =
+        parseTableRows
+            lines
+            startIndex
+            false
+            (fun map line ->
+                let contract = map |> Map.tryFind "contract" |> Option.defaultValue ""
+                let verifiedBy = map |> Map.tryFind "verified_by" |> Option.defaultValue ""
+
+                if not (String.IsNullOrWhiteSpace contract) && not (String.IsNullOrWhiteSpace verifiedBy) then
+                    facts.Add({ Contract = contract; VerifiedBy = verifiedBy; Line = line }) |> ignore)
+            diagnostics
+            "config-fact-missing-contract"
+            "Facts table row is missing `contract`."
 
     let private skipTableBody (lines: AuthoringLine list) (startIndex: int) =
         let mutable i = startIndex
@@ -167,7 +226,9 @@ module ConfigParser =
         let mutable name: string option = None
         let mutable basedOnAdr: string option = None
         let defaults = Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        let sources = ResizeArray<ConfigSourceRow>()
         let contracts = ResizeArray<ConfigContractRow>()
+        let facts = ResizeArray<ConfigFactRow>()
         let lineList = lines |> List.ofSeq
         let mutable i = 0
 
@@ -188,8 +249,14 @@ module ConfigParser =
             elif text.Equals("defaults", StringComparison.OrdinalIgnoreCase) then
                 i <- parseDefaultsBlock lineList (i + 1) defaults diagnostics
                 i <- i + 1
+            elif text.Equals("sources table", StringComparison.OrdinalIgnoreCase) then
+                i <- parseSourcesTable lineList (i + 1) sources diagnostics
+                i <- i + 1
             elif text.Equals("contracts table", StringComparison.OrdinalIgnoreCase) then
                 i <- parseContractsTable lineList (i + 1) contracts diagnostics
+                i <- i + 1
+            elif text.Equals("facts table", StringComparison.OrdinalIgnoreCase) then
+                i <- parseFactsTable lineList (i + 1) facts diagnostics
                 i <- i + 1
             elif text.EndsWith(" table", StringComparison.OrdinalIgnoreCase) then
                 i <- skipTableBody lineList (i + 1)
@@ -212,7 +279,9 @@ module ConfigParser =
                       { Name = n
                         BasedOnAdr = basedOnAdr
                         Defaults = defaults
-                        Contracts = contracts.ToArray() }
+                        Sources = sources.ToArray()
+                        Contracts = contracts.ToArray()
+                        Facts = facts.ToArray() }
               Diagnostics = diagnostics.ToArray() }
 
     let parseText (text: string) : ConfigParseResult =

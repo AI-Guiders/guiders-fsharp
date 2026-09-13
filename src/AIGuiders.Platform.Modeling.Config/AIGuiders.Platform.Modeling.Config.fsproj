@@ -8,5 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Schema.fs" />
+    <Compile Include="KnowledgeWire.fs" />
+    <Compile Include="ContractPredicates.fs" />
   </ItemGroup>
 </Project>
