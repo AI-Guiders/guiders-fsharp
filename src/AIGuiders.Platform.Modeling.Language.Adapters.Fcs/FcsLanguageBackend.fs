@@ -163,7 +163,6 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                 match symbolNameOfPat headPat with
                 | Some name -> target.Add(symbol name "let" path range container)
                 | None -> ()
-            | _ -> ()
 
         let rec visitDecl (target: ResizeArray<LanguageSymbol>) (container: string) (decl: SynModuleDecl) =
             match decl with
@@ -203,8 +202,6 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                     visitDecl inner fullName decl
                 collected.Add({ symbol fullName "module" path range "" with Children = inner.ToArray() })
         | ParsedInput.SigFile _ -> ()
-
-        collected.ToArray()
 
         collected.ToArray()
 
@@ -382,7 +379,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
         task {
             let ext = Path.GetExtension(path)
 
-            if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+            if String.Equals(ext, ".fsx", StringComparison.OrdinalIgnoreCase) then
                 let! projectOptions, _scriptDiags =
                     checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
 
@@ -425,7 +422,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                 task {
                     let ext = Path.GetExtension(path)
 
-                    if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+                    if String.Equals(ext, ".fsx", StringComparison.OrdinalIgnoreCase) then
                         let! projectOptions, _scriptDiags =
                             checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)
 
@@ -499,7 +496,7 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
                     let ext = Path.GetExtension(path)
 
                     let! navigation =
-                        if ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase) then
+                        if String.Equals(ext, ".fsx", StringComparison.OrdinalIgnoreCase) then
                             task {
                                 let! projectOptions, _scriptDiags =
                                     checker.GetProjectOptionsFromScript(path, sourceText, assumeDotNetFramework = false)

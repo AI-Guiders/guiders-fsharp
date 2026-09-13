@@ -21,7 +21,7 @@ module PathBoundary =
         with _ ->
             Nullable()
 
-    let private toPhysicalFallback (workspaceRoot: string) (logical: string) =
+    let private toPhysicalFallback (workspaceRoot: string) (logical: string) : string | null =
         try
             let segments = logical.Split('/', StringSplitOptions.RemoveEmptyEntries)
             Path.GetFullPath(Path.Combine(Array.append [| workspaceRoot.Trim() |] segments))

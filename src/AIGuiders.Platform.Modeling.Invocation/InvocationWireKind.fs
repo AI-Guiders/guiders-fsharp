@@ -1,6 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Invocation
 
 /// <summary>Which Notations branch parses user wire for this surface (ADR-0021).</summary>
+[<RequireQualifiedAccess>]
 type InvocationWireKind =
     | SlashPath = 1
     | ConsolePath = 2
@@ -15,10 +16,10 @@ module InvocationWireKind =
         | InvocationWireKind.SlashPath -> "slash-path"
         | InvocationWireKind.ConsolePath -> "console-path"
         | InvocationWireKind.KeySequence -> "key-sequence"
-        | InvocationWireKind.None -> "none"
+        | kind when kind = InvocationWireKind.None -> "none"
 
     let tryParse (wire: string) : InvocationWireKind option =
-        if System.String.IsNullOrWhiteSpace wire then None
+        if System.String.IsNullOrWhiteSpace wire then (None: InvocationWireKind option)
         else
             match wire.Trim().ToLowerInvariant() with
             | "slash-path" -> Some InvocationWireKind.SlashPath

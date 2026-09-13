@@ -46,7 +46,7 @@ type LogicalPath =
     static member Parse(raw: string) = LogicalPath.Create raw
 
     static member TryParse(raw: string) =
-        if isNull raw then
+        if String.IsNullOrEmpty raw then
             None
         else
             Some(LogicalPath.Create raw)

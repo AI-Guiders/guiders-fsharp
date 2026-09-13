@@ -13,13 +13,13 @@ type GdlLanguageBackend() =
 
     let isDeckFile (path: string) =
         let fileName = Path.GetFileName(path)
-        fileName.EndsWith(".deck.gdl", StringComparison.OrdinalIgnoreCase)
+        not (String.IsNullOrEmpty fileName) && fileName.EndsWith(".deck.gdl", StringComparison.OrdinalIgnoreCase)
 
     let isGdlFile (path: string) =
         let ext = Path.GetExtension(path)
 
-        ext.Equals(".gdl", StringComparison.OrdinalIgnoreCase)
-        || ext.Equals(".gdlproj", StringComparison.OrdinalIgnoreCase)
+        String.Equals(ext, ".gdl", StringComparison.OrdinalIgnoreCase)
+        || String.Equals(ext, ".gdlproj", StringComparison.OrdinalIgnoreCase)
 
     let readSource (req: LanguageRequest) =
         if not (String.IsNullOrWhiteSpace req.SourceText) then

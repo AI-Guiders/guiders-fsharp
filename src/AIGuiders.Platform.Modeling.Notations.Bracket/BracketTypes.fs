@@ -79,7 +79,7 @@ module BracketProfiles =
           AxisShape = BracketAxisShape.Opaque
           StripOuterTerminals = true
           RespectBracketDepthOnListSplit = true
-          NestedAxisKeys = null }
+          NestedAxisKeys = [||] }
 
     let DocSymbol =
         { Id = "bracket.doc-symbol"
@@ -90,7 +90,7 @@ module BracketProfiles =
           AxisShape = BracketAxisShape.KeyValue
           StripOuterTerminals = true
           RespectBracketDepthOnListSplit = true
-          NestedAxisKeys = null }
+          NestedAxisKeys = [||] }
 
     /// <summary>Forge compound wire: FRG path + CDP square-kv tail (GUIDERS-ADR-0026 §2.1).</summary>
     let ForgeFrg =

@@ -42,7 +42,7 @@ module FcsProjectResolver =
                         multiple
                         |> Array.tryFind (fun fsproj ->
                             let projName = Path.GetFileNameWithoutExtension fsproj
-                            projName.Equals(fileNameNoExt, StringComparison.OrdinalIgnoreCase))
+                            String.Equals(projName, fileNameNoExt, StringComparison.OrdinalIgnoreCase))
                     matching
                 | _ ->
                     let parent = Directory.GetParent dir

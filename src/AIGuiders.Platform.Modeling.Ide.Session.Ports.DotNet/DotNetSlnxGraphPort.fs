@@ -9,9 +9,9 @@ module DotNetSlnxGraphPort =
 
     let toProjectKind (entry: DotNetProjectEntry) =
         match entry.Kind with
-        | DotNetProjectKind.CSharp -> DotNet { Language = CSharp }
-        | DotNetProjectKind.FSharp -> DotNet { Language = FSharp }
-        | DotNetProjectKind.Unknown -> failwith $"Unsupported managed project '{entry.AbsolutePath}'."
+        | DotNetWorkspace.Core.DotNetProjectKind.CSharp -> DotNet { Language = DotNetLanguage.CSharp }
+        | DotNetWorkspace.Core.DotNetProjectKind.FSharp -> DotNet { Language = DotNetLanguage.FSharp }
+        | DotNetWorkspace.Core.DotNetProjectKind.Unknown -> failwith $"Unsupported managed project '{entry.AbsolutePath}'."
 
     let buildProjectNodes (entries: DotNetProjectEntry list) =
         entries

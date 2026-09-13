@@ -50,12 +50,12 @@ module PresetMerge =
                     | None -> (None, None)
                 | _ -> (None, None)
 
-            let include =
+            let includedKinds =
                 match requestInclude with
                 | Some ri when ri.Length > 0 -> Some ri
                 | _ -> presetInclude
 
-            let exclude =
+            let excludedKinds =
                 match requestExclude, presetExclude with
                 | Some re, Some pe when re.Length > 0 && pe.Length > 0 ->
                     let set = System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -72,7 +72,7 @@ module PresetMerge =
                 | Some re, _ when re.Length > 0 -> Some re
                 | _ -> presetExclude
 
-            (include, exclude, None)
+            (includedKinds, excludedKinds, None)
 
 /// <summary>Kind filter: non-empty include is a whitelist; exclude subtracts. Unknown tokens ignored.</summary>
 [<RequireQualifiedAccess>]

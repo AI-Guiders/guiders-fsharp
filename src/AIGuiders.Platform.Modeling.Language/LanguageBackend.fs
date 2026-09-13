@@ -50,38 +50,38 @@ module LanguagePathRules =
             let fileName = Path.GetFileName path
             let ext = Path.GetExtension path
 
-            if ext.Equals(".sln", StringComparison.OrdinalIgnoreCase)
-               || ext.Equals(".slnx", StringComparison.OrdinalIgnoreCase) then
+            if String.Equals(ext, ".sln", StringComparison.OrdinalIgnoreCase)
+               || String.Equals(ext, ".slnx", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Csharp
-            elif ext.Equals(".csproj", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".csproj", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Csharp
-            elif ext.Equals(".fsproj", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".fsproj", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Fsharp
-            elif ext.Equals(".gdlproj", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".gdlproj", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Gdl
-            elif fileName.Equals("tsconfig.json", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(fileName, "tsconfig.json", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Typescript
-            elif fileName.Equals("pyproject.toml", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(fileName, "pyproject.toml", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Python
-            elif ext.Equals(".fsx", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".fs", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".fsx", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".fs", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Fsharp
-            elif ext.Equals(".cs", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".cs", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Csharp
-            elif ext.Equals(".ts", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".tsx", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".js", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".jsx", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".ts", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".tsx", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".js", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".jsx", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Typescript
-            elif ext.Equals(".ps1", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".psm1", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".ps1", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".psm1", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.PowerShell
-            elif ext.Equals(".py", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".py", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Python
-            elif ext.Equals(".pas", StringComparison.OrdinalIgnoreCase)
-                 || ext.Equals(".dpr", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".pas", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".dpr", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Delphi
-            elif ext.Equals(".gdl", StringComparison.OrdinalIgnoreCase) then
+            elif String.Equals(ext, ".gdl", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Gdl
             else
                 None

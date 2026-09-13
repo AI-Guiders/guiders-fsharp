@@ -13,6 +13,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);MSB3277;NU1504;FS3261;FS0025;FS0104</NoWarn>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj'">

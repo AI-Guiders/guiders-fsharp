@@ -13,8 +13,8 @@ type ArgumentSlot
     (
         name: string,
         [<Optional; DefaultParameterValue(ArgumentSlotKind.Value)>] kind: ArgumentSlotKind,
-        [<Optional; DefaultParameterValue(null: string)>] longOption: string,
-        [<Optional; DefaultParameterValue(null: string)>] shortOption: string
+        [<Optional; DefaultParameterValue("")>] longOption: string,
+        [<Optional; DefaultParameterValue("")>] shortOption: string
     ) =
     member val Name = name with get, set
     member val Kind = kind with get, set
@@ -24,7 +24,7 @@ type ArgumentSlot
 [<AllowNullLiteral>]
 type ArgumentNotationProfile
     (
-        [<Optional; DefaultParameterValue(null: string)>] readerId: string,
+        [<Optional; DefaultParameterValue("")>] readerId: string,
         [<Optional; DefaultParameterValue(null: IReadOnlyList<ArgumentSlot>)>] slots: IReadOnlyList<ArgumentSlot>
     ) =
     member val ReaderId = readerId with get, set
@@ -38,7 +38,9 @@ type ArgumentNotationProfile
         if isNull incoming || incoming.IsEmpty then existing
         elif isNull existing || existing.IsEmpty then incoming
         else
-            let reader = if isNull incoming.ReaderId then existing.ReaderId else incoming.ReaderId
+            let reader =
+                if String.IsNullOrWhiteSpace incoming.ReaderId then existing.ReaderId
+                else incoming.ReaderId
             let slots =
                 if not (isNull incoming.Slots) && incoming.Slots.Count > 0 then incoming.Slots else existing.Slots
             ArgumentNotationProfile(reader, slots)
@@ -60,16 +62,16 @@ module ArgumentReaders =
 
 type NormalizedArguments
     (
-        [<Optional; DefaultParameterValue(null: string)>] raw: string,
+        [<Optional; DefaultParameterValue("")>] raw: string,
         [<Optional; DefaultParameterValue(null: IReadOnlyDictionary<string, string>)>] slots: IReadOnlyDictionary<string, string>,
-        [<Optional; DefaultParameterValue(null: string)>] readerId: string
+        [<Optional; DefaultParameterValue("")>] readerId: string
     ) =
     member val Raw = raw with get, set
     member val Slots = slots with get, set
     member val ReaderId = readerId with get, set
 
-    static member FromRaw(raw: string, [<Optional; DefaultParameterValue(null: string)>] readerId: string) =
+    static member FromRaw(raw: string, [<Optional; DefaultParameterValue("")>] readerId: string) =
         NormalizedArguments(raw, null, readerId)
 
-    static member FromSlots(slots: IReadOnlyDictionary<string, string>, [<Optional; DefaultParameterValue(null: string)>] readerId: string) =
+    static member FromSlots(slots: IReadOnlyDictionary<string, string>, [<Optional; DefaultParameterValue("")>] readerId: string) =
         NormalizedArguments(null, slots, readerId)

@@ -55,14 +55,14 @@ module Presets =
         | Some(def, _) ->
             let deniedByWhitelist =
                 match def.IncludeKinds with
-                | Some include when include.Length > 0 -> not (List.contains kind include)
+                | Some allowed when allowed.Length > 0 -> not (List.contains kind allowed)
                 | _ -> false
 
             if deniedByWhitelist then
                 false
             else
                 match def.ExcludeKinds with
-                | Some exclude when exclude.Length > 0 -> not (List.contains kind exclude)
+                | Some denied when denied.Length > 0 -> not (List.contains kind denied)
                 | _ -> true
 
     /// <summary>Preset names in catalog order (discovery helper).</summary>

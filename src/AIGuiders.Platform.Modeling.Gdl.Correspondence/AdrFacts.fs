@@ -171,7 +171,10 @@ module AdrFactsParser =
             false
 
     let private tryExtractAdrId (sourcePath: string) (markdown: string) =
-        let fileName = System.IO.Path.GetFileNameWithoutExtension sourcePath
+        let fileName =
+            System.IO.Path.GetFileNameWithoutExtension sourcePath
+            |> Option.ofObj
+            |> Option.defaultValue ""
 
         if not (String.IsNullOrWhiteSpace fileName) then
             let fileMatch = adrIdRegex.Match fileName
@@ -194,7 +197,7 @@ module AdrFactsParser =
                 None
 
     /// <summary>Parse ADR markdown facts block. Returns None when no facts fence/body found.</summary>
-    let tryParse (sourcePath: string) (markdown: string) : AdrFactsBlock option =
+    let tryParse (sourcePath: string) (markdown: string | null) : AdrFactsBlock option =
         if String.IsNullOrWhiteSpace sourcePath then
             invalidArg "sourcePath" "Source path is required."
 
