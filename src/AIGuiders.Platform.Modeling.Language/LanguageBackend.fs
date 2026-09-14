@@ -41,6 +41,29 @@ module LanguageIds =
     [<Literal>]
     let Delphi = "delphi"
 
+    [<Literal>]
+    let Dashspec = "dashspec"
+
+/// <summary>DashSpec planet file roots (ADR-0017).</summary>
+module DashSpecPathRules =
+    let private extensions =
+        set
+            [ ".dashspec"
+              ".dashdiagram"
+              ".dashlayout"
+              ".dashpalette"
+              ".dashpresentation"
+              ".dashtransform"
+              ".dashcatalog"
+              ".dashtooltip"
+              ".dashinclude" ]
+
+    let isDashSpecPath (path: string) =
+        if String.IsNullOrWhiteSpace path then
+            false
+        else
+            extensions.Contains(Path.GetExtension(path).ToLowerInvariant())
+
 /// <summary>Extension-based language id resolution per GUIDERS-ADR-0061 §3.</summary>
 module LanguagePathRules =
     let resolveLanguageId (path: string) : string option =
@@ -83,6 +106,8 @@ module LanguagePathRules =
                 Some LanguageIds.Delphi
             elif String.Equals(ext, ".gdl", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Gdl
+            elif DashSpecPathRules.isDashSpecPath path then
+                Some LanguageIds.Dashspec
             else
                 None
 
