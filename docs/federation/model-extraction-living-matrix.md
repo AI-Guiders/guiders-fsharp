@@ -22,5 +22,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `LegacyBracketRelationWire` boundary parse only | **shipped** obsolete shims deleted |
+| RelationSpec resolve path | `RelationSpec` + Kind: wire | `RelationSpecWireBoundary` + `RelationSpecLegacyBridge` + C# `TryResolve(spec)` | **shipped** v1 bridge |
 
-**Next waves:** delete `LegacyBracketRelationWire` after RelationSpec resolve path · Execution package renames (`*.Anchors` → `*.Relations` where applicable) · `FcsProjectOptionsSdkSource` dead code trim.
+**Next waves:** delete `LegacyBracketRelationWire` after Xml/CDP migrate · Execution `*.Anchors` package renames · conformance anchor-resolve Kind vectors.

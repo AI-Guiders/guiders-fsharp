@@ -15,5 +15,6 @@
     <Compile Include="BracketTypes.fs" />
     <Compile Include="LegacyBracketSpan.fs" />
     <Compile Include="BracketRelationWire.fs" />
+    <Compile Include="RelationSpecLegacyBridge.fs" />
   </ItemGroup>
 </Project>
