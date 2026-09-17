@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
     <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.Ide.Session\AIGuiders.Platform.Execution.Ide.Session.csproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.Language.Adapters.Fcs\AIGuiders.Platform.Execution.Language.Adapters.Fcs.csproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language.Adapters.Fcs\AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language.Adapters.Gdl\AIGuiders.Platform.Modeling.Language.Adapters.Gdl.fsproj" />
   </ItemGroup>

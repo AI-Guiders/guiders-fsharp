@@ -6,6 +6,8 @@ open Xunit
 open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open AIGuiders.Platform.Modeling.Language.Adapters.Gdl
+open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Execution.Language.Adapters.Fcs
 
 module LanguageAdapterSmokeTests =
     let private languageRequest file line column sourceText solution =
@@ -25,7 +27,7 @@ module LanguageAdapterSmokeTests =
         :> ILanguageBackend
 
     let private materializeGuidersSlnx (slnx: string) (anchorFs: string) =
-        FcsCompilerServicesHost.invalidate (Some slnx)
+        FcsExecutionHost.Invalidate(slnx)
 
         let ensure =
             AIGuiders.Platform.Execution.Ide.Session.FederationSessionRuntime.TryEnsureCompilerServices(
@@ -33,10 +35,7 @@ module LanguageAdapterSmokeTests =
                 anchorFs)
 
         Assert.True(ensure.Ok, ensure.Reason)
-
-        match ensure.WorkspaceView with
-        | null -> Assert.Fail "WorkspaceView missing after EnsureCompilerServices"
-        | view -> FcsCompilerServicesHost.materialize view |> ignore
+        Assert.NotNull(ensure.WorkspaceView)
 
     [<Fact>]
     let ``Fcs parses simple fs source`` () =
@@ -400,8 +399,8 @@ module LanguageAdapterSmokeTests =
         else
             materializeGuidersSlnx slnx backendFs
 
-            let enriched =
-                match FcsCompilerServicesHost.tryGetView slnx with
+            let enriched : WorkspaceView =
+                match FcsExecutionHost.TryGetView(slnx) |> Option.ofObj with
                 | Some view -> view
                 | None -> Assert.Fail "materialized view missing"; failwith "unreachable"
 
