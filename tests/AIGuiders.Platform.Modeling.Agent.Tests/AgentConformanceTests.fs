@@ -1,8 +1,8 @@
-module AIGuiders.Platform.Modeling.Gdl.Agent.Tests.ConformanceTests
+module AIGuiders.Platform.Modeling.Agent.Tests.ConformanceTests
 
 open System.Collections.Generic
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Agent
+open AIGuiders.Platform.Modeling.Agent
 
 [<Fact>]
 let ``Envelope: green pulse with hint rows`` () =

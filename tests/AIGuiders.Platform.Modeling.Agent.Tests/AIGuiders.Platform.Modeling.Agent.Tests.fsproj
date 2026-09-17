@@ -9,9 +9,9 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GdlAgentConformanceTests.fs" />
+    <Compile Include="AgentConformanceTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Agent\AIGuiders.Platform.Modeling.Gdl.Agent.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Agent\AIGuiders.Platform.Modeling.Agent.fsproj" />
   </ItemGroup>
 </Project>

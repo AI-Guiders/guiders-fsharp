@@ -4,7 +4,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Command/AIGuiders.Platform.Modeling.Gdl.Command.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Core/AIGuiders.Platform.Modeling.Gdl.Core.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Validation/AIGuiders.Platform.Modeling.Gdl.Validation.fsproj" />
-    <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Agent/AIGuiders.Platform.Modeling.Gdl.Agent.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Agent/AIGuiders.Platform.Modeling.Agent.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Authoring/AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Presentation/AIGuiders.Platform.Modeling.Gdl.Presentation.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Deck/AIGuiders.Platform.Modeling.Gdl.Parse.Deck.fsproj" />
@@ -53,7 +53,7 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.Tests/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Combinations.Tests/AIGuiders.Platform.Modeling.Combinations.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Core.Tests/AIGuiders.Platform.Modeling.Core.Tests.fsproj" />
-    <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Agent.Tests/AIGuiders.Platform.Modeling.Agent.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests/AIGuiders.Platform.Modeling.Gdl.Core.Tests.fsproj" />

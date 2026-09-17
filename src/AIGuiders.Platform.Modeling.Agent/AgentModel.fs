@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Gdl.Agent
+namespace AIGuiders.Platform.Modeling.Agent
 
 open System.Collections.Generic
 
