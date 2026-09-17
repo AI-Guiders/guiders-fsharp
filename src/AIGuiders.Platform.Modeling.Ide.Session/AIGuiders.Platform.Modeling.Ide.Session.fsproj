@@ -33,6 +33,7 @@
     <Compile Include="WorkspaceView.fs" />
     <Compile Include="RevisionLedger.fs" />
     <Compile Include="SessionRuntime.fs" />
+    <Compile Include="DiagnosticIndexOps.fs" />
     <Compile Include="CompilerServicesMaterialization.fs" />
     <Compile Include="SessionOrchestrator.fs" />
     <Compile Include="SnapshotJob.fs" />
