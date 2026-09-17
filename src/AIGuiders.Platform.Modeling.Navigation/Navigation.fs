@@ -43,6 +43,7 @@ type Node =
       Label: string option }
 
 [<CLIMutable>]
+/// <summary>Projection edge — <see cref="Kind"/> mirrors <see cref="Ide.Session.RelationType"/> wire, not a parallel SSOT.</summary>
 type Edge =
     { FromId: string
       ToId: string

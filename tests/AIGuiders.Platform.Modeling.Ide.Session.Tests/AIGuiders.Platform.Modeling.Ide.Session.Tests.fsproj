@@ -19,6 +19,7 @@
     <Compile Include="FrozenSnapshotTests.fs" />
     <Compile Include="ConformanceGoldenSessionTests.fs" />
     <Compile Include="RelationGraphTests.fs" />
+    <Compile Include="SceneProjectionTests.fs" />
     <Compile Include="DiagnosticIndexOpsTests.fs" />
     <Compile Include="OpenBuildGoldenTests.fs" />
     <Compile Include="SolutionProviderRegistryTests.fs" />
