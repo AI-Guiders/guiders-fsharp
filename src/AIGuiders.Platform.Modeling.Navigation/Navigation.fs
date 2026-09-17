@@ -26,14 +26,12 @@ type Domain =
     | Docs
     | Workspace
 
-[<CLIMutable>]
 type Anchor =
     { Path: string
       Line: int option
       Column: int option
       SolutionPath: string option }
 
-[<CLIMutable>]
 type Node =
     { Id: string
       Path: string
@@ -42,7 +40,6 @@ type Node =
       RelativePath: string option
       Label: string option }
 
-[<CLIMutable>]
 /// <summary>Projection edge — <see cref="Kind"/> mirrors <see cref="Ide.Session.RelationType"/> wire, not a parallel SSOT.</summary>
 type Edge =
     { FromId: string
@@ -50,7 +47,6 @@ type Edge =
       Kind: string
       RelatedKind: string option }
 
-[<CLIMutable>]
 type SceneCaps =
     { MaxRelated: int
       MaxNodes: int
@@ -58,7 +54,6 @@ type SceneCaps =
       Preset: string option
       KindCaps: Map<string, int> option }
 
-[<CLIMutable>]
 type Scene =
     { Schema: string
       Mode: Mode

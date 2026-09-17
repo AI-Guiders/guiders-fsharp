@@ -21,6 +21,7 @@
     <Compile Include="RelationGraphTests.fs" />
     <Compile Include="DependencyRelationTests.fs" />
     <Compile Include="DependencyRelationOpsTests.fs" />
+    <Compile Include="FederationPhase1ChecklistTests.fs" />
     <Compile Include="CorrespondenceRelationTests.fs" />
     <Compile Include="SessionGraphPickerChoicesTests.fs" />
     <Compile Include="SceneProjectionTests.fs" />

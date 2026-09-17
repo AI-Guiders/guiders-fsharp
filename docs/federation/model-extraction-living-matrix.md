@@ -58,5 +58,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Session Contents E_dep hook | `DependencyRelationOps.ingest` + `SolutionGraph.mergeRelations` | `DependencyRelationIngest` @ `FederationSessionRuntime.Open` | **shipped** ship-36 |
 | Correspondence CLIMutable strip | plain F# records in `Documentation.Correspondence` | `CorrespondenceModels` constructor seam (no CLIMutable views) | **shipped** ship-37 |
 | CompilerServices E_dep v2 | `buildExtends` / `buildImplementsInterface` / `buildTypeUses` | `RoslynDependencyRelationIngest.IngestProjectSources` + `IngestForProject` @ ensure | **shipped** ship-38 |
+| Navigation CLIMutable strip | plain F# `Navigation.Scene` records | `NavigationModels` constructor seam | **shipped** ship-39 |
+| Phase 1 checklist gate | `FederationPhase1ChecklistTests` | platform green + living matrix | **shipped** ship-39 |
 
-**Next waves:** Plan §10 Phase 1 checklist closure.
+**Next waves:** Phase 2 modeling tree (plan §10).
