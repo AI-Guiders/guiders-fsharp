@@ -44,6 +44,10 @@ module DiagnosticIndexOps =
 
         { runtime with Diagnostics = index }
 
+    /// <summary>Replace session index for a language refresh scope (plan §2.4.2).</summary>
+    let refresh (incoming: IncomingDiagnostic seq) (runtime: SessionRuntime) : SessionRuntime =
+        ingest incoming { runtime with Diagnostics = Map.empty }
+
     let tryFindByCode (code: string) (index: DiagnosticIndex) =
         index
         |> Map.tryPick (fun ref record ->
