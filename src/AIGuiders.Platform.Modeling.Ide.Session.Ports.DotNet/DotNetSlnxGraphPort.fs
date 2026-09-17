@@ -1,6 +1,5 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
-open System
 open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Paths
 
@@ -39,19 +38,7 @@ module DotNetSlnxGraphPort =
                 match Map.tryFind refPath byPath with
                 | None -> None
                 | Some toId ->
-                    Some(
-                        RelationGraph.fromProjectEdge
-                            { From = ProjectId.create entry.AbsolutePath
-                              To = toId })))
-
-    [<Obsolete("Use buildProjectRefRelations returning Relation list.", false)>]
-    let buildProjectEdges (entries: DotNetProjectEntry list) =
-        buildProjectRefRelations entries
-        |> List.map (fun r ->
-            match r.From, r.To with
-            | GraphNodeRef.SessionProject fromPid, GraphNodeRef.SessionProject toPid ->
-                { From = fromPid; To = toPid }
-            | _ -> failwith "buildProjectRefRelations produced non ProjectRef edge")
+                    Some(RelationGraph.projectRef (ProjectId.create entry.AbsolutePath) toId)))
 
     let buildDocumentOwnership (entries: DotNetProjectEntry list) =
         entries

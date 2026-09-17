@@ -39,4 +39,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 
 | BracketAnchorSpan Modeling delete | `XmlWireEncoding` only in `Notations.Bracket` | `BracketAnchorSpan` + `BracketAxisFamily` + `RelationSpecLegacyBridge` @ Execution | **shipped** ship-26 |
 
-**Next waves:** Plan §10 Phase 1 checklist · remove obsolete `SessionEdge`/`ProjectEdge` shims · ship-3 IO ports slice.
+| Legacy edge shims deleted | `RelationGraph.projectRef` + orchestration helpers | ports/tests use `Relation` only | **shipped** ship-27 |
+
+**Next waves:** Plan §10 Phase 1 checklist · ship-3 IO ports slice (GoldenEvidence, Config sources, FCS host split).

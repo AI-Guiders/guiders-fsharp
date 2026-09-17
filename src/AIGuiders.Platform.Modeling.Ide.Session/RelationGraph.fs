@@ -1,20 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-open System
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
-
-type SessionEdgeKind =
-    | Requires
-    | Invalidates
-    | Feeds
-
-[<Obsolete("Use Relation in SolutionGraph.Relations. Migrate via RelationGraph.fromSessionEdge.", false)>]
-type SessionEdge =
-    { From: GraphNodeId
-      To: GraphNodeId
-      Kind: SessionEdgeKind
-      Attributes: Map<string, string> }
 
 type NodeSort =
     | SessionProject
@@ -90,6 +77,44 @@ module RelationGraph =
         | GraphNodeRef.SessionCapability(pid, _) -> Some pid
         | _ -> None
 
+    let private graphNodeRef (node: GraphNodeId) =
+        match node with
+        | GraphNodeId.ProjectNode pid -> GraphNodeRef.SessionProject pid
+        | GraphNodeId.CapabilityNode(pid, kind) -> GraphNodeRef.SessionCapability(pid, kind)
+
+    let projectRef (fromPid: ProjectId) (toPid: ProjectId) =
+        { From = GraphNodeRef.SessionProject fromPid
+          Type = RelationType.ProjectRef
+          To = GraphNodeRef.SessionProject toPid
+          Scope = SessionG
+          Attributes = RelationAttributes.empty }
+
+    let orchestration
+        (relationType: RelationType)
+        (fromNode: GraphNodeId)
+        (toNode: GraphNodeId)
+        (attributes: Map<string, string>)
+        =
+        let kind =
+            match relationType with
+            | RelationType.Requires | RelationType.Invalidates | RelationType.Feeds -> relationType
+            | _ -> invalidArg (nameof relationType) "orchestration requires Requires|Invalidates|Feeds"
+
+        { From = graphNodeRef fromNode
+          Type = kind
+          To = graphNodeRef toNode
+          Scope = SessionG
+          Attributes = { Tags = []; Wire = attributes } }
+
+    let requiresOrchestration (fromNode: GraphNodeId) (toNode: GraphNodeId) =
+        orchestration RelationType.Requires fromNode toNode Map.empty
+
+    let invalidatesOrchestration (fromNode: GraphNodeId) (toNode: GraphNodeId) =
+        orchestration RelationType.Invalidates fromNode toNode Map.empty
+
+    let feedsOrchestration (fromNode: GraphNodeId) (toNode: GraphNodeId) =
+        orchestration RelationType.Feeds fromNode toNode Map.empty
+
     let validateRelation (relation: Relation) =
         let fromSort = sortOfNode relation.From
         let toSort = sortOfNode relation.To
@@ -120,38 +145,3 @@ module RelationGraph =
                 Ok()
             else
                 Error { Message = $"TypeSystem {relation.Type}: requires SemanticSymbol -> SemanticSymbol." }
-
-    let fromSessionEdge (edge: SessionEdge) =
-        let fromNode =
-            match edge.From with
-            | GraphNodeId.ProjectNode pid -> GraphNodeRef.SessionProject pid
-            | GraphNodeId.CapabilityNode(pid, kind) -> GraphNodeRef.SessionCapability(pid, kind)
-
-        let toNode =
-            match edge.To with
-            | GraphNodeId.ProjectNode pid -> GraphNodeRef.SessionProject pid
-            | GraphNodeId.CapabilityNode(pid, kind) -> GraphNodeRef.SessionCapability(pid, kind)
-
-        let relationType =
-            match edge.Kind with
-            | SessionEdgeKind.Requires -> RelationType.Requires
-            | SessionEdgeKind.Invalidates -> RelationType.Invalidates
-            | SessionEdgeKind.Feeds -> RelationType.Feeds
-
-        { From = fromNode
-          Type = relationType
-          To = toNode
-          Scope = SessionG
-          Attributes = { Tags = []; Wire = edge.Attributes } }
-
-    let fromProjectEdge (edge: ProjectEdge) =
-        { From = GraphNodeRef.SessionProject edge.From
-          Type = RelationType.ProjectRef
-          To = GraphNodeRef.SessionProject edge.To
-          Scope = SessionG
-          Attributes = RelationAttributes.empty }
-
-    [<Obsolete("Use SolutionGraph.Relations (Relation list).", false)>]
-    let fromLegacy (projectEdges: ProjectEdge list) (sessionEdges: SessionEdge list) =
-        [ yield! sessionEdges |> List.map fromSessionEdge
-          yield! projectEdges |> List.map fromProjectEdge ]

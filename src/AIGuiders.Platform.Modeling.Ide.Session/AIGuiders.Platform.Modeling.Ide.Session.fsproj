@@ -20,7 +20,6 @@
     <Compile Include="Topology.fs" />
     <Compile Include="Capabilities.fs" />
     <Compile Include="Projects.fs" />
-    <Compile Include="ProjectEdges.fs" />
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="RelationGraph.fs" />
     <Compile Include="SceneProjection.fs" />

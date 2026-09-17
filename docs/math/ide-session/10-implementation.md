@@ -12,8 +12,8 @@
 | \( \mathbb{P} \) | `ProjectNode` list |
 | \( \kappa_\pi \) | `ProjectNode.Capabilities` |
 | \( V \) | `GraphNodeId` = `ProjectNode` \| `CapabilityNode` |
-| \( E_{\mathsf{proj}} \) | `ProjectEdge` list; port `Ports.DotNet.DotNetSlnxGraphPort` |
-| \( E_{\mathsf{req}} \) | `SessionEdge` with `Kind = Requires`; WF7 local-only |
+| \( E_{\mathsf{proj}} \) | `RelationType.ProjectRef` in `SolutionGraph.Relations`; port `Ports.DotNet.DotNetSlnxGraphPort` |
+| \( E_{\mathsf{req}} \) | `RelationType.Requires|Invalidates|Feeds` orchestration; WF7 local-only |
 | \( \omega \) | `SolutionGraph.FileOwnership` |
 | \( \mathcal{S} \) | `SolutionSession` |
 | \( \rho_0 \) | `SessionPolicy` (v0 face; → merge в graph) |

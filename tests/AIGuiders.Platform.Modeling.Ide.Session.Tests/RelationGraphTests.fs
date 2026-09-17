@@ -14,23 +14,17 @@ type RelationGraphTests() =
         let from = GraphNodeId.capability pid Build
         let to' = GraphNodeId.capability pid CompilerServices
 
-        let edge =
-            { From = from
-              To = to'
-              Kind = SessionEdgeKind.Requires
-              Attributes = Map.empty }
-
-        let relation = RelationGraph.fromSessionEdge edge
+        let relation = RelationGraph.requiresOrchestration from to'
 
         match RelationGraph.validateRelation relation with
         | Ok () -> Assert.Equal(RelationType.Requires, relation.Type)
         | Error e -> Assert.Fail e.Message
 
     [<Fact>]
-    member _.``Project edge maps to ProjectRef``() =
+    member _.``ProjectRef relation validates``() =
         let a = ProjectId.create @"D:\repo\A\A.fsproj"
         let b = ProjectId.create @"D:\repo\B\B.fsproj"
-        let relation = RelationGraph.fromProjectEdge { From = a; To = b }
+        let relation = RelationGraph.projectRef a b
 
         match RelationGraph.validateRelation relation with
         | Ok () -> Assert.Equal(RelationType.ProjectRef, relation.Type)
