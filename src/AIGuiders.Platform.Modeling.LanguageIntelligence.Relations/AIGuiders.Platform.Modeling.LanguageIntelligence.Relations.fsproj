@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.LanguageIntelligence.Relations</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.LanguageIntelligence.Relations</AssemblyName>
+    <Description>Federation RelationSpec kernel — typed relation witness before Resolve/Materialize.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.LanguageIntelligence.Relations</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ResolveTier.fs" />
+    <Compile Include="RelationGeometry.fs" />
+    <Compile Include="RelationSpec.fs" />
+  </ItemGroup>
+</Project>
