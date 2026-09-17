@@ -12,6 +12,8 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | DiagnosticIndex ingest | `DiagnosticIndexOps.ingest` + `refresh` (Modeling) | `DiagnosticIndexIngest` + `FederationSessionRuntime.TryRefreshDiagnosticIndex` + LRC hook @ `LanguageResolverCenter` | **shipped** ship-22 |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** |
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
+| attach step brokers | `AttachSchemaCatalog` + contextual pickers | `FederationAttachCatalog` + ArgSuggestions matrix | **shipped** ship-5 |
+| Relation resolve seams | `ResolveCtx` + `RelationSpec` (Modeling) | `IResolveRelation` + `IMaterializeRelation` @ `Execution.LanguageIntelligence.Relations` | **shipped** ship-5 |
 | FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + probe + ProjInfo sources | **shipped** all FCS File/MSBuild IO @ Execution |
 | FCS patch apply IO | `FcsSessionPatchBridge` (pure map) + `IFcsSessionPatchApplier` port | `FcsSessionPatchApplier` bound @ `FcsModelingBindings` | **shipped** |
 | FCS backend text/graph IO | `IFcsSourceTextSource` + `IFcsSolutionGraphSource` ports | `FcsWorkspaceIoSource` bound @ `FcsModelingBindings` | **shipped** |
@@ -47,4 +49,4 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 
 | Legacy edge shims deleted | `RelationGraph.projectRef` + orchestration helpers | ports/tests use `Relation` only | **shipped** ship-27 |
 
-**Next waves:** Plan §10 Phase 1 checklist · ship-5 attach body audit · R5 residual IO · Dependency kernel · ReverseAnchor→Relation.
+**Next waves:** Plan §10 Phase 1 checklist · R5 adapter registration · Dependency kernel · ReverseAnchor→Relation.
