@@ -1,7 +1,7 @@
-module AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.HoareCatalogTests
+module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.HoareCatalogTests
 
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Correspondence
+open AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 [<Fact>]
 let ``registeredIds includes OB-H1 OB-H2 OB-H3 from ADR-0007`` () =

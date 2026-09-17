@@ -15,6 +15,6 @@
     <Compile Include="GoldenEvidenceTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Correspondence\AIGuiders.Platform.Modeling.Gdl.Correspondence.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Documentation.Correspondence\AIGuiders.Platform.Modeling.Documentation.Correspondence.fsproj" />
   </ItemGroup>
 </Project>

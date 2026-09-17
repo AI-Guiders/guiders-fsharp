@@ -1,9 +1,9 @@
-module AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.AdrFactsParserTests
+module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.AdrFactsParserTests
 
 open System
 open System.IO
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Correspondence
+open AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 let private sample0007 =
     """# GUIDERS-FSHARP-ADR-0007: Open build SSOT

@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Gdl.Correspondence
+namespace AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 open System
 open System.Text.RegularExpressions

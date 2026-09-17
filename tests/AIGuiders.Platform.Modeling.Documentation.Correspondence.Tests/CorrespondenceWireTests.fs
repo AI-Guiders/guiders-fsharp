@@ -1,7 +1,7 @@
-module AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.CorrespondenceWireTests
+module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.CorrespondenceWireTests
 
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Correspondence
+open AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 [<Fact>]
 let ``build: member wins over line span`` () =
@@ -58,3 +58,15 @@ let ``model: kind and provenance constants keep wire vocabulary`` () =
     Assert.Equal("normates", Kind.Normates)
     Assert.Equal("verified_by", Kind.VerifiedBy)
     Assert.Equal("bracket", Provenance.Bracket)
+
+[<Fact>]
+let ``CorrespondenceRelationKind parses normates wire`` () =
+    match CorrespondenceRelationKind.tryParse Kind.Normates with
+    | Some CorrespondenceRelationKind.Normates -> Assert.Equal(Kind.Normates, CorrespondenceRelationKind.toWire CorrespondenceRelationKind.Normates)
+    | _ -> failwith "expected normates kind"
+
+[<Fact>]
+let ``CorrespondenceRelationKind maps implements homonym`` () =
+    match CorrespondenceRelationKind.tryParse Kind.Implements with
+    | Some CorrespondenceRelationKind.ImplementsObligation -> Assert.Equal(Kind.Implements, CorrespondenceRelationKind.toWire CorrespondenceRelationKind.ImplementsObligation)
+    | _ -> failwith "expected implements obligation kind"

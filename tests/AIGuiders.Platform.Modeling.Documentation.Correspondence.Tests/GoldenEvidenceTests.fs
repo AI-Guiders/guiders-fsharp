@@ -1,9 +1,9 @@
-module AIGuiders.Platform.Modeling.Gdl.Correspondence.Tests.GoldenEvidenceTests
+module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.GoldenEvidenceTests
 
 open System
 open System.IO
 open Xunit
-open AIGuiders.Platform.Modeling.Gdl.Correspondence
+open AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 let private repoRoot =
     Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."))
