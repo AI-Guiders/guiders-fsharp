@@ -27,6 +27,8 @@
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProbeWire.fs" />
     <Compile Include="FcsProjectOptions.fs" />
+    <Compile Include="IFcsSessionPatchApplier.fs" />
+    <Compile Include="FcsSessionPatchApply.fs" />
     <Compile Include="FcsSessionPatchBridge.fs" />
     <Compile Include="FcsLanguageBackend.fs" />
 
