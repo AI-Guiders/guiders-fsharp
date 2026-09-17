@@ -54,7 +54,7 @@ lrc table
 end lrc
 
 implementation table
-  | operation     | plan                         | apply                         |
-  | rename-symbol | FcsSessionPatchBridge        | FcsSessionPatchBridge.tryApplyPatch |
-  | buffer-edit   | SessionPatch from buffer     | SessionOrchestrator.applyPatch  |
+  | operation     | plan                         | apply                                      |
+  | rename-symbol | FcsSessionPatchBridge (pure) | Execution FcsSessionPatchApplier @ FcsModelingBindings |
+  | buffer-edit   | SessionPatch from buffer     | SessionOrchestrator.applyPatch             |
 end implementation
