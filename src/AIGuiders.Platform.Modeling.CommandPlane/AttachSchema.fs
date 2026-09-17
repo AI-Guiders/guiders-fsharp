@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.CommandPlane
 
+open System
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 /// <summary>Human attach verb picker (plan §4.3) — maps to <see cref="RelationSpec"/> cases.</summary>
@@ -60,3 +61,43 @@ module AttachSchema =
         | RelationSpec.Address _ -> "Address"
         | RelationSpec.Nav _ -> "Nav"
         | RelationSpec.Resource _ -> "Resource"
+
+    let tryParseVerb (name: string) =
+        match name.Trim().ToLowerInvariant() with
+        | "error" -> Some Error
+        | "issue" -> Some Issue
+        | "document" -> Some Document
+        | "code" -> Some Code
+        | "nav" -> Some Nav
+        | "manual" -> Some Manual
+        | _ -> None
+
+    let validateSpecVector (verb: string) (targetCase: string) (steps: string list) =
+        match tryParseVerb verb with
+        | None -> [ $"unknown attach verb \"{verb}\"" ]
+        | Some parsed ->
+            let schema = forVerb parsed
+            let errors = ResizeArray<string>()
+
+            if schema.TargetCase <> targetCase then
+                errors.Add($"verb \"{verb}\" targetCase expected \"{targetCase}\", got \"{schema.TargetCase}\"")
+
+            let actual = schema.Steps |> List.map (fun s -> s.Id)
+
+            if actual <> steps then
+                let expected = String.Join(", ", steps)
+                let got = String.Join(", ", actual)
+                errors.Add($"verb \"{verb}\" steps expected [{expected}], got [{got}]")
+
+            List.ofSeq errors
+
+module AttachSchemaCatalog =
+    let allVerbs =
+        [ AttachVerb.Error
+          AttachVerb.Issue
+          AttachVerb.Document
+          AttachVerb.Code
+          AttachVerb.Nav
+          AttachVerb.Manual ]
+
+    let schemas = allVerbs |> List.map AttachSchema.forVerb

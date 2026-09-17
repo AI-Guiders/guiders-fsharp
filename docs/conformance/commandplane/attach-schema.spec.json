@@ -1,0 +1,43 @@
+{
+  "kind": "commandplane.attach-schema",
+  "version": 1,
+  "source": "plan §4.3 AttachSchema verb → RelationSpec case pipeline",
+  "vectors": [
+    {
+      "id": "error-verb",
+      "verb": "error",
+      "targetCase": "Diag",
+      "steps": ["pick_diagnostic"]
+    },
+    {
+      "id": "issue-verb",
+      "verb": "issue",
+      "targetCase": "Resource",
+      "steps": ["pick_issue"]
+    },
+    {
+      "id": "document-verb",
+      "verb": "document",
+      "targetCase": "DocToCode",
+      "steps": ["pick_doc", "pick_code"]
+    },
+    {
+      "id": "code-verb",
+      "verb": "code",
+      "targetCase": "CodeEdit",
+      "steps": ["pick_file", "pick_member"]
+    },
+    {
+      "id": "nav-verb",
+      "verb": "nav",
+      "targetCase": "Nav",
+      "steps": ["pick_nav"]
+    },
+    {
+      "id": "manual-verb",
+      "verb": "manual",
+      "targetCase": "*",
+      "steps": ["pick_kind", "browse_all"]
+    }
+  ]
+}
