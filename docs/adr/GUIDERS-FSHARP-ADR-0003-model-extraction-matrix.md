@@ -94,8 +94,8 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `IntermediateRepresentation.Argument` | `Modeling.Notations.Argument` |
 | `IntermediateRepresentation.Keyboard` | `Modeling.Notations.Keyboard` |
 | `IntermediateRepresentation.Bracket` | `Modeling.Notations.Bracket` |
-| `IntermediateRepresentation.Agent` | `Modeling.Gdl.Agent` |
-| `IntermediateRepresentation.Language` | `Modeling.Gdl.Language` |
+| `IntermediateRepresentation.Agent` | `Modeling.Agent` ✓ |
+| `IntermediateRepresentation.Language` | `Modeling.LanguageIntelligence.Relations` ✓ (was `Gdl.Language`; IR fork deleted) |
 
 #### 4.4 Notations (parse → Modeling; `.All` bundles → meta only)
 
@@ -157,20 +157,22 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 
 | Package | Split | F# target | Execution keeps |
 |---------|-------|-----------|-----------------|
-| `Navigation` | M | `Modeling.Navigation` | — |
-| `Navigation.Policy` | M | `Modeling.Navigation.Policy` | — |
-| `Navigation.Code` | E | — | Roslyn scene builder |
-| `Documentation.Correspondence.Core` | M | `Modeling.Gdl.Correspondence` | — |
-| `Documentation.Correspondence` | M/E | wire shapes | orchestration |
+| `Navigation` | M | `Modeling.Navigation` ✓ | — |
+| `Navigation.Policy` | M | `Modeling.Navigation.Policy` ✓ | — |
+| `Navigation.Code` | E | scene projection from `G` | Roslyn scene builder ✓ |
+| `Documentation.Correspondence.Core` | M | `Modeling.Documentation.Correspondence` ✓ (was `Gdl.Correspondence`) | — |
+| `Documentation.Correspondence` | M/E | wire shapes in Modeling | orchestration |
 | `Documentation.Correspondence.*` | E | — | resolve/reverse/workspace IO |
-| `Documentation.Anchors` | M/E | anchor id grammar | file scan |
+| `Documentation.Anchors` | M/E | anchor id grammar → `RelationSpec` / `DocToCode` | file scan |
 | `Documentation.LinkCheck` / `.LinkMutate` / `.Reports` | E | report **shapes** → Modeling if reused | runners |
+| `LanguageIntelligence.Anchors` | **deleted** | `Modeling.LanguageIntelligence.Relations` ✓ | `Execution.LanguageIntelligence.Relations` ✓ |
+| `NavigationAnchor` | **deleted** | `NavSeed` in Relations + Navigation ✓ | — |
 
 #### 4.9 MCPlane, Conformance, Language intelligence
 
 | Package | Split | F# target | Execution keeps |
 |---------|-------|-----------|-----------------|
-| `MCPlane` | M/E | `Modeling.Gdl.Agent` — tier/truncate rules | envelope dispatch host |
+| `MCPlane` | M/E | `Modeling.Agent` ✓ (was `Gdl.Agent` / MCPlane naming) | envelope dispatch host |
 | `Conformance.Navigation` | M | `Modeling.Conformance` ✓ (spec wire shapes + expectation algebra; runner stays E) | runner |
 | `Conformance.Policies` | M | `Modeling.Conformance` ✓ (policy spec wire shapes; combinators resolve via Modeling.Combinations) | runner |
 | `Conformance.Schemas` | M | embedded JSON Schema texts stay E (mechanics); spec shapes in `Modeling.Conformance` ✓ | runner |
@@ -184,7 +186,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | Package | Split | F# target | Status |
 |---------|-------|-----------|--------|
 | `Platform.Modeling.Language` | **M** | `Kernel.fs` — `LanguageRequest`, `LanguageDiagnostic`, `FindUsagesResult`, `RenameSymbolResult`, … | **shipped** (sibling `guiders-fsharp`) |
-| `Platform.Modeling.Language.Adapters.Fcs` | **M** | FCS backend — 7 IDE verbs; rename `apply` via `SessionOrchestrator.applyPatch`; project resolve via ω (`FileOwnership`); active-pattern blocker; workspace scan via `FSharpSymbol.IsEffectivelySameAs` | **shipped** |
+| `Platform.Modeling.Language.Adapters.Fcs` | **M** | FCS backend — 7 IDE verbs; rename `apply` via bound `IFcsSessionPatchApplier`; source/graph IO via bound `IFcsSourceTextSource` / `IFcsSolutionGraphSource` @ Execution; project resolve walk-up + graph port; active-pattern blocker | **shipped** |
 | `Platform.Modeling.Language.Adapters.Gdl` | **M** | GDL adapter stubs (deck pilot) | scaffold |
 | `Platform.Execution.Language` | **E** | `LanguageResolverCenter`, `ILanguageBackend` federation gateway | **shipped** (sibling `guiders-platform`) |
 
@@ -208,20 +210,23 @@ Platform.Modeling.Paths
 Platform.Modeling.Routing
 Platform.Modeling.Catalog
 Platform.Modeling.Combinations.*
-Platform.Modeling.Gdl.*
+Platform.Modeling.Gdl.*                    quarry spine ONLY (Parse.*, Command, Presentation, …)
 Platform.Modeling.Notations.*
+Platform.Modeling.CommandPlane
 Platform.Modeling.Cockpit.*
-  ├── Topology, Circuit, Cds, Rules, DataBus, Ids
-Platform.Modeling.Graph.*
 Platform.Modeling.Navigation.*
-Platform.Modeling.Gdl.Correspondence
-Platform.Modeling.Gdl.Agent
-Platform.Modeling.Gdl.Language
+Platform.Modeling.Documentation.Correspondence
+Platform.Modeling.LanguageIntelligence.Relations
 Platform.Modeling.Language
-Platform.Modeling.Language.Adapters.Fcs
-Platform.Modeling.Language.Adapters.Gdl
+Platform.Modeling.Language.Adapters.Fcs      shapes + pure transforms; IO ports bound @ Execution
+Platform.Modeling.Agent
+Platform.Modeling.Build
+Platform.Modeling.Ide.Session.*
+Platform.Modeling.Configurations
 Platform.Modeling.Conformance.*
 ```
+
+**Retired names (do not recreate):** `Modeling.Gdl.Language`, `Modeling.Gdl.Correspondence`, `Modeling.Gdl.Agent`, `IntermediateRepresentation.Language`, `LanguageIntelligence.Anchors`, `NavigationAnchor`.
 
 ~**45–55** F# packages after split (some slices merge). ~**40–50** Execution packages (mostly Sources, adapters, hosts, emit).
 

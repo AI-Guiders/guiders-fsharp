@@ -11,7 +11,6 @@ open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
 open AIGuiders.Platform.Modeling.Ide.Session
-open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 open AIGuiders.Platform.Modeling.Language
 
 type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
@@ -36,10 +35,10 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
     let readSource (req: LanguageRequest) =
         if not (String.IsNullOrWhiteSpace req.SourceText) then
             req.SourceText
-        elif File.Exists req.FilePath then
-            File.ReadAllText req.FilePath
         else
-            ""
+            match FcsSourceText.tryRead req.FilePath with
+            | Some text -> text
+            | None -> ""
 
     let sourceIndexOf (path: string) (projectOptions: FSharpProjectOptions) =
         let full = Path.GetFullPath path
@@ -256,10 +255,10 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
     let readFileText (path: string) (preferredSource: string) =
         if not (String.IsNullOrWhiteSpace preferredSource) then
             preferredSource
-        elif File.Exists path then
-            File.ReadAllText path
         else
-            ""
+            match FcsSourceText.tryRead path with
+            | Some text -> text
+            | None -> ""
 
     let replaceRangeInSource (source: string) (range: range) (replacement: string) =
         let normalized = source.Replace("\r\n", "\n")
@@ -334,17 +333,12 @@ type FcsLanguageBackend(?projectOptionsSource: IFcsProjectOptionsSource) =
         | DotNet { Language = FSharp } -> true
         | _ -> false
 
-    /// Federation SolutionGraph SSOT (ADR-0004) — not raw DotNetWorkspace.
+    /// Federation SolutionGraph SSOT (ADR-0004) — graph load via Execution-bound port.
     let tryLoadSolutionGraph (anchorPath: string) =
         if String.IsNullOrWhiteSpace anchorPath then
             None
-        elif not (File.Exists anchorPath) then
-            None
         else
-            try
-                Some(DotNetSlnxGraphPort.load anchorPath)
-            with _ ->
-                None
+            FcsSolutionGraph.tryLoadGraph anchorPath
 
     let getUsesInProject (symbol: FSharpSymbol) (projectResults: FSharpCheckProjectResults) =
         projectResults.GetAllUsesOfAllSymbols()

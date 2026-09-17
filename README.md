@@ -20,7 +20,7 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 | `Modeling.Cockpit.DataBus` | event catalog, dispatch policy, projection graph | ✓ |
 | `Modeling.Cockpit.Rules` | headless cockpit rule evaluation — traceable rule id | — |
 | `Modeling.Combinations` | merge semantics DU, combinator alias, ordered fold laws | ✓ |
-| `Modeling.Gdl.Agent` | IR.Agent port — response envelope, detail tier, next hints | ✓ |
+| `Modeling.Agent` | agent response envelope — detail tier, next hints (was `Gdl.Agent` / MCPlane) | ✓ |
 | `Modeling.Gdl.Authoring` | lexical kit — F# mirror of Platform Authoring.Core | — |
 | `Modeling.Gdl.Command` | IR.Command port — descriptor, arg-tail policy, catalog route entry | ✓ |
 | `Modeling.Gdl.Command.Binding` | IR.Binding port — targets, well-known keys, gesture entry | ✓ |

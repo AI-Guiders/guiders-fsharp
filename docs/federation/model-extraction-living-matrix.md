@@ -10,11 +10,14 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
 | FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + probe + ProjInfo sources | **shipped** all FCS File/MSBuild IO @ Execution |
 | FCS patch apply IO | `FcsSessionPatchBridge` (pure map) + `IFcsSessionPatchApplier` port | `FcsSessionPatchApplier` bound @ `FcsExecutionHost` | **shipped** |
+| FCS backend text/graph IO | `IFcsSourceTextSource` + `IFcsSolutionGraphSource` ports | `FcsWorkspaceIoSource` bound @ `FcsExecutionHost` | **shipped** backend + graph resolver; walk-up fsproj still in Modeling |
 | Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` primary; `NavigationAnchor` deleted | **shipped** |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | ADR-0063 TO-BE | — | `GUIDERS-ADR-0063` §9–§10 RelationSpec normative | **shipped** §10 body |
+| ADR-0003 tree amend | §4.8–§5 Relations/Agent/Correspondence | — | **shipped** |
+| ship-2 package tree | `Modeling.Agent`, `Documentation.Correspondence`, Relations | IR.Language fork deleted | **shipped** code; README/catalog drift cleanup pending |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `LegacyBracketRelationWire` boundary parse only | **shipped** obsolete shims deleted |
 
-**Next waves:** `FcsLanguageBackend` File IO trim · ship-2 modeling tree (Gdl.Language/Correspondence/Agent merges) · ADR-0003 §4.8 amend · delete `LegacyBracketRelationWire` after RelationSpec resolve path.
+**Next waves:** `FcsProjectResolver` walk-up IO → Execution · README/Gdl catalog doc drift · delete `LegacyBracketRelationWire` after RelationSpec resolve path · ship-5 product stubs.

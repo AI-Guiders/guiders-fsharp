@@ -3,7 +3,7 @@ namespace AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open System
 open System.IO
 open AIGuiders.Platform.Modeling.Ide.Session
-open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
+open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open DotNetWorkspace.Core
 
 module FcsProjectResolver =
@@ -69,15 +69,12 @@ module FcsProjectResolver =
         |> Option.map (fun project -> project.AbsolutePath)
 
     let private tryResolveFromGraph (filePath: string) (anchorPath: string) =
-        if not (File.Exists anchorPath) then
+        if String.IsNullOrWhiteSpace anchorPath then
             None
         else
-            try
-                let graph = DotNetSlnxGraphPort.load anchorPath
-                let ownership = DotNetSlnxGraphPort.loadDocumentOwnership anchorPath
-                tryOwnerProjectPath ownership graph filePath
-            with _ ->
-                None
+            match FcsSolutionGraph.tryLoadGraph anchorPath, FcsSolutionGraph.tryLoadOwnership anchorPath with
+            | Some graph, Some ownership -> tryOwnerProjectPath ownership graph filePath
+            | _ -> None
 
     /// Resolve owning fsproj: walk-up first (O(depth)), graph fallback only if walk-up fails.
     let resolveFsproj (filePath: string) (solutionOrProjectPath: string) =
