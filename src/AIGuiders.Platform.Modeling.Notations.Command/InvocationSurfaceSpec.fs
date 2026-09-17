@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Invocation
+namespace AIGuiders.Platform.Modeling.Notations.Command
 
 open AIGuiders.Platform.Modeling.Notations.Command
 

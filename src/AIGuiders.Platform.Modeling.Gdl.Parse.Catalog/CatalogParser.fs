@@ -2,7 +2,7 @@ namespace AIGuiders.Platform.Modeling.Gdl.Parse.Catalog
 
 open System
 open AIGuiders.Platform.Modeling.Gdl.Authoring
-open AIGuiders.Platform.Modeling.Invocation
+open AIGuiders.Platform.Modeling.Notations.Command
 
 /// F# mirror of Platform Authoring.Command.Catalog parser (phase 1: structure, tables,
 /// channels tree, defaults, profiles, diagnostics). Grammar cross-validation

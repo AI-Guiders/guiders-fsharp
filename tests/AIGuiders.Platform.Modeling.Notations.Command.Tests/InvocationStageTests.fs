@@ -1,7 +1,6 @@
-module AIGuiders.Platform.Modeling.Invocation.Tests.InvocationStageTests
+module AIGuiders.Platform.Modeling.Notations.Command.Tests.InvocationStageTests
 
 open Xunit
-open AIGuiders.Platform.Modeling.Invocation
 open AIGuiders.Platform.Modeling.Notations.Argument
 open AIGuiders.Platform.Modeling.Notations.Command
 

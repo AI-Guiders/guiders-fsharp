@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="NotationsCommandConformanceTests.fs" />
     <Compile Include="InvocationConformanceTests.fs" />
+    <Compile Include="SurfaceRegistryTests.fs" />
+    <Compile Include="InvocationStageTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Notations.Command\AIGuiders.Platform.Modeling.Notations.Command.fsproj" />

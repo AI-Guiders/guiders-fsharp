@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Invocation
+namespace AIGuiders.Platform.Modeling.Notations.Command
 
 /// <summary>Stable invocation surface id (ADR-0009). Not notation dialect, not cockpit UI.</summary>
 type InvocationSurfaceId =

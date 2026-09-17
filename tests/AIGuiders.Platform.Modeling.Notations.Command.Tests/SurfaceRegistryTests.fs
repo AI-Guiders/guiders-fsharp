@@ -1,7 +1,6 @@
-module AIGuiders.Platform.Modeling.Invocation.Tests.SurfaceRegistryTests
+module AIGuiders.Platform.Modeling.Notations.Command.Tests.SurfaceRegistryTests
 
 open Xunit
-open AIGuiders.Platform.Modeling.Invocation
 open AIGuiders.Platform.Modeling.Notations.Command
 
 [<Fact>]

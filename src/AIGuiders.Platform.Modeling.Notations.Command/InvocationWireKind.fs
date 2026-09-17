@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Invocation
+namespace AIGuiders.Platform.Modeling.Notations.Command
 
 /// <summary>Which Notations branch parses user wire for this surface (ADR-0021).</summary>
 [<RequireQualifiedAccess>]

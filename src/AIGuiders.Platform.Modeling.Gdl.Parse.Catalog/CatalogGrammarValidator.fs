@@ -2,7 +2,7 @@ namespace AIGuiders.Platform.Modeling.Gdl.Parse.Catalog
 
 open System
 open AIGuiders.Platform.Modeling.Gdl.Authoring
-open AIGuiders.Platform.Modeling.Invocation
+open AIGuiders.Platform.Modeling.Notations.Command
 
 /// Phase 2 port of Platform CatalogGrammarValidator + CatalogParseContext.ValidateChannels.
 /// Keyboard/melody wire checks take pluggable predicates — the wire parsers live

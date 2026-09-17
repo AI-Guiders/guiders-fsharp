@@ -8,7 +8,7 @@
 
     <AssemblyName>AIGuiders.Platform.Modeling.Notations.Command</AssemblyName>
 
-    <Description>Command notation wire: slash body, KV atom, bracket-aware list split (GUIDERS-ADR-0021 port).</Description>
+    <Description>Command notation wire and invocation surfaces SSOT (GUIDERS-ADR-0021, ADR-0008).</Description>
 
     <PackageId>AIGuiders.Platform.Modeling.Notations.Command</PackageId>
 
@@ -24,6 +24,22 @@
 
     <Compile Include="InvocationNotation.fs" />
 
+    <Compile Include="InvocationSurfaceId.fs" />
+
+    <Compile Include="InvocationWireKind.fs" />
+
+    <Compile Include="InvocationSurfaceSpec.fs" />
+
+    <Compile Include="CanonicalInvocation.fs" />
+
+    <Compile Include="InvocationStage.fs" />
+
+    <Compile Include="SurfaceRegistry.fs" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Notations.Argument\AIGuiders.Platform.Modeling.Notations.Argument.fsproj" />
   </ItemGroup>
 
 </Project>
