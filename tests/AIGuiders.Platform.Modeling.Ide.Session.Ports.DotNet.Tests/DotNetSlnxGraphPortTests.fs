@@ -62,7 +62,7 @@ type DotNetSlnxGraphPortTests() =
             let ownership = DotNetSlnxGraphPort.loadDocumentOwnership slnx
 
             Assert.Equal(2, graph.Projects.Length)
-            Assert.Equal(1, graph.ProjectEdges.Length)
+            Assert.Equal(1, SolutionGraph.projectRefEdges graph |> List.length)
 
             let registry =
                 ownership

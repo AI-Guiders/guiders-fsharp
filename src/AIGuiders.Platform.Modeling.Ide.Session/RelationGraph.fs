@@ -3,6 +3,17 @@ namespace AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
+type SessionEdgeKind =
+    | Requires
+    | Invalidates
+    | Feeds
+
+type SessionEdge =
+    { From: GraphNodeId
+      To: GraphNodeId
+      Kind: SessionEdgeKind
+      Attributes: Map<string, string> }
+
 type NodeSort =
     | SessionProject
     | SessionCapability
@@ -129,3 +140,7 @@ module RelationGraph =
           To = GraphNodeRef.SessionProject edge.To
           Scope = SessionG
           Attributes = RelationAttributes.empty }
+
+    let fromLegacy (projectEdges: ProjectEdge list) (sessionEdges: SessionEdge list) =
+        [ yield! sessionEdges |> List.map fromSessionEdge
+          yield! projectEdges |> List.map fromProjectEdge ]

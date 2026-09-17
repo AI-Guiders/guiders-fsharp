@@ -21,8 +21,8 @@
     <Compile Include="Projects.fs" />
     <Compile Include="ProjectEdges.fs" />
     <Compile Include="ProjectCapabilityCatalog.fs" />
-    <Compile Include="SolutionGraph.fs" />
     <Compile Include="RelationGraph.fs" />
+    <Compile Include="SolutionGraph.fs" />
     <Compile Include="WorkspaceGraph.fs" />
     <Compile Include="SolutionProviders.fs" />
     <Compile Include="GraphValidation.fs" />

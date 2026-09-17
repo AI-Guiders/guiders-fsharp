@@ -25,9 +25,13 @@ type FrozenTreeSnapshot =
 module FrozenSnapshot =
     let private dependencyClosure (graph: SolutionGraph) (root: ProjectId) =
         let byFrom =
-            graph.ProjectEdges
-            |> List.groupBy (fun e -> e.From)
-            |> List.map (fun (k, edges) -> k, edges |> List.map (fun e -> e.To))
+            SolutionGraph.projectRefEdges graph
+            |> List.choose (fun r ->
+                match r.From, r.To with
+                | GraphNodeRef.SessionProject fromPid, GraphNodeRef.SessionProject toPid -> Some(fromPid, toPid)
+                | _ -> None)
+            |> List.groupBy fst
+            |> List.map (fun (k, edges) -> k, edges |> List.map snd)
             |> Map.ofList
 
         let rec visit seen queue =

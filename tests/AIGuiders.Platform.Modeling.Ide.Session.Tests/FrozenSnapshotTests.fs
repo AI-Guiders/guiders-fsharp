@@ -127,4 +127,4 @@ type FrozenSnapshotTests() =
             frozen.Projects |> List.sumBy (fun p -> Map.count p.Documents)
 
         Assert.Equal(2, docCount)
-        Assert.Equal(1, graph.ProjectEdges.Length)
+        Assert.Equal(1, SolutionGraph.projectRefEdges graph |> List.length)

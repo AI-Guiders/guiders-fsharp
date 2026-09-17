@@ -2,17 +2,6 @@ namespace AIGuiders.Platform.Modeling.Ide.Session
 
 open AIGuiders.Platform.Modeling.Paths
 
-type SessionEdgeKind =
-    | Requires
-    | Invalidates
-    | Feeds
-
-type SessionEdge =
-    { From: GraphNodeId
-      To: GraphNodeId
-      Kind: SessionEdgeKind
-      Attributes: Map<string, string> }
-
 type DesignTimeLoadPolicy =
     | Lazy
     | Eager
@@ -29,8 +18,7 @@ module SessionPolicy =
 type SolutionGraph =
     { Anchor: LogicalPath
       Projects: ProjectNode list
-      ProjectEdges: ProjectEdge list
-      Edges: SessionEdge list }
+      Relations: Relation list }
 
 type SolutionSession =
     { Graph: SolutionGraph
@@ -46,11 +34,20 @@ module SolutionSession =
     let withPhase phase (session: SolutionSession) = { session with Phase = phase }
 
 module SolutionGraph =
-    let create (anchor: LogicalPath) projects projectEdges edges =
+    let create (anchor: LogicalPath) projects relations =
         { Anchor = anchor
           Projects = projects
-          ProjectEdges = projectEdges
-          Edges = edges }
+          Relations = relations }
+
+    let projectRefEdges (graph: SolutionGraph) =
+        graph.Relations |> List.filter (fun r -> r.Type = RelationType.ProjectRef)
+
+    let orchestrationEdges (graph: SolutionGraph) =
+        graph.Relations
+        |> List.filter (fun r ->
+            match r.Type with
+            | RelationType.Requires | RelationType.Invalidates | RelationType.Feeds -> true
+            | _ -> false)
 
     let tryFindProject id (graph: SolutionGraph) =
         graph.Projects |> List.tryFind (fun p -> p.Id = id)

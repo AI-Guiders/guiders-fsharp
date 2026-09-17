@@ -66,10 +66,16 @@ module SessionPatch =
             else
                 FileChange
 
-    let private projectForNode (graph: SolutionGraph) (node: GraphNodeId) =
+    let private projectForNode (_graph: SolutionGraph) (node: GraphNodeId) =
         match node with
         | GraphNodeId.ProjectNode pid -> Some pid
         | GraphNodeId.CapabilityNode(pid, _) -> Some pid
+
+    let private projectOfRef (node: GraphNodeRef) =
+        match node with
+        | GraphNodeRef.SessionProject pid -> Some pid
+        | GraphNodeRef.SessionCapability(pid, _) -> Some pid
+        | _ -> None
 
     let private applyProjectMutations (graph: SolutionGraph) (patch: GraphStructurePatch) =
         let removed = patch.ProjectsRemoved |> Set.ofList
@@ -80,16 +86,15 @@ module SessionPatch =
             else
                 { graph with
                     Projects = graph.Projects |> List.filter (fun p -> not (Set.contains p.Id removed))
-                    ProjectEdges =
-                        graph.ProjectEdges
-                        |> List.filter (fun e -> not (Set.contains e.From removed || Set.contains e.To removed))
-                    Edges =
-                        graph.Edges
-                        |> List.filter (fun e ->
-                            match projectForNode graph e.From, projectForNode graph e.To with
+                    Relations =
+                        graph.Relations
+                        |> List.filter (fun r ->
+                            match projectOfRef r.From, projectOfRef r.To with
                             | Some fromPid, Some toPid ->
                                 not (Set.contains fromPid removed || Set.contains toPid removed)
-                            | _ -> true) }
+                            | Some fromPid, None -> not (Set.contains fromPid removed)
+                            | None, Some toPid -> not (Set.contains toPid removed)
+                            | None, None -> true) }
 
         let graphAfterAdds =
             if List.isEmpty patch.ProjectsAdded then

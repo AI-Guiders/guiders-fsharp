@@ -22,8 +22,9 @@ module SolutionProviders =
     /// Assemble topology graph from provider output (ω lives on SessionRuntime registry).
     let toGraph (anchorPath: string) (provider: ISolutionInfoProvider) : SolutionGraph =
         let entries = provider.Entries ()
+        let relations = provider.Relations () |> List.map RelationGraph.fromProjectEdge
 
-        SolutionGraph.create (LogicalPath.Create anchorPath) entries (provider.Relations ()) []
+        SolutionGraph.create (LogicalPath.Create anchorPath) entries relations
 
 /// Plugin-style provider catalog (ADR-0210 stage 1): the core knows only
 /// the contract + this registry; provider assemblies self-register.

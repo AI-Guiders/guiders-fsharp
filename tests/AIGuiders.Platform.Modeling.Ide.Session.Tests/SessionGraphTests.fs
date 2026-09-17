@@ -36,7 +36,7 @@ module private Samples =
             (Map.ofList [ @"D:\repo\src\App\Module.fs", fs.Id ])
             [ { From = buildCap
                 To = compilerCap
-                Kind = Requires
+                Kind = SessionEdgeKind.Requires
                 Attributes = Map.empty } ]
             []
         |> fst
@@ -97,8 +97,8 @@ type SessionGraphTests() =
                 @"D:\repo\App.slnx"
                 [ fs ]
                 Map.empty
-                [ { From = a; To = b; Kind = Requires; Attributes = Map.empty }
-                  { From = b; To = a; Kind = Requires; Attributes = Map.empty } ]
+                [ { From = a; To = b; Kind = SessionEdgeKind.Requires; Attributes = Map.empty }
+                  { From = b; To = a; Kind = SessionEdgeKind.Requires; Attributes = Map.empty } ]
                 []
 
         let result = GraphValidation.validate graph Map.empty

@@ -42,7 +42,7 @@ type GraphValidationWfTests() =
                 @"D:\repo\App.slnx"
                 [ fs; cs ]
                 Map.empty
-                [ { From = fromCap; To = toCap; Kind = Requires; Attributes = Map.empty } ]
+                [ { From = fromCap; To = toCap; Kind = SessionEdgeKind.Requires; Attributes = Map.empty } ]
                 []
 
         let result = GraphValidation.validate graph Map.empty

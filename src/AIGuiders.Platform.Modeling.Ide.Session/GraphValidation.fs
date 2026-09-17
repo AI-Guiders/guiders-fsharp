@@ -17,30 +17,41 @@ type GraphValidationResult =
 module GraphValidation =
     let private issue message = { Message = message }
 
-    let private edgeKey (e: SessionEdge) =
-        $"{e.Kind}-{e.From}-{e.To}"
+    let private relationKey (r: Relation) = $"{r.Type}-{r.From}-{r.To}"
 
-    let private requiresEdges (graph: SolutionGraph) =
-        graph.Edges |> List.filter (fun e -> e.Kind = SessionEdgeKind.Requires)
+    let private requiresRelations (graph: SolutionGraph) =
+        graph.Relations |> List.filter (fun r -> r.Type = RelationType.Requires)
 
-    let private hasNode (graph: SolutionGraph) (node: GraphNodeId) =
+    let private hasNodeRef (graph: SolutionGraph) (node: GraphNodeRef) =
         match node with
-        | GraphNodeId.ProjectNode pid -> graph |> SolutionGraph.tryFindProject pid |> Option.isSome
-        | GraphNodeId.CapabilityNode(pid, kind) ->
+        | GraphNodeRef.SessionProject pid -> graph |> SolutionGraph.tryFindProject pid |> Option.isSome
+        | GraphNodeRef.SessionCapability(pid, kind) ->
             match graph |> SolutionGraph.tryFindProject pid with
             | None -> false
             | Some project -> project.Capabilities |> List.exists (fun c -> c.Kind = kind)
+        | _ -> false
 
-    let private projectForNode (node: GraphNodeId) =
+    let private projectOfRef (node: GraphNodeRef) =
         match node with
-        | GraphNodeId.ProjectNode pid -> pid
-        | GraphNodeId.CapabilityNode(pid, _) -> pid
+        | GraphNodeRef.SessionProject pid -> Some pid
+        | GraphNodeRef.SessionCapability(pid, _) -> Some pid
+        | _ -> None
 
     let private detectProjectCycle (graph: SolutionGraph) =
         let adj =
-            graph.ProjectEdges
-            |> List.groupBy (fun e -> ProjectId.value e.From)
-            |> List.map (fun (from, edges) -> from, edges |> List.map (fun e -> ProjectId.value e.To))
+            SolutionGraph.projectRefEdges graph
+            |> List.groupBy (fun r ->
+                match r.From with
+                | GraphNodeRef.SessionProject pid -> ProjectId.value pid
+                | _ -> "")
+            |> List.filter (fun (k, _) -> k <> "")
+            |> List.map (fun (from, edges) ->
+                from,
+                edges
+                |> List.choose (fun r ->
+                    match r.To with
+                    | GraphNodeRef.SessionProject pid -> Some(ProjectId.value pid)
+                    | _ -> None))
             |> Map.ofList
 
         let rec visit stack nodeKey =
@@ -51,17 +62,27 @@ module GraphValidation =
                 | None -> None
                 | Some targets -> targets |> List.tryPick (fun t -> visit (Set.add nodeKey stack) t)
 
-        graph.ProjectEdges
-        |> List.tryPick (fun e -> visit Set.empty (ProjectId.value e.From))
+        SolutionGraph.projectRefEdges graph
+        |> List.tryPick (fun r ->
+            match r.From with
+            | GraphNodeRef.SessionProject pid -> visit Set.empty (ProjectId.value pid)
+            | _ -> None)
         |> Option.map id
 
     let private detectRequiresCycle (graph: SolutionGraph) =
-        let requires = requiresEdges graph
+        let requires = requiresRelations graph
+
+        let nodeKey ref =
+            match ref with
+            | GraphNodeRef.SessionProject pid -> GraphNodeId.key (GraphNodeId.project pid)
+            | GraphNodeRef.SessionCapability(pid, kind) -> GraphNodeId.key (GraphNodeId.capability pid kind)
+            | _ -> ""
 
         let adj =
             requires
-            |> List.groupBy (fun e -> GraphNodeId.key e.From)
-            |> List.map (fun (from, edges) -> from, edges |> List.map (fun e -> GraphNodeId.key e.To))
+            |> List.groupBy (fun r -> nodeKey r.From)
+            |> List.filter (fun (k, _) -> k <> "")
+            |> List.map (fun (from, edges) -> from, edges |> List.map (fun r -> nodeKey r.To))
             |> Map.ofList
 
         let rec visit (stack: Set<string>) nodeKey =
@@ -70,12 +91,12 @@ module GraphValidation =
             else
                 match Map.tryFind nodeKey adj with
                 | None -> None
-                | Some targets ->
-                    targets
-                    |> List.tryPick (fun t -> visit (Set.add nodeKey stack) t)
+                | Some targets -> targets |> List.tryPick (fun t -> visit (Set.add nodeKey stack) t)
 
         requires
-        |> List.tryPick (fun e -> visit Set.empty (GraphNodeId.key e.From))
+        |> List.tryPick (fun r ->
+            let k = nodeKey r.From
+            if k = "" then None else visit Set.empty k)
         |> Option.map id
 
     let validate (graph: SolutionGraph) (registry: DocumentRegistry) =
@@ -104,16 +125,21 @@ module GraphValidation =
                         $"Duplicate capability '{CapabilityKind.id kind}' on project '{ProjectId.value project.Id}'."
                 )
 
-        for edge in graph.Edges do
-            if not (hasNode graph edge.From) then
-                issues.Add(issue $"Edge '{edgeKey edge}' references missing From node.")
+        for relation in SolutionGraph.orchestrationEdges graph do
+            if not (hasNodeRef graph relation.From) then
+                issues.Add(issue $"Relation '{relationKey relation}' references missing From node.")
 
-            if not (hasNode graph edge.To) then
-                issues.Add(issue $"Edge '{edgeKey edge}' references missing To node.")
+            if not (hasNodeRef graph relation.To) then
+                issues.Add(issue $"Relation '{relationKey relation}' references missing To node.")
 
-            // WF7 — capability edges local to subgraph(π)
-            if projectForNode edge.From <> projectForNode edge.To then
-                issues.Add(issue $"WF7: capability edge '{edgeKey edge}' crosses project subgraphs.")
+            match projectOfRef relation.From, projectOfRef relation.To with
+            | Some fromProject, Some toProject when fromProject <> toProject ->
+                issues.Add(issue $"WF7: orchestration relation '{relationKey relation}' crosses project subgraphs.")
+            | _ -> ()
+
+            match RelationGraph.validateRelation relation with
+            | Ok () -> ()
+            | Error e -> issues.Add(issue e.Message)
 
         match detectRequiresCycle graph with
         | Some nodeKey -> issues.Add(issue $"Cycle detected in requires edges near node '{nodeKey}'.")
@@ -121,12 +147,15 @@ module GraphValidation =
 
         let knownProjects = Set.ofList projectIds
 
-        for edge in graph.ProjectEdges do
-            if not (Set.contains edge.From knownProjects) then
-                issues.Add(issue $"WF8: project edge From '{ProjectId.value edge.From}' is unknown.")
+        for relation in SolutionGraph.projectRefEdges graph do
+            match relation.From, relation.To with
+            | GraphNodeRef.SessionProject fromPid, GraphNodeRef.SessionProject toPid ->
+                if not (Set.contains fromPid knownProjects) then
+                    issues.Add(issue $"WF8: project edge From '{ProjectId.value fromPid}' is unknown.")
 
-            if not (Set.contains edge.To knownProjects) then
-                issues.Add(issue $"WF8: project edge To '{ProjectId.value edge.To}' is unknown.")
+                if not (Set.contains toPid knownProjects) then
+                    issues.Add(issue $"WF8: project edge To '{ProjectId.value toPid}' is unknown.")
+            | _ -> issues.Add(issue $"WF8: invalid project ref relation '{relationKey relation}'.")
 
         match detectProjectCycle graph with
         | Some nodeKey -> issues.Add(issue $"WF8: cycle detected in project edges near '{nodeKey}'.")

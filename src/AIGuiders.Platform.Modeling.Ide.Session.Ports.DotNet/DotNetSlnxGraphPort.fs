@@ -57,9 +57,9 @@ module DotNetSlnxGraphPort =
         let entries = parsed.Projects |> Seq.toList
 
         let projects = buildProjectNodes entries
-        let projectEdges = buildProjectEdges entries
+        let relations = buildProjectEdges entries |> List.map RelationGraph.fromProjectEdge
 
-        SolutionGraph.create (LogicalPath.Create parsed.SolutionPath) projects projectEdges []
+        SolutionGraph.create (LogicalPath.Create parsed.SolutionPath) projects relations
 
     let loadDocumentOwnership (anchorPath: string) : Map<string, ProjectId> =
         let parsed = DotNetWorkspace.Load anchorPath
