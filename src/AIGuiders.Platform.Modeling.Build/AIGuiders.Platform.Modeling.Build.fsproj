@@ -8,11 +8,15 @@
 
     <AssemblyName>AIGuiders.Platform.Modeling.Build</AssemblyName>
 
-    <Description>Neutral build-result model: diagnostics with anchor wires (GUIDERS-ADR-0021 line_literal).</Description>
+    <Description>Neutral build-result model — diagnostics as RelationSpec.Diag witnesses.</Description>
 
     <PackageId>AIGuiders.Platform.Modeling.Build</PackageId>
 
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+  </ItemGroup>
 
   <ItemGroup>
 

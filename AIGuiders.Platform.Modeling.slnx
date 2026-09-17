@@ -51,7 +51,7 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.Tests/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Combinations.Tests/AIGuiders.Platform.Modeling.Combinations.Tests.fsproj" />
-    <Project Path="tests/AIGuiders.Platform.Modeling.Core.Tests/AIGuiders.Platform.Modeling.Core.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Build.Tests/AIGuiders.Platform.Modeling.Build.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Agent.Tests/AIGuiders.Platform.Modeling.Agent.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests.fsproj" />

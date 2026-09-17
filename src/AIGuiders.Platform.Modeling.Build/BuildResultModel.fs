@@ -1,6 +1,8 @@
 namespace AIGuiders.Platform.Modeling.Build
 
 open System
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 /// Raw build diagnostic as reported by the toolchain (Execution side).
 [<CLIMutable>]
@@ -11,7 +13,7 @@ type RawDiagnostic =
       Code: string
       Message: string }
 
-/// Shaped build diagnostic with resolved anchor wire — sniper-ready, no line guessing.
+/// Shaped build diagnostic — RelationSpec.Diag witness (no legacy F/L anchor wires).
 [<CLIMutable>]
 type BuildDiagnostic =
     { File: string
@@ -19,18 +21,20 @@ type BuildDiagnostic =
       Column: int
       Code: string
       Message: string
-      Anchor: string }
+      Spec: RelationSpec }
 
 [<RequireQualifiedAccess>]
 module BuildDiagnostics =
+    let private specFor (index: int) (_raw: RawDiagnostic) =
+        RelationSpec.Diag(DiagnosticRef.mint(NumericId.ofCounter (int64 index)))
 
-    /// Shape raw diagnostics with anchor wires — [F:file;L:line] line_literal (GUIDERS-ADR-0021).
+    /// Shape raw diagnostics into RelationSpec.Diag witnesses for session ingest.
     let shape (raw: RawDiagnostic[]) : BuildDiagnostic[] =
         raw
-        |> Array.map (fun r ->
+        |> Array.mapi (fun i r ->
             { File = r.File
               Line = r.Line
               Column = r.Column
               Code = r.Code
               Message = r.Message
-              Anchor = $"[F:{r.File};L:{r.Line}]" })
+              Spec = specFor i r })
