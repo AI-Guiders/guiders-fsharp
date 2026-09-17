@@ -12,7 +12,6 @@
     <Compile Include="CorrespondenceWireTests.fs" />
     <Compile Include="AdrFactsParserTests.fs" />
     <Compile Include="HoareCatalogTests.fs" />
-    <Compile Include="GoldenEvidenceTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Documentation.Correspondence\AIGuiders.Platform.Modeling.Documentation.Correspondence.fsproj" />

@@ -4,7 +4,7 @@ open Xunit
 
 /// <summary>
 /// ADR-0007 open-build golden session stubs (GS-OB1..OB3).
-/// Parity gate placeholders — discoverable by GoldenEvidence.locate.
+/// Parity gate placeholders — discoverable by Execution GoldenEvidence scan.
 /// </summary>
 type OpenBuildGoldenTests() =
 

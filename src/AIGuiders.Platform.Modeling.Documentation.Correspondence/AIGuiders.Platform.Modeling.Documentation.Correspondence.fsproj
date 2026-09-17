@@ -13,7 +13,6 @@
     <Compile Include="Correspondence.fs" />
     <Compile Include="CorrespondenceRelationKind.fs" />
     <Compile Include="AdrFacts.fs" />
-    <Compile Include="GoldenEvidence.fs" />
     <Compile Include="HoareCatalog.fs" />
   </ItemGroup>
 </Project>
