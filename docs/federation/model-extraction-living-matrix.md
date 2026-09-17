@@ -25,7 +25,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | ship-5 product docs | GDL catalog + README | platform README + architecture hub IR.Language retired | **shipped** |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
-| Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `RelationWireBoundary` parse + obsolete `LegacyBracketRelationWire` shim | **shipped** ship-18 |
+| Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `RelationWireBoundary` parse boundary only | **shipped** ship-23 shim deleted |
 | BracketLocate Kind-first | Kind: wire parse in Modeling | CDP `BracketLocate.Parse` → `RelationSpecWireBoundary` then legacy fallback | **shipped** ship-18 |
 | RelationSpec resolve path | `RelationSpec` + Kind: wire | `RelationSpecWireBoundary` + `RelationSpecLegacyBridge` + C# + Xml `TryResolve(spec)` | **shipped** v1 bridge |
 | Language C#/Xml resolve packages | — | `Execution.Language.CSharp.Relations` + `Language.Xml.Relations`; Anchors shims TypeForwardedTo | **shipped** ship-16 |
@@ -33,4 +33,4 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | anchor-resolve Kind vectors | Kind: wire in conformance spec | `RelationResolveSpecConformance` kind-spec mode + legacy-span dual path | **shipped** |
 | Architecture hub Relations rows | — | hub EN/RU: `*.Relations` SSOT + Anchors shims + `RelationWireBoundary` | **shipped** ship-19 |
 
-**Next waves:** retire obsolete `LegacyBracketRelationWire` shim after CDP cutover · Plan §10 Phase 1 checklist.
+**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · cdp-mcp FileOwnership → DocumentRegistry.
