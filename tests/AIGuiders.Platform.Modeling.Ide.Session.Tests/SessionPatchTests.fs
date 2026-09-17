@@ -42,7 +42,7 @@ type SessionPatchTests() =
         let newPath = @"D:\repo\Renamed.fs"
 
         let graph, ownership =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [] (Map.ofList [ oldPath, owner ]) [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [] (Map.ofList [ oldPath, owner ]) [] 
 
         let boot = SessionTestFixtures.bootstrap ownership [ oldPath, "module App" ]
         let patch = RefactorPlan.planMovePath { From = oldPath; To = newPath }

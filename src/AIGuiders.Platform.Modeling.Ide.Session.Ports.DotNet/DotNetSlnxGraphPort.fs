@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
+open System
 open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Paths
 
@@ -25,7 +26,7 @@ module DotNetSlnxGraphPort =
                 entry.AbsolutePath
                 (ProjectCapabilityCatalog.forKind (toProjectKind entry)))
 
-    let buildProjectEdges (entries: DotNetProjectEntry list) =
+    let buildProjectRefRelations (entries: DotNetProjectEntry list) =
         let byPath =
             entries
             |> List.map (fun e -> e.AbsolutePath, ProjectId.create e.AbsolutePath)
@@ -38,9 +39,19 @@ module DotNetSlnxGraphPort =
                 match Map.tryFind refPath byPath with
                 | None -> None
                 | Some toId ->
-                    Some
-                        { From = ProjectId.create entry.AbsolutePath
-                          To = toId }))
+                    Some(
+                        RelationGraph.fromProjectEdge
+                            { From = ProjectId.create entry.AbsolutePath
+                              To = toId })))
+
+    [<Obsolete("Use buildProjectRefRelations returning Relation list.", false)>]
+    let buildProjectEdges (entries: DotNetProjectEntry list) =
+        buildProjectRefRelations entries
+        |> List.map (fun r ->
+            match r.From, r.To with
+            | GraphNodeRef.SessionProject fromPid, GraphNodeRef.SessionProject toPid ->
+                { From = fromPid; To = toPid }
+            | _ -> failwith "buildProjectRefRelations produced non ProjectRef edge")
 
     let buildDocumentOwnership (entries: DotNetProjectEntry list) =
         entries
@@ -57,7 +68,7 @@ module DotNetSlnxGraphPort =
         let entries = parsed.Projects |> Seq.toList
 
         let projects = buildProjectNodes entries
-        let relations = buildProjectEdges entries |> List.map RelationGraph.fromProjectEdge
+        let relations = buildProjectRefRelations entries
 
         SolutionGraph.create (LogicalPath.Create parsed.SolutionPath) projects relations
 

@@ -18,7 +18,7 @@ type SnapshotJobTests() =
         let ownership = Map.ofList [ sourcePath, id ]
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] 
 
         let runtime =
             SessionTestFixtures.createRuntime graph ownership [ sourcePath, "let foo = 1" ] DesignTime

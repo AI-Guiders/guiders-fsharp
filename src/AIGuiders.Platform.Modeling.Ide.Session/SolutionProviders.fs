@@ -15,14 +15,14 @@ type ISolutionInfoProvider =
     /// Graph vertices — project entries.
     abstract Entries: unit -> ProjectNode list
 
-    /// Graph edges — project reference / membership relations.
-    abstract Relations: unit -> ProjectEdge list
+    /// Graph edges — project reference / membership relations in G.
+    abstract Relations: unit -> Relation list
 
 module SolutionProviders =
     /// Assemble topology graph from provider output (ω lives on SessionRuntime registry).
     let toGraph (anchorPath: string) (provider: ISolutionInfoProvider) : SolutionGraph =
         let entries = provider.Entries ()
-        let relations = provider.Relations () |> List.map RelationGraph.fromProjectEdge
+        let relations = provider.Relations ()
 
         SolutionGraph.create (LogicalPath.Create anchorPath) entries relations
 

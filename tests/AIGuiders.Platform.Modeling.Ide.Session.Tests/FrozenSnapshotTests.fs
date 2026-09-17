@@ -20,7 +20,7 @@ type FrozenSnapshotTests() =
         let ownership = Map.ofList [ sourcePath, id ]
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership []
 
         let runtime =
             SessionTestFixtures.createRuntime graph ownership [ sourcePath, "let foo = 1" ] Unloaded
@@ -46,7 +46,7 @@ type FrozenSnapshotTests() =
         let ownership = Map.ofList [ sourcePath, id ]
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership []
 
         let runtime =
             SessionTestFixtures.createRuntime graph ownership [ sourcePath, "let foo = 1" ] Unloaded
@@ -77,8 +77,8 @@ type FrozenSnapshotTests() =
                 @"D:\repo\App.slnx"
                 [ app; lib; core ]
                 ownership
-                []
-                [ ProjectEdge.create appId libId; ProjectEdge.create libId coreId ]
+                [ SessionTestFixtures.projectRef appId libId
+                  SessionTestFixtures.projectRef libId coreId ]
 
         let boot = SessionTestFixtures.bootstrap ownership [ appFile, "module App"; libFile, "module Lib"; coreFile, "module Core" ]
 
@@ -114,8 +114,7 @@ type FrozenSnapshotTests() =
                 @"D:\repo\App.slnx"
                 [ app; lib ]
                 ownership
-                []
-                [ ProjectEdge.create appId libId ]
+                [ SessionTestFixtures.projectRef appId libId ]
 
         let boot = SessionTestFixtures.bootstrap ownership [ appFile, "module App"; libFile, "module Lib" ]
 

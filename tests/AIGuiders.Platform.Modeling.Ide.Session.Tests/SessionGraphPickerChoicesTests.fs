@@ -11,7 +11,7 @@ type SessionGraphPickerChoicesTests() =
     [<Fact>]
     member _.``SemanticSymbolPickerChoices collects graph semantic nodes``() =
         let pid = ProjectId.create @"D:\repo\App.fsproj"
-        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] []
+        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] 
 
         let doc = DocumentRef.File(LogicalPath.Create "src/Foo.fs")
         let sym = { Container = [ "Module" ]; Name = "Bar"; Arity = None }

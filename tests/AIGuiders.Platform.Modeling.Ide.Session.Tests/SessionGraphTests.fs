@@ -34,11 +34,7 @@ module private Samples =
             @"D:\repo\App.slnx"
             [ fs; cs ]
             (Map.ofList [ @"D:\repo\src\App\Module.fs", fs.Id ])
-            [ { From = buildCap
-                To = compilerCap
-                Kind = SessionEdgeKind.Requires
-                Attributes = Map.empty } ]
-            []
+            [ SessionTestFixtures.requiresOrchestration buildCap compilerCap ]
         |> fst
 
     let mixedRegistry =
@@ -60,7 +56,7 @@ type SessionGraphTests() =
                 (ProjectCapabilityCatalog.forKind (Gdl { ProjectFile = "deck.gdlproj" }))
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty []
 
         let result = GraphValidation.validate graph Map.empty
         Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
@@ -80,7 +76,7 @@ type SessionGraphTests() =
                     :: [] }
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty []
 
         let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
@@ -97,9 +93,8 @@ type SessionGraphTests() =
                 @"D:\repo\App.slnx"
                 [ fs ]
                 Map.empty
-                [ { From = a; To = b; Kind = SessionEdgeKind.Requires; Attributes = Map.empty }
-                  { From = b; To = a; Kind = SessionEdgeKind.Requires; Attributes = Map.empty } ]
-                []
+                [ SessionTestFixtures.requiresOrchestration a b
+                  SessionTestFixtures.requiresOrchestration b a ]
 
         let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
@@ -116,7 +111,7 @@ type SessionGraphTests() =
         let project = { Samples.fsharpProject with Capabilities = [ cap ] }
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty []
 
         let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)

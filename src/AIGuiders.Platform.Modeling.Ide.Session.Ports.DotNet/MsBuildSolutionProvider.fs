@@ -35,7 +35,7 @@ type MsBuildSolutionProvider(anchorPath: string) =
 
         member _.Relations() =
             entries ()
-            |> DotNetSlnxGraphPort.buildProjectEdges
+            |> DotNetSlnxGraphPort.buildProjectRefRelations
 
 /// Provider self-registration (ADR-0210 stage 1) — explicit composition-root init.
 module Registration =

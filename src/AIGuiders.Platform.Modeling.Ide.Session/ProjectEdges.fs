@@ -1,7 +1,9 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-/// <summary>\( E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P} \) — project references, slnx membership order.</summary>
-[<Struct; StructuralEquality; StructuralComparison>]
+open System
+
+/// <summary>\( E_{\mathsf{proj}} \subseteq \mathbb{P} \times \mathbb{P} \) — legacy bridge; prefer RelationType.ProjectRef in G.</summary>
+[<Obsolete("Use Relation with RelationType.ProjectRef in SolutionGraph.Relations.", false)>]
 type ProjectEdge =
     { From: ProjectId
       To: ProjectId }

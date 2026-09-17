@@ -42,8 +42,7 @@ type GraphValidationWfTests() =
                 @"D:\repo\App.slnx"
                 [ fs; cs ]
                 Map.empty
-                [ { From = fromCap; To = toCap; Kind = SessionEdgeKind.Requires; Attributes = Map.empty } ]
-                []
+                [ SessionTestFixtures.requiresOrchestration fromCap toCap ]
 
         let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
@@ -65,9 +64,8 @@ type GraphValidationWfTests() =
                 @"D:\repo\App.slnx"
                 [ pa; pb ]
                 Map.empty
-                []
-                [ { From = a; To = b }
-                  { From = b; To = a } ]
+                [ SessionTestFixtures.projectRef a b
+                  SessionTestFixtures.projectRef b a ]
 
         let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
@@ -91,7 +89,7 @@ module InvalidationTestFixtures =
         let ownership = Map.ofList [ appSource, appId; libSource, libId ]
 
         let graph, _ =
-            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ appProject; libProject ] ownership [] []
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ appProject; libProject ] ownership []
 
         let registry = SessionTestFixtures.registryForOwnership ownership
 

@@ -10,7 +10,7 @@ type DiagnosticIndexOpsTests() =
     [<Fact>]
     member _.``Ingest mints DiagnosticRef and stores rule Code``() =
         let pid = ProjectId.create @"D:\repo\App.fsproj"
-        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] []
+        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] 
         let runtime = SessionTestFixtures.createRuntime graph ownership [ "src/Foo.fs", "let x = 1" ] Unloaded
 
         let docId =
@@ -40,7 +40,7 @@ type DiagnosticIndexOpsTests() =
     [<Fact>]
     member _.``PickerChoices lists ingested diagnostics for attach``() =
         let pid = ProjectId.create @"D:\repo\App.fsproj"
-        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] []
+        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] 
         let runtime = SessionTestFixtures.createRuntime graph ownership [ "src/Foo.fs", "let x = 1" ] Unloaded
 
         let docId =
@@ -69,7 +69,7 @@ type DiagnosticIndexOpsTests() =
     [<Fact>]
     member _.``Refresh replaces prior index entries``() =
         let pid = ProjectId.create @"D:\repo\App.fsproj"
-        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] []
+        let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.fs", pid ]) [] 
         let runtime = SessionTestFixtures.createRuntime graph ownership [ "src/Foo.fs", "let x = 1" ] Unloaded
 
         let docId =

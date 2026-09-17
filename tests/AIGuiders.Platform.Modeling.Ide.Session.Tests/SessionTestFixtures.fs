@@ -7,9 +7,17 @@ open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 /// Shared graph/runtime bootstrap for session tests (DocumentRegistry canon).
 module SessionTestFixtures =
-    let createGraph (anchorPath: string) projects ownership sessionEdges projectEdges =
-        let relations = RelationGraph.fromLegacy projectEdges sessionEdges
+    let requiresOrchestration (fromNode: GraphNodeId) (toNode: GraphNodeId) =
+        RelationGraph.fromSessionEdge
+            { From = fromNode
+              To = toNode
+              Kind = SessionEdgeKind.Requires
+              Attributes = Map.empty }
 
+    let projectRef (fromPid: ProjectId) (toPid: ProjectId) =
+        RelationGraph.fromProjectEdge (ProjectEdge.create fromPid toPid)
+
+    let createGraph (anchorPath: string) projects ownership (relations: Relation list) =
         SolutionGraph.create (LogicalPath.Create anchorPath) projects relations,
         ownership
 

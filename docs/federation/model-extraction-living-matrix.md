@@ -35,4 +35,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 
 | CDP federation pulse | `SessionRuntime.Registry` (DocumentRegistry ω) | `FederationSessionBridge` pulse/scene `document_registry_count` | **shipped** ship-24 |
 
-**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · `TransformClass` DU · `SessionEdgeKind`→`Relation` migration.
+| SessionEdgeKind migration | `Relation` in `SolutionGraph.Relations` | `ISolutionInfoProvider.Relations` + test fixtures Relation-first | **shipped** ship-25 |
+
+**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · remove obsolete `SessionEdge`/`ProjectEdge` shims.

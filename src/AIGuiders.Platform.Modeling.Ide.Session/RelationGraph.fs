@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open System
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
@@ -8,6 +9,7 @@ type SessionEdgeKind =
     | Invalidates
     | Feeds
 
+[<Obsolete("Use Relation in SolutionGraph.Relations. Migrate via RelationGraph.fromSessionEdge.", false)>]
 type SessionEdge =
     { From: GraphNodeId
       To: GraphNodeId
@@ -149,6 +151,7 @@ module RelationGraph =
           Scope = SessionG
           Attributes = RelationAttributes.empty }
 
+    [<Obsolete("Use SolutionGraph.Relations (Relation list).", false)>]
     let fromLegacy (projectEdges: ProjectEdge list) (sessionEdges: SessionEdge list) =
         [ yield! sessionEdges |> List.map fromSessionEdge
           yield! projectEdges |> List.map fromProjectEdge ]
