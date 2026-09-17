@@ -27,6 +27,8 @@
     <Compile Include="FcsSourceText.fs" />
     <Compile Include="IFcsSolutionGraphSource.fs" />
     <Compile Include="FcsSolutionGraph.fs" />
+    <Compile Include="IFcsProjectOwnershipSource.fs" />
+    <Compile Include="FcsProjectOwnership.fs" />
     <Compile Include="FcsProjectOptionsGuards.fs" />
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProbeWire.fs" />
@@ -39,8 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-
-    <ProjectReference Include="..\..\..\guiders-core\src\DotNetWorkspace.Core\DotNetWorkspace.Core.csproj" />
 
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
 

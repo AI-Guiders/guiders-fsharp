@@ -10,7 +10,8 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
 | FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + probe + ProjInfo sources | **shipped** all FCS File/MSBuild IO @ Execution |
 | FCS patch apply IO | `FcsSessionPatchBridge` (pure map) + `IFcsSessionPatchApplier` port | `FcsSessionPatchApplier` bound @ `FcsExecutionHost` | **shipped** |
-| FCS backend text/graph IO | `IFcsSourceTextSource` + `IFcsSolutionGraphSource` ports | `FcsWorkspaceIoSource` bound @ `FcsExecutionHost` | **shipped** backend + graph resolver; walk-up fsproj still in Modeling |
+| FCS backend text/graph IO | `IFcsSourceTextSource` + `IFcsSolutionGraphSource` ports | `FcsWorkspaceIoSource` bound @ `FcsExecutionHost` | **shipped** |
+| FCS fsproj ownership IO | `IFcsProjectOwnershipSource` port; `FcsProjectResolver` thin delegate | `FcsProjectOwnershipSource` bound @ `FcsModelingBindings` | **shipped** all FCS File/Directory IO @ Execution |
 | Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` primary; `NavigationAnchor` deleted | **shipped** |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | ADR-0063 TO-BE | — | `GUIDERS-ADR-0063` §9–§10 RelationSpec normative | **shipped** §10 body |
@@ -20,4 +21,4 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `LegacyBracketRelationWire` boundary parse only | **shipped** obsolete shims deleted |
 
-**Next waves:** `FcsProjectResolver` walk-up IO → Execution · README/Gdl catalog doc drift · delete `LegacyBracketRelationWire` after RelationSpec resolve path · ship-5 product stubs.
+**Next waves:** ship-5 product stubs · delete `LegacyBracketRelationWire` after RelationSpec resolve path · Gdl catalog doc drift · `FcsProjectOptionsSdkSource` / remaining DotNetWorkspace in Modeling trim.
