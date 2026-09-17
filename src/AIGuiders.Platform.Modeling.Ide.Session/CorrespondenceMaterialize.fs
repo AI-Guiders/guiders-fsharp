@@ -38,8 +38,40 @@ module CorrespondenceMaterialize =
           Scope = SemanticSubstrate project
           Attributes = RelationAttributes.empty }
 
-    let buildUsesFromTypeNames (logicalPath: string) (fromTypeName: string) (toTypeName: string) (project: ProjectId) =
+    let private buildSemanticFromTypeNames
+        (logicalPath: string)
+        (fromTypeName: string)
+        (toTypeName: string)
+        (project: ProjectId)
+        (relationType: RelationType)
+        =
         let doc = DocumentRef.File(LogicalPath.Create logicalPath)
-        let fromSymbol = { Container = []; Name = fromTypeName; Arity = None }
-        let toSymbol = { Container = []; Name = toTypeName; Arity = None }
-        buildUses doc fromSymbol toSymbol project
+
+        let fromSymbol =
+            { Container = []; Name = fromTypeName; Arity = None }
+
+        let toSymbol =
+            { Container = []; Name = toTypeName; Arity = None }
+
+        { From = GraphNodeRef.Semantic(doc, fromSymbol)
+          Type = relationType
+          To = GraphNodeRef.Semantic(doc, toSymbol)
+          Scope = SemanticSubstrate project
+          Attributes = RelationAttributes.empty }
+
+    let buildUsesFromTypeNames (logicalPath: string) (fromTypeName: string) (toTypeName: string) (project: ProjectId) =
+        buildSemanticFromTypeNames logicalPath fromTypeName toTypeName project RelationType.Uses
+
+    let buildTypeUsesFromTypeNames (logicalPath: string) (fromTypeName: string) (toTypeName: string) (project: ProjectId) =
+        buildSemanticFromTypeNames logicalPath fromTypeName toTypeName project RelationType.TypeUses
+
+    let buildExtendsFromTypeNames (logicalPath: string) (fromTypeName: string) (toTypeName: string) (project: ProjectId) =
+        buildSemanticFromTypeNames logicalPath fromTypeName toTypeName project RelationType.Extends
+
+    let buildImplementsInterfaceFromTypeNames
+        (logicalPath: string)
+        (fromTypeName: string)
+        (toTypeName: string)
+        (project: ProjectId)
+        =
+        buildSemanticFromTypeNames logicalPath fromTypeName toTypeName project RelationType.ImplementsInterface

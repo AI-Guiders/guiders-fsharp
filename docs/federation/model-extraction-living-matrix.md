@@ -57,5 +57,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Roslyn E_dep ingest v1 | `CorrespondenceMaterialize.buildUses` | `RoslynDependencyRelationIngest` field-type Uses | **shipped** ship-35 |
 | Session Contents E_dep hook | `DependencyRelationOps.ingest` + `SolutionGraph.mergeRelations` | `DependencyRelationIngest` @ `FederationSessionRuntime.Open` | **shipped** ship-36 |
 | Correspondence CLIMutable strip | plain F# records in `Documentation.Correspondence` | `CorrespondenceModels` constructor seam (no CLIMutable views) | **shipped** ship-37 |
+| CompilerServices E_dep v2 | `buildExtends` / `buildImplementsInterface` / `buildTypeUses` | `RoslynDependencyRelationIngest.IngestProjectSources` + `IngestForProject` @ ensure | **shipped** ship-38 |
 
-**Next waves:** Plan §10 Phase 1 checklist · full CompilerServices E_dep.
+**Next waves:** Plan §10 Phase 1 checklist closure.
