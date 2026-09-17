@@ -48,3 +48,15 @@ module DiagnosticIndexOps =
         index
         |> Map.tryPick (fun ref record ->
             if record.Code = code then Some(ref, record) else None)
+
+    /// Attach picker rows scoped to session DiagnosticIndex (plan §4.4).
+    type DiagnosticPickerChoice = { Id: string; Label: string }
+
+    let pickerChoices (index: DiagnosticIndex) : DiagnosticPickerChoice list =
+        index
+        |> Map.toList
+        |> List.map (fun (ref, record) ->
+            let id = DiagnosticRef.carrier ref |> NumericId.value |> string
+            { Id = id
+              Label = $"{record.Code}: {record.Message}" })
+        |> List.sortBy (fun choice -> choice.Id)
