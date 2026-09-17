@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>AIGuiders.Platform.Modeling.Config</RootNamespace>
-    <AssemblyName>AIGuiders.Platform.Modeling.Config</AssemblyName>
+    <RootNamespace>AIGuiders.Platform.Modeling.Configurations</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Configurations</AssemblyName>
     <Description>Config quarry IR — *.config.gdl document model (F# SSOT).</Description>
-    <PackageId>AIGuiders.Platform.Modeling.Config</PackageId>
+    <PackageId>AIGuiders.Platform.Modeling.Configurations</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Schema.fs" />

@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Config
+namespace AIGuiders.Platform.Modeling.Configurations
 
 open System
 open System.IO

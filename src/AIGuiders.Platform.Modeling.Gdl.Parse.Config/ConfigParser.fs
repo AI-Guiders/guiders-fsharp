@@ -2,7 +2,7 @@ namespace AIGuiders.Platform.Modeling.Gdl.Parse.Config
 
 open System
 open System.Collections.Generic
-open AIGuiders.Platform.Modeling.Config
+open AIGuiders.Platform.Modeling.Configurations
 open AIGuiders.Platform.Modeling.Gdl.Authoring
 
 type ConfigParseDiagnostic = { Code: string; Message: string; Line: int }

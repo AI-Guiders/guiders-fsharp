@@ -1,4 +1,4 @@
-namespace AIGuiders.Platform.Modeling.Config
+namespace AIGuiders.Platform.Modeling.Configurations
 
 /// <summary>
 /// Pilot IR for *.config.gdl (GUIDERS-ADR-0064 v0): header, defaults, contracts.

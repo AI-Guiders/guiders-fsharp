@@ -12,7 +12,7 @@
     <Compile Include="ContractPredicatesTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Config\AIGuiders.Platform.Modeling.Config.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Configurations\AIGuiders.Platform.Modeling.Configurations.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Gdl.Parse.Config\AIGuiders.Platform.Modeling.Gdl.Parse.Config.fsproj" />
   </ItemGroup>
 </Project>

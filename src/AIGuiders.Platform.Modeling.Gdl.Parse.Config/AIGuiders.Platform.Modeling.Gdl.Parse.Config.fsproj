@@ -10,7 +10,7 @@
     <Compile Include="ConfigParser.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Config\AIGuiders.Platform.Modeling.Config.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Configurations\AIGuiders.Platform.Modeling.Configurations.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Gdl.Authoring\AIGuiders.Platform.Modeling.Gdl.Authoring.fsproj" />
   </ItemGroup>
 </Project>

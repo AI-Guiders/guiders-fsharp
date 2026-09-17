@@ -1,10 +1,10 @@
-module AIGuiders.Platform.Modeling.Config.Tests.ContractPredicatesTests
+module AIGuiders.Platform.Modeling.Configurations.Tests.ContractPredicatesTests
 
 open System
 open System.Collections.Generic
 open System.IO
 open Xunit
-open AIGuiders.Platform.Modeling.Config
+open AIGuiders.Platform.Modeling.Configurations
 open AIGuiders.Platform.Modeling.Gdl.Parse.Config
 
 let private emptyDocument () =
