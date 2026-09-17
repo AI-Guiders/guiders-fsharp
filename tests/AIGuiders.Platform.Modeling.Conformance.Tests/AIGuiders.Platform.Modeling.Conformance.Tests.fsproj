@@ -11,9 +11,11 @@
   <ItemGroup>
     <Compile Include="ConformanceSpecTests.fs" />
     <Compile Include="CommandPlaneConformanceTests.fs" />
+    <Compile Include="AttachSchemaTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Conformance\AIGuiders.Platform.Modeling.Conformance.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CommandPlane\AIGuiders.Platform.Modeling.CommandPlane.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
   </ItemGroup>
 </Project>

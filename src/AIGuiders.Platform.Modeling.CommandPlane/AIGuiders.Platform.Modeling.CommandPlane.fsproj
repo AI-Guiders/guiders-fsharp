@@ -10,5 +10,9 @@
     <Compile Include="PrefixArmShapes.fs" />
     <Compile Include="ConstructorShapes.fs" />
     <Compile Include="LocaleDateAlgebra.fs" />
+    <Compile Include="AttachSchema.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
   </ItemGroup>
 </Project>
