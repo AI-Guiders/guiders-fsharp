@@ -13,7 +13,7 @@ module CorrespondenceRelationKind =
     let toWire =
         function
         | Documents -> Kind.Documents
-        | ImplementsObligation -> Kind.Implements
+        | ImplementsObligation -> Kind.ImplementsObligation
         | Related -> Kind.Related
         | Constrains -> Kind.Constrains
         | Normates -> Kind.Normates
@@ -25,7 +25,7 @@ module CorrespondenceRelationKind =
         else
             match wire.Trim().ToLowerInvariant() with
             | Kind.Documents -> Some Documents
-            | Kind.Implements -> Some ImplementsObligation
+            | Kind.ImplementsObligation -> Some ImplementsObligation
             | Kind.Related -> Some Related
             | Kind.Constrains -> Some Constrains
             | Kind.Normates -> Some Normates

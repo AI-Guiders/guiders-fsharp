@@ -38,6 +38,9 @@ type RelationType =
     | Feeds
     | Uses
     | Normates
+    | ImplementsInterface
+    | Extends
+    | Instantiates
 
 type RelationScope =
     | SessionG
@@ -110,6 +113,11 @@ module RelationGraph =
                 Ok()
             else
                 Error { Message = $"Correspondence/dependency {relation.Type}: invalid sort pair {fromSort} -> {toSort}." }
+        | RelationType.ImplementsInterface | RelationType.Extends | RelationType.Instantiates ->
+            if fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.SemanticSymbol then
+                Ok()
+            else
+                Error { Message = $"TypeSystem {relation.Type}: requires SemanticSymbol -> SemanticSymbol." }
 
     let fromSessionEdge (edge: SessionEdge) =
         let fromNode =

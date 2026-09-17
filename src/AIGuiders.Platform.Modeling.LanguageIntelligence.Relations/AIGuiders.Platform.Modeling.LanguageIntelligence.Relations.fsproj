@@ -13,6 +13,7 @@
   <ItemGroup>
     <Compile Include="ResolveTier.fs" />
     <Compile Include="RelationGeometry.fs" />
+    <Compile Include="TypeSystemRelationKind.fs" />
     <Compile Include="RelationSpec.fs" />
   </ItemGroup>
 </Project>

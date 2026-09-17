@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RelationSpecTests.fs" />
+    <Compile Include="TypeSystemRelationKindTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />

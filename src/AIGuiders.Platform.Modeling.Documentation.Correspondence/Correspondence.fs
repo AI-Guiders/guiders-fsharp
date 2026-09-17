@@ -26,8 +26,9 @@ module Provenance =
 module Kind =
     [<Literal>]
     let Documents = "documents"
+    /// ADR obligation wire token (typed <c>ImplementsObligation</c> — not TypeSystem <c>ImplementsInterface</c>).
     [<Literal>]
-    let Implements = "implements"
+    let ImplementsObligation = "implements"
     [<Literal>]
     let Related = "related"
     [<Literal>]

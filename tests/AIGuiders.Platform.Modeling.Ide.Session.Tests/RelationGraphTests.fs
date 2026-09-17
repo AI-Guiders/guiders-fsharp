@@ -1,5 +1,8 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.Paths
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 open Xunit
 open AIGuiders.Platform.Modeling.Ide.Session
 
@@ -48,3 +51,20 @@ type RelationGraphTests() =
         match RelationGraph.validateRelation relation with
         | Ok () -> Assert.Fail "expected sort validation failure"
         | Error e -> Assert.Contains("cross-project", e.Message)
+
+    [<Fact>]
+    member _.``ImplementsInterface validates semantic symbol pair``() =
+        let doc = DocumentRef.File(LogicalPath.Create "src/Foo.cs")
+        let symA = { Container = []; Name = "Dog"; Arity = None }
+        let symB = { Container = []; Name = "Animal"; Arity = None }
+
+        let relation =
+            { From = GraphNodeRef.Semantic(doc, symA)
+              Type = RelationType.ImplementsInterface
+              To = GraphNodeRef.Semantic(doc, symB)
+              Scope = SemanticSubstrate(ProjectId.create @"D:\repo\App.fsproj")
+              Attributes = RelationAttributes.empty }
+
+        match RelationGraph.validateRelation relation with
+        | Ok () -> ()
+        | Error e -> Assert.Fail e.Message

@@ -67,6 +67,6 @@ let ``CorrespondenceRelationKind parses normates wire`` () =
 
 [<Fact>]
 let ``CorrespondenceRelationKind maps implements homonym`` () =
-    match CorrespondenceRelationKind.tryParse Kind.Implements with
-    | Some CorrespondenceRelationKind.ImplementsObligation -> Assert.Equal(Kind.Implements, CorrespondenceRelationKind.toWire CorrespondenceRelationKind.ImplementsObligation)
+    match CorrespondenceRelationKind.tryParse Kind.ImplementsObligation with
+    | Some CorrespondenceRelationKind.ImplementsObligation -> Assert.Equal(Kind.ImplementsObligation, CorrespondenceRelationKind.toWire CorrespondenceRelationKind.ImplementsObligation)
     | _ -> failwith "expected implements obligation kind"
