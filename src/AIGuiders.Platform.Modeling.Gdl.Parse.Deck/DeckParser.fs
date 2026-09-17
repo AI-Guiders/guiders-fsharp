@@ -116,6 +116,3 @@ module DeckParser =
 
     let parse (text: string) (_sourcePath: string option) =
         parseLines (AuthoringSource.fromText text)
-
-    let parseFile (path: string) =
-        parseLines (AuthoringSource.fromFile path)

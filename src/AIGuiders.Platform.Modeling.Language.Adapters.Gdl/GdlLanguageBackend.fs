@@ -22,12 +22,7 @@ type GdlLanguageBackend() =
         || String.Equals(ext, ".gdlproj", StringComparison.OrdinalIgnoreCase)
 
     let readSource (req: LanguageRequest) =
-        if not (String.IsNullOrWhiteSpace req.SourceText) then
-            req.SourceText
-        elif File.Exists req.FilePath then
-            File.ReadAllText req.FilePath
-        else
-            ""
+        if String.IsNullOrWhiteSpace req.SourceText then "" else req.SourceText
 
     let toSpan (path: string) line column =
         { Path = path

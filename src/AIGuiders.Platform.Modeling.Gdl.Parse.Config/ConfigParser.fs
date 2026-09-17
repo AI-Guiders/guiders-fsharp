@@ -284,6 +284,3 @@ module ConfigParser =
 
     let parseText (text: string) : ConfigParseResult =
         AuthoringSource.fromText text |> parse
-
-    let parseFile (path: string) : ConfigParseResult =
-        AuthoringSource.fromFile path |> parse

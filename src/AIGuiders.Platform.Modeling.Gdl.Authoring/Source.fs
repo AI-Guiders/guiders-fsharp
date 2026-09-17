@@ -1,8 +1,5 @@
 namespace AIGuiders.Platform.Modeling.Gdl.Authoring
 
-open System.IO
-open System.Text
-
 type AuthoringLine = { LineNumber: int; Text: string }
 
 [<RequireQualifiedAccess>]
@@ -20,6 +17,3 @@ module AuthoringSource =
 
     let fromText (text: string) =
         text.Replace("\r\n", "\n").Split '\n' |> Array.toList |> fromRawLines
-
-    let fromFile (path: string) =
-        fromText (File.ReadAllText(path, Encoding.UTF8))

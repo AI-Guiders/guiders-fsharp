@@ -388,5 +388,3 @@ module CatalogParser =
         | None -> result
 
     let parse (text: string) : CatalogParseResult = postValidate (parseLines (AuthoringSource.fromText text))
-
-    let parseFile (path: string) : CatalogParseResult = postValidate (parseLines (AuthoringSource.fromFile path))

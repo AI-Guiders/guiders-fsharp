@@ -142,6 +142,3 @@ module IdeSessionCatalogParser =
 
     let parseText (text: string) (sourcePath: string) : IdeSessionCatalogParseResult =
         parse (AuthoringSource.fromText text) sourcePath
-
-    let parseFile (path: string) : IdeSessionCatalogParseResult =
-        parse (AuthoringSource.fromFile path) path
