@@ -7,6 +7,13 @@
     <PackageId>AIGuiders.Platform.Modeling.Notations.Bracket</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="BracketTypes.fs" />
+    <Compile Include="LegacyBracketSpan.fs" />
+    <Compile Include="BracketRelationWire.fs" />
   </ItemGroup>
 </Project>

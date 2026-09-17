@@ -10,8 +10,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BracketShapeTests.fs" />
+    <Compile Include="LegacyBracketSpanTests.fs" />
+    <Compile Include="BracketRelationWireTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Notations.Bracket\AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
   </ItemGroup>
 </Project>
