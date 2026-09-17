@@ -26,6 +26,10 @@ type RelationType =
     | Invalidates
     | Feeds
     | Uses
+    | TypeUses
+    | Binds
+    | Imports
+    | SyntaxDepends
     | Normates
     | ImplementsInterface
     | Extends
@@ -52,6 +56,14 @@ type Relation =
 type SortError = { Message: string }
 
 module RelationGraph =
+    let dependencyKindToRelationType (kind: DependencyRelationKind) =
+        match kind with
+        | DependencyRelationKind.Uses -> RelationType.Uses
+        | DependencyRelationKind.TypeUses -> RelationType.TypeUses
+        | DependencyRelationKind.Binds -> RelationType.Binds
+        | DependencyRelationKind.Imports -> RelationType.Imports
+        | DependencyRelationKind.SyntaxDepends -> RelationType.SyntaxDepends
+
     let private sortOfNode (node: GraphNodeRef) =
         match node with
         | GraphNodeRef.SessionProject _ -> NodeSort.SessionProject
@@ -133,13 +145,31 @@ module RelationGraph =
                 Ok()
             else
                 Error { Message = "ProjectRef requires SessionProject endpoints." }
-        | RelationType.Uses | RelationType.Normates ->
+        | RelationType.Uses | RelationType.TypeUses | RelationType.Binds ->
             if fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.SemanticSymbol then
                 Ok()
-            elif fromSort = NodeSort.DocumentFragment && toSort = NodeSort.SemanticSymbol then
+            else
+                Error { Message = $"Dependency {relation.Type}: requires SemanticSymbol -> SemanticSymbol." }
+        | RelationType.Imports ->
+            let synSem sort =
+                sort = NodeSort.SyntaxNode || sort = NodeSort.SemanticSymbol
+
+            if synSem fromSort && synSem toSort then
                 Ok()
             else
-                Error { Message = $"Correspondence/dependency {relation.Type}: invalid sort pair {fromSort} -> {toSort}." }
+                Error { Message = $"Dependency Imports: endpoints must be SyntaxNode or SemanticSymbol." }
+        | RelationType.SyntaxDepends ->
+            if fromSort = NodeSort.SyntaxNode && toSort = NodeSort.SyntaxNode then
+                Ok()
+            else
+                Error { Message = "Dependency SyntaxDepends: requires SyntaxNode -> SyntaxNode." }
+        | RelationType.Normates ->
+            if fromSort = NodeSort.DocumentFragment && toSort = NodeSort.SemanticSymbol then
+                Ok()
+            elif fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.SemanticSymbol then
+                Ok()
+            else
+                Error { Message = $"Correspondence Normates: invalid sort pair {fromSort} -> {toSort}." }
         | RelationType.ImplementsInterface | RelationType.Extends | RelationType.Instantiates ->
             if fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.SemanticSymbol then
                 Ok()

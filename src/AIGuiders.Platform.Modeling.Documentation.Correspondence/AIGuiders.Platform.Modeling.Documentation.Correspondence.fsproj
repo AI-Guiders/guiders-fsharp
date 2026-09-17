@@ -8,10 +8,12 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Correspondence.fs" />
     <Compile Include="CorrespondenceRelationKind.fs" />
+    <Compile Include="ReverseAnchorBridge.fs" />
     <Compile Include="AdrFacts.fs" />
     <Compile Include="HoareCatalog.fs" />
   </ItemGroup>

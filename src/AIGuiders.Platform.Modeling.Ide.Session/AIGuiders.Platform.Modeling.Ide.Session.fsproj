@@ -22,6 +22,7 @@
     <Compile Include="Projects.fs" />
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="RelationGraph.fs" />
+    <Compile Include="TypeSystemProfile.fs" />
     <Compile Include="SceneProjection.fs" />
     <Compile Include="SolutionGraph.fs" />
     <Compile Include="WorkspaceGraph.fs" />
