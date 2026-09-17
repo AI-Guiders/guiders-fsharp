@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Language.Tests
 
 open System
 open System.Threading
+open Microsoft.FSharp.Core
 open Xunit
 open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
@@ -10,6 +11,14 @@ open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Execution.Language.Adapters.Fcs
 
 module LanguageAdapterSmokeTests =
+    let private probeLoadOption (fsproj: string) =
+        let mutable options = Unchecked.defaultof<FSharp.Compiler.CodeAnalysis.FSharpProjectOptions>
+
+        if FcsProbeProjectOptions.TryGet(fsproj, &options) then
+            Some options
+        else
+            None
+
     let private languageRequest file line column sourceText solution =
         { FilePath = file
           Line = line
@@ -550,7 +559,7 @@ module LanguageAdapterSmokeTests =
         if not (System.IO.File.Exists fsproj) then
             Assert.Fail(sprintf "fixture missing: %s" fsproj)
         else
-            match FcsProjectOptions.tryLoadViaProjInfo fsproj with
+            match probeLoadOption fsproj with
             | None -> Assert.Fail("expected F# project options")
             | Some options ->
                 let hasRef =
@@ -575,7 +584,7 @@ module LanguageAdapterSmokeTests =
         if not (System.IO.File.Exists fsproj) then
             Assert.Fail(sprintf "fixture missing: %s" fsproj)
         else
-            match FcsProjectOptions.tryLoadViaProjInfo fsproj with
+            match probeLoadOption fsproj with
             | None -> Assert.Fail("expected F# project options for adapters fsproj")
             | Some options ->
                 let hasModelingLanguage =

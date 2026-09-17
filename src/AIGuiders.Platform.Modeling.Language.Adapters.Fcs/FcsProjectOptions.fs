@@ -1,17 +1,24 @@
 namespace AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 
-open System
-open System.IO
-
 /// Federation F# project options — Execution binds materialized host source @ startup (plan §7).
 module FcsProjectOptions =
+    type private UnboundSource() =
+        interface IFcsProjectOptionsSource with
+            member _.TryLoad _ =
+                Error
+                    { Message =
+                        "FCS project options source not bound. Load Execution.Language.Adapters.Fcs (FcsExecutionHost) first." }
+
+            member _.Warm _ = ()
+
+            member _.Invalidate _ = ()
+
     let mutable private boundSource: IFcsProjectOptionsSource option = None
 
     let internal activeSource () =
         match boundSource with
         | Some source -> source
-        | None ->
-            FcsProbeProjectOptionsSource() :> IFcsProjectOptionsSource
+        | None -> UnboundSource() :> IFcsProjectOptionsSource
 
     /// Called from <c>Execution.Language.Adapters.Fcs</c> static init.
     let bindSource (source: IFcsProjectOptionsSource) =
@@ -43,14 +50,3 @@ module FcsProjectOptions =
     let invalidate () = Default.Invalidate()
 
     let invalidateProject (_fsprojPath: string) = ()
-
-    /// <summary>Direct ProjInfo load for probes/tests only — not the federation hot path.</summary>
-    let tryLoadViaProjInfo (fsprojPath: string) =
-        if String.IsNullOrWhiteSpace fsprojPath || not (File.Exists fsprojPath) then
-            None
-        else
-            let loader = FcsProbeProjectOptionsSource() :> IFcsProjectOptionsSource
-
-            match loader.TryLoad fsprojPath with
-            | Ok options -> Some options
-            | Error _ -> None

@@ -33,7 +33,7 @@
     <Compile Include="FcsProjectOptionsGuards.fs" />
     <Compile Include="FcsProjectResolver.fs" />
     <Compile Include="FcsProjInfoProjectOptionsSource.fs" />
-    <Compile Include="FcsProbeProjectOptionsSource.fs" />
+    <Compile Include="FcsProbeWire.fs" />
     <Compile Include="FcsProjectOptions.fs" />
     <Compile Include="FcsSessionPatchBridge.fs" />
     <Compile Include="FcsLanguageBackend.fs" />
