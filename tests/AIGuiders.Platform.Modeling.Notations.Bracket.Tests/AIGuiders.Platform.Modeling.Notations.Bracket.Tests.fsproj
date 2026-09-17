@@ -10,7 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BracketShapeTests.fs" />
-    <Compile Include="LegacyBracketSpanTests.fs" />
     <Compile Include="BracketRelationWireTests.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -55,20 +55,6 @@ let ``Kind CodeEdit Element parses xml wire encoding`` () =
     | Some _ -> Assert.Fail "unexpected spec case"
 
 [<Fact>]
-let ``RelationSpecLegacyBridge maps xml wire encoding to X span`` () =
-    let spec =
-        RelationSpec.CodeEdit(
-            XmlWireEncoding.elementTarget (LogicalPath.Create "doc.xml") "Root/Item" None None
-        )
-
-    match RelationSpecLegacyBridge.tryToLegacySpan spec with
-    | None -> Assert.Fail "expected legacy span"
-    | Some span ->
-        Assert.Equal(Some "doc.xml", span.File)
-        Assert.Equal(Some "Root/Item", span.XmlPath)
-        Assert.Equal(None, span.MemberKey)
-
-[<Fact>]
 let ``Kind Nav parses NavSeed`` () =
     let wire =
         { ProfileId = BracketProfiles.CdpSquareKeyValue.Id

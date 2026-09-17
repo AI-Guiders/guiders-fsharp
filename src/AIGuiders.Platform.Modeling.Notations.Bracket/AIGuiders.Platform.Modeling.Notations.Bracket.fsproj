@@ -13,8 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BracketTypes.fs" />
-    <Compile Include="LegacyBracketSpan.fs" />
-    <Compile Include="RelationSpecLegacyBridge.fs" />
+    <Compile Include="XmlWireEncoding.fs" />
     <Compile Include="BracketRelationWire.fs" />
   </ItemGroup>
 </Project>

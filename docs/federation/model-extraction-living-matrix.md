@@ -37,4 +37,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 
 | SessionEdgeKind migration | `Relation` in `SolutionGraph.Relations` | `ISolutionInfoProvider.Relations` + test fixtures Relation-first | **shipped** ship-25 |
 
-**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · remove obsolete `SessionEdge`/`ProjectEdge` shims.
+| BracketAnchorSpan Modeling delete | `XmlWireEncoding` only in `Notations.Bracket` | `BracketAnchorSpan` + `BracketAxisFamily` + `RelationSpecLegacyBridge` @ Execution | **shipped** ship-26 |
+
+**Next waves:** Plan §10 Phase 1 checklist · remove obsolete `SessionEdge`/`ProjectEdge` shims · ship-3 IO ports slice.
