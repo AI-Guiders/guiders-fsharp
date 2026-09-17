@@ -8,11 +8,11 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Scene projection | `Ide.Session.SceneProjection` | `Navigation.Code` | **shipped** |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** |
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
-| FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + `FcsProbeProjectOptionsSource` | **shipped** probe IO @ Execution |
+| FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + probe + ProjInfo sources | **shipped** all FCS File/MSBuild IO @ Execution |
 | Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` primary; `NavigationAnchor` deleted | **shipped** |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
-| Legacy F/M/L wires | delete at boundary | `LegacyBracketRelationWire` transitional parse | **bounded** Obsolete + shim alias |
+| Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `LegacyBracketRelationWire` boundary parse only | **shipped** obsolete shims deleted |
 
-**Next waves:** move `FcsProjInfoProjectOptionsSource` MSBuild IO · ADR-0063 full body · legacy F/M/L wire delete.
+**Next waves:** `FcsLanguageBackend`/`FcsSessionPatchBridge` File IO trim · ADR-0063 full body · ship-2 modeling tree.
