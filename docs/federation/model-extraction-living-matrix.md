@@ -7,7 +7,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Relations kernel | `LanguageIntelligence.Relations` | `Execution.LanguageIntelligence.Relations` | **shipped** Phase 1 |
 | Scene projection | `Ide.Session.SceneProjection` | `Navigation.Code` | **shipped** |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** verb+step pickers |
-| Attach contextual | `DiagnosticIndexOps` + `DocumentRegistryOps` pickers | diagnostic + registry path providers | **shipped** pick_diagnostic/file/doc/nav |
+| Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
 | FCS host IO | shapes in `Language.Adapters.Fcs` | `FcsExecutionHost` + `FcsExecutionProjectOptionsSource` bind | **shipped** options source @ Execution boundary |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
@@ -15,4 +15,4 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | C# IR fork | shim only | delete post-conformance | **open** |
 | Legacy F/M/L wires | delete at boundary | `LegacyBracketRelationWire` transitional parse | **bounded** Obsolete + shim alias |
 
-**Next waves:** IR fork deletion · full `FcsCompilerServicesHost` File IO move · attach pick_member symbols · `NavigationAnchor` type removal · ADR-0063 full body.
+**Next waves:** IR fork deletion · full `FcsCompilerServicesHost` File IO move · `NavigationAnchor` type removal · ADR-0063 full body.
