@@ -36,6 +36,39 @@ let ``Wire without Kind returns none`` () =
     Assert.True(BracketRelationWire.tryParseRelationSpec wire |> Option.isNone)
 
 [<Fact>]
+let ``Kind CodeEdit Element parses xml wire encoding`` () =
+    let wire =
+        { ProfileId = BracketProfiles.CdpSquareKeyValue.Id
+          Raw = "[Kind:CodeEdit; File:doc.xml; Element:Root/Item]"
+          Axes =
+            [ BracketAxis("Kind", ':', "CodeEdit")
+              BracketAxis("File", ':', "doc.xml")
+              BracketAxis("Element", ':', "Root/Item") ]
+            :> IReadOnlyList<_> }
+
+    match BracketRelationWire.tryParseRelationSpec wire with
+    | None -> Assert.Fail "expected CodeEdit spec"
+    | Some (RelationSpec.CodeEdit (CodeTarget.Symbol(DocumentRef.File path, sym))) ->
+        Assert.Equal("doc.xml", path.Value)
+        Assert.Equal("Root/Item", sym.Name)
+        Assert.Equal(XmlWireEncoding.Marker, sym.Container.[0])
+    | Some _ -> Assert.Fail "unexpected spec case"
+
+[<Fact>]
+let ``RelationSpecLegacyBridge maps xml wire encoding to X span`` () =
+    let spec =
+        RelationSpec.CodeEdit(
+            XmlWireEncoding.elementTarget (LogicalPath.Create "doc.xml") "Root/Item" None None
+        )
+
+    match RelationSpecLegacyBridge.tryToLegacySpan spec with
+    | None -> Assert.Fail "expected legacy span"
+    | Some span ->
+        Assert.Equal(Some "doc.xml", span.File)
+        Assert.Equal(Some "Root/Item", span.XmlPath)
+        Assert.Equal(None, span.MemberKey)
+
+[<Fact>]
 let ``Kind Nav parses NavSeed`` () =
     let wire =
         { ProfileId = BracketProfiles.CdpSquareKeyValue.Id

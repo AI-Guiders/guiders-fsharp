@@ -31,11 +31,26 @@ module BracketRelationWire =
         | Some kind ->
             match kind with
             | "CodeEdit" ->
-                match axisValue wire "File", axisValue wire "Member" with
-                | Some file, Some memberName ->
-                    RelationSpec.CodeEdit(symbolFromAxes (LogicalPath.Create file) memberName (axisValue wire "Scope"))
-                    |> Some
-                | _ -> None
+                match axisValue wire "File" with
+                | None -> None
+                | Some file ->
+                    match axisValue wire "Member", axisValue wire "Element" with
+                    | Some memberName, None ->
+                        RelationSpec.CodeEdit(symbolFromAxes (LogicalPath.Create file) memberName (axisValue wire "Scope"))
+                        |> Some
+                    | None, Some elementPath ->
+                        let attr =
+                            axisValue wire "Attribute"
+                            |> Option.orElse (axisValue wire "Attr")
+
+                        let upsertRole = axisValue wire "Role"
+
+                        let target =
+                            XmlWireEncoding.elementTarget (LogicalPath.Create file) elementPath attr upsertRole
+
+                        Some(RelationSpec.CodeEdit target)
+                    | Some _, Some _ -> None
+                    | None, None -> None
             | "Diag" ->
                 match axisValue wire "DiagnosticId" with
                 | Some id ->
