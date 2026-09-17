@@ -15,18 +15,13 @@ type SnapshotJobTests() =
         let project =
             ProjectNode.create id (DotNet { Language = FSharp }) projectPath (CapabilityCatalog.defaultDotNet ())
 
-        let graph =
-            SolutionGraph.create
-                @"D:\repo\App.slnx"
-                [ project ]
-                (Map.ofList [ sourcePath, id ])
-                []
-                []
+        let ownership = Map.ofList [ sourcePath, id ]
+
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
 
         let runtime =
-            SessionOrchestrator.create
-                (SolutionSession.create graph.AnchorPath graph |> SolutionSession.withPhase DesignTime)
-                (Map.ofList [ sourcePath, "let foo = 1" ])
+            SessionTestFixtures.createRuntime graph ownership [ sourcePath, "let foo = 1" ] DesignTime
 
         let job, runtime' = SnapshotJob.start runtime CodeTransform id "rename-local" (Local id)
 

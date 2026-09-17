@@ -1,6 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open Xunit
+open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
 
 module private Samples =
@@ -29,7 +30,7 @@ module private Samples =
         let buildCap = GraphNodeId.capability fs.Id Build
         let compilerCap = GraphNodeId.capability fs.Id CompilerServices
 
-        SolutionGraph.create
+        SessionTestFixtures.createGraph
             @"D:\repo\App.slnx"
             [ fs; cs ]
             (Map.ofList [ @"D:\repo\src\App\Module.fs", fs.Id ])
@@ -38,6 +39,12 @@ module private Samples =
                 Kind = Requires
                 Attributes = Map.empty } ]
             []
+        |> fst
+
+    let mixedRegistry =
+        SessionTestFixtures.registryForOwnership (
+            Map.ofList [ @"D:\repo\src\App\Module.fs", fsharpProject.Id ]
+        )
 
 type SessionGraphTests() =
 
@@ -52,13 +59,15 @@ type SessionGraphTests() =
                 (ProjectId.value id)
                 (ProjectCapabilityCatalog.forKind (Gdl { ProjectFile = "deck.gdlproj" }))
 
-        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
-        let result = GraphValidation.validate graph
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
+
+        let result = GraphValidation.validate graph Map.empty
         Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
 
     [<Fact>]
     member _.``Mixed solution graph validates``() =
-        let result = GraphValidation.validate Samples.mixedSolution
+        let result = GraphValidation.validate Samples.mixedSolution Samples.mixedRegistry
         Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
 
     [<Fact>]
@@ -70,10 +79,10 @@ type SessionGraphTests() =
                     :: CapabilityCatalog.compilerServices ()
                     :: [] }
 
-        let graph =
-            SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
 
-        let result = GraphValidation.validate graph
+        let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
         Assert.Contains(result.Issues, fun i -> i.Message.Contains("Duplicate capability"))
 
@@ -83,8 +92,8 @@ type SessionGraphTests() =
         let a = GraphNodeId.capability fs.Id CompilerServices
         let b = GraphNodeId.capability fs.Id Build
 
-        let graph =
-            SolutionGraph.create
+        let graph, _ =
+            SessionTestFixtures.createGraph
                 @"D:\repo\App.slnx"
                 [ fs ]
                 Map.empty
@@ -92,7 +101,7 @@ type SessionGraphTests() =
                   { From = b; To = a; Kind = Requires; Attributes = Map.empty } ]
                 []
 
-        let result = GraphValidation.validate graph
+        let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
         Assert.Contains(result.Issues, fun i -> i.Message.Contains("Cycle"))
 
@@ -106,8 +115,10 @@ type SessionGraphTests() =
 
         let project = { Samples.fsharpProject with Capabilities = [ cap ] }
 
-        let graph = SolutionGraph.create @"D:\repo\App.slnx" [ project ] Map.empty [] []
-        let result = GraphValidation.validate graph
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] Map.empty [] []
+
+        let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
 
     [<Fact>]

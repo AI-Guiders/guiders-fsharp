@@ -1,5 +1,8 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+
 type SessionRevision = int64
 
 type FreezeMode =
@@ -12,8 +15,7 @@ type FrozenProjectSnapshot =
     { ProjectId: ProjectId
       Revision: SessionRevision
       Capabilities: CapabilityNode list
-      Ownership: Map<string, ProjectId>
-      Contents: Map<string, string> }
+      Documents: Map<DocId, DocumentText> }
 
 type FrozenTreeSnapshot =
     { Revision: SessionRevision
@@ -54,7 +56,8 @@ module FrozenSnapshot =
     let private freezeProject
         (revision: SessionRevision)
         (graph: SolutionGraph)
-        (contents: Map<string, string>)
+        (registry: DocumentRegistry)
+        (contents: Map<DocId, DocumentText>)
         (projectId: ProjectId)
         =
         let capabilities =
@@ -63,34 +66,23 @@ module FrozenSnapshot =
             |> Option.map (fun n -> n.Capabilities)
             |> Option.defaultValue []
 
-        let ownership =
-            graph.FileOwnership
-            |> Map.filter (fun _ owner -> owner = projectId)
-
-        let projectContents =
-            ownership
-            |> Map.keys
-            |> Seq.choose (fun path ->
-                match Map.tryFind path contents with
-                | None -> None
-                | Some text -> Some(path, text))
-            |> Map.ofSeq
+        let projectContents = DocumentRegistryOps.contentsForProject projectId registry contents
 
         { ProjectId = projectId
           Revision = revision
           Capabilities = capabilities
-          Ownership = ownership
-          Contents = projectContents }
+          Documents = projectContents }
 
     let freezeTree
         (revision: SessionRevision)
         (graph: SolutionGraph)
-        (contents: Map<string, string>)
+        (registry: DocumentRegistry)
+        (contents: Map<DocId, DocumentText>)
         (mode: FreezeMode)
         =
         let projects =
             resolveProjects graph mode
-            |> List.map (freezeProject revision graph contents)
+            |> List.map (freezeProject revision graph registry contents)
 
         { Revision = revision
           Mode = mode

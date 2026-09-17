@@ -1,17 +1,19 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-/// <summary>§2.8b workspace projection — analyzer-facing view @ revision <c>r</c>.</summary>
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
+
 type WorkspaceProjectView =
     { ProjectId: ProjectId
       ProjectPath: string
       LanguageId: string
-      /// <summary>MSBuild @(Compile) order frozen @ revision (from ProjInfo at materialize).</summary>
       CompileFiles: string list }
 
 type WorkspaceView =
     { Revision: SessionRevision
-      AnchorPath: string
+      Anchor: LogicalPath
       Mode: FreezeMode
       RootProjectId: ProjectId
       Projects: WorkspaceProjectView list
-      Contents: Map<string, string> }
+      Documents: Map<DocId, DocumentText> }

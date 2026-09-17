@@ -66,7 +66,7 @@ type MsBuildSolutionProviderTests() =
 
             let validation =
                 SolutionProviders.toGraph (Path.Combine(root, "Mixed.slnx")) provider
-                |> GraphValidation.validate
+                |> fun graph -> GraphValidation.validate graph Map.empty
 
             Assert.True(validation.IsValid, validation.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
         finally

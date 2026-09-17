@@ -9,6 +9,8 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SessionTestFixtures.fs" />
+    <Compile Include="DocumentRegistryTests.fs" />
     <Compile Include="SessionGraphTests.fs" />
     <Compile Include="InvalidationScopeTests.fs" />
     <Compile Include="SessionPatchTests.fs" />

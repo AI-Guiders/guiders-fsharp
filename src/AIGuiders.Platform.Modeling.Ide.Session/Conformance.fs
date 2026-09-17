@@ -1,5 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Core.Identity
+
 /// <summary>§2.11 style paths — vendor ≠ proven guarantees.</summary>
 type StylePath =
     | Text
@@ -28,13 +30,15 @@ module StyleConformance =
 type GoldenSession =
     { Name: string
       Graph: SolutionGraph
+      Ownership: Map<string, ProjectId>
       Contents: Map<string, string>
       Phase: LifecyclePhase }
 
 module GoldenSession =
-    let create name graph contents phase =
+    let create name graph ownership contents phase =
         { Name = name
           Graph = graph
+          Ownership = ownership
           Contents = contents
           Phase = phase }
 
@@ -51,6 +55,7 @@ module Conformance =
             pre
             session.Phase
             session.Graph
+            session.Ownership
             session.Contents
             post
             patch
@@ -61,7 +66,8 @@ module Conformance =
         (spec: RefactorPlan.RenameSymbol)
         (typecheckAfter: TypecheckVerdict)
         =
-        let patch = RefactorPlan.planRename session.Contents spec
+        let boot = DocumentRegistryOps.bootstrap (Map.toList session.Contents) session.Ownership 0L
+        let patch = RefactorPlan.planRename boot.Registry boot.Contents spec
         let post = HoarePostcondition.refactorRename spec.OldName spec.NewName
         runRefactorGolden session patch post typecheckAfter
 

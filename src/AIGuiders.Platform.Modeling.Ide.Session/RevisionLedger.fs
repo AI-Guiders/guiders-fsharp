@@ -1,11 +1,18 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-type GitPin = { Commit: string option }
+open AIGuiders.Platform.Modeling.Core.Identity
+
+type TransformClass =
+    | Refactor of id: string
+    | Fix
+    | Style
+    | Config
+    | Other of tag: string
 
 type LedgerEntry =
     { Revision: SessionRevision
       Scope: InvalidationScope
-      ThetaClass: string
+      ThetaClass: TransformClass
       Patch: SessionPatch
       GitPin: GitPin }
 
@@ -16,7 +23,7 @@ type RevisionLedger =
 module RevisionLedger =
     let empty = { NextRevision = 1L; Entries = [] }
 
-    let append (scope: InvalidationScope) (thetaClass: string) (patch: SessionPatch) (gitPin: GitPin) (ledger: RevisionLedger) =
+    let append (scope: InvalidationScope) (thetaClass: TransformClass) (patch: SessionPatch) (gitPin: GitPin) (ledger: RevisionLedger) =
         let entry =
             { Revision = ledger.NextRevision
               Scope = scope
@@ -27,8 +34,6 @@ module RevisionLedger =
         { NextRevision = ledger.NextRevision + 1L
           Entries = ledger.Entries @ [ entry ] }
 
-    /// Freeze is not a Δ (§2.12 Λ = Δ-stream of applied patches), but its revision
-    /// must still come from the same monotonic counter — reserve it atomically.
     let reserve (ledger: RevisionLedger) : SessionRevision * RevisionLedger =
         ledger.NextRevision, { ledger with NextRevision = ledger.NextRevision + 1L }
 

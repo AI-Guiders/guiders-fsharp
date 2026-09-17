@@ -1,5 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+
 type GraphValidationIssue =
     { Message: string }
 
@@ -76,7 +78,7 @@ module GraphValidation =
         |> List.tryPick (fun e -> visit Set.empty (GraphNodeId.key e.From))
         |> Option.map id
 
-    let validate (graph: SolutionGraph) =
+    let validate (graph: SolutionGraph) (registry: DocumentRegistry) =
         let issues = ResizeArray()
 
         let projectIds =
@@ -130,14 +132,12 @@ module GraphValidation =
         | Some nodeKey -> issues.Add(issue $"WF8: cycle detected in project edges near '{nodeKey}'.")
         | None -> ()
 
-        for kv in graph.FileOwnership do
-            let filePath, ownerId = kv.Key, kv.Value
-
-            match graph |> SolutionGraph.tryFindProject ownerId with
+        for _, meta in Map.toSeq registry do
+            match graph |> SolutionGraph.tryFindProject meta.Owner with
             | None ->
                 issues.Add(
                     issue
-                        $"File ownership for '{filePath}' references missing project '{ProjectId.value ownerId}'."
+                        $"Document '{meta.Path.Value}' references missing project '{ProjectId.value meta.Owner}'."
                 )
             | Some _ -> ()
 

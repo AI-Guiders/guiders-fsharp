@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 open System.IO
 open Xunit
+open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
 
 type DotNetSlnxGraphPortTests() =
@@ -52,23 +53,31 @@ type DotNetSlnxGraphPortTests() =
         root
 
     [<Fact>]
-    member _.``Slnx port builds graph with E_proj and omega``() =
+    member _.``Slnx port builds graph with E_proj and document ownership``() =
         let root = createWorkspace ()
 
         try
             let slnx = Path.Combine(root, "Mixed.slnx")
             let graph = DotNetSlnxGraphPort.load slnx
+            let ownership = DotNetSlnxGraphPort.loadDocumentOwnership slnx
 
             Assert.Equal(2, graph.Projects.Length)
             Assert.Equal(1, graph.ProjectEdges.Length)
 
-            let result = GraphValidation.validate graph
-            Assert.True(result.IsValid, result.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
+            let registry =
+                ownership
+                |> Map.toList
+                |> List.map (fun (path, _) -> path, "")
+                |> fun paths -> DocumentRegistryOps.bootstrap paths ownership 0L
+                |> fun b -> b.Registry
+
+            let validation = GraphValidation.validate graph registry
+            Assert.True(validation.IsValid, validation.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
 
             let cs = Path.Combine(root, "app", "App.cs")
             let fs = Path.Combine(root, "lib", "Lib.fs")
-            Assert.True(Map.containsKey cs graph.FileOwnership)
-            Assert.True(Map.containsKey fs graph.FileOwnership)
+            Assert.True(Map.containsKey cs ownership)
+            Assert.True(Map.containsKey fs ownership)
         finally
             Directory.Delete(root, recursive = true)
 

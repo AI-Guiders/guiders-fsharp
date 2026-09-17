@@ -1,15 +1,21 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open Xunit
+open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 type SessionPatchTests() =
 
     [<Fact>]
     member _.``Rename patch scope is FileChange``() =
+        let owner = ProjectId.create @"D:\repo\App.fsproj"
+        let boot = SessionTestFixtures.bootstrap (Map.ofList [ "a.fs", owner ]) [ "a.fs", "let foo = 1" ]
+
         let patch =
             RefactorPlan.planRename
-                (Map.ofList [ "a.fs", "let foo = 1" ])
+                boot.Registry
+                boot.Contents
                 { OldName = "foo"; NewName = "bar"; Files = [ "a.fs" ] }
 
         Assert.Equal(FileChange, SessionPatch.scope patch)
@@ -30,27 +36,31 @@ type SessionPatchTests() =
         Assert.Equal(ProjectFileCrud, SessionPatch.scope patch)
 
     [<Fact>]
-    member _.``Move path transfers omega and contents``() =
+    member _.``Move path transfers registry path and contents``() =
         let owner = ProjectId.create @"D:\repo\App.fsproj"
         let oldPath = @"D:\repo\Module.fs"
         let newPath = @"D:\repo\Renamed.fs"
 
-        let graph =
-            SolutionGraph.create
-                @"D:\repo\App.slnx"
-                []
-                (Map.ofList [ oldPath, owner ])
-                []
-                []
+        let graph, ownership =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [] (Map.ofList [ oldPath, owner ]) [] []
 
-        let contents = Map.ofList [ oldPath, "module App" ]
+        let boot = SessionTestFixtures.bootstrap ownership [ oldPath, "module App" ]
         let patch = RefactorPlan.planMovePath { From = oldPath; To = newPath }
 
-        let graph', contents' = SessionPatch.apply graph contents patch
+        let _, registry', contents', _ =
+            SessionPatch.apply graph boot.Registry boot.Contents 0L patch
 
-        Assert.False(Map.containsKey oldPath graph'.FileOwnership)
-        Assert.Equal(Some owner, Map.tryFind newPath graph'.FileOwnership)
-        Assert.Equal("module App", Map.find newPath contents')
+        Assert.True(
+            DocumentRegistryOps.resolvePath (LogicalPath.Create oldPath) registry'
+            |> Option.isNone
+        )
+
+        match DocumentRegistryOps.resolvePath (LogicalPath.Create newPath) registry' with
+        | None -> Assert.Fail("Expected renamed document in registry")
+        | Some docId ->
+            match Map.tryFind docId contents' with
+            | Some (DocumentText text) -> Assert.Equal("module App", text)
+            | None -> Assert.Fail("Expected contents at renamed doc id")
 
     [<Fact>]
     member _.``Project metadata patch scope is ProjectCrud``() =

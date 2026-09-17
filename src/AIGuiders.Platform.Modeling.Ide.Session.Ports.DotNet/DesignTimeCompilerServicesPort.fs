@@ -7,7 +7,7 @@ module DesignTimeCompilerServicesPort =
     let materialize (runtime: SessionRuntime) (filePath: string) : CompilerServicesEnsureResult =
         let graph = runtime.Session.Graph
 
-        match CompilerServicesMaterialization.tryResolveProjectId graph filePath with
+        match CompilerServicesMaterialization.tryResolveProjectId runtime.Registry filePath with
         | None -> Failed "file_not_owned_by_session_graph"
         | Some projectId ->
             match SolutionGraph.tryFindProject projectId graph with
@@ -22,6 +22,7 @@ module DesignTimeCompilerServicesPort =
                         FrozenSnapshot.freezeTree
                             revision
                             graph
+                            runtime.Registry
                             runtime.Contents
                             (ProjClosure projectId)
 

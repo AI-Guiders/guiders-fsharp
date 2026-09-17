@@ -1,6 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open Xunit
+open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
 
 module GoldenSessions =
@@ -16,19 +17,16 @@ module GoldenSessions =
                 projectPath
                 (CapabilityCatalog.defaultDotNet ())
 
-        let graph =
-            SolutionGraph.create
-                @"D:\repo\App.slnx"
-                [ project ]
-                (Map.ofList [ sourcePath, id ])
-                []
-                []
+        let ownership = Map.ofList [ sourcePath, id ]
+
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
 
         let contents =
             Map.ofList
                 [ sourcePath, "module App\n\nlet foo = 1\nlet twice x = x + x\n" ]
 
-        GoldenSession.create "rename-local-symbol" graph contents DesignTime
+        GoldenSession.create "rename-local-symbol" graph ownership contents DesignTime
 
     let moveTypeToFile =
         let projectPath = @"D:\repo\src\App\App.fsproj"
@@ -43,20 +41,17 @@ module GoldenSessions =
                 projectPath
                 (CapabilityCatalog.defaultDotNet ())
 
-        let graph =
-            SolutionGraph.create
-                @"D:\repo\App.slnx"
-                [ project ]
-                (Map.ofList [ sourcePath, id ])
-                []
-                []
+        let ownership = Map.ofList [ sourcePath, id ]
+
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ project ] ownership [] []
 
         let contents =
             Map.ofList
                 [ sourcePath,
                   "module App\n\ntype Foo = { X: int }\n\nlet useFoo () = Foo { X = 1 }\n" ]
 
-        GoldenSession.create "move-type-to-file" graph contents DesignTime
+        GoldenSession.create "move-type-to-file" graph ownership contents DesignTime
 
 type ConformanceGoldenSessionTests() =
 
@@ -95,7 +90,7 @@ type ConformanceGoldenSessionTests() =
         | Satisfied -> Assert.Fail("Expected Q_types violation when typecheck not run.")
 
     [<Fact>]
-    member _.``Move type plan satisfies RF6 and updates omega``() =
+    member _.``Move type plan satisfies RF6 and updates registry``() =
         let session = GoldenSessions.moveTypeToFile
         let sourcePath = @"D:\repo\src\App\Module.fs"
         let targetPath = @"D:\repo\src\App\Foo.fs"
@@ -123,10 +118,18 @@ type ConformanceGoldenSessionTests() =
                       UpdatedSourceContents = "module App\n\nlet useFoo () = Foo { X = 1 }\n"
                       ExtractedContents = "module App\n\ntype Foo = { X: int }\n" }
 
-            let graph', _ = SessionPatch.apply session.Graph session.Contents patch
-            Assert.True(Map.containsKey targetPath graph'.FileOwnership)
+            let boot =
+                SessionTestFixtures.bootstrap session.Ownership (Map.toList session.Contents)
 
-            let validation = GraphValidation.validate graph'
+            let graph', registry', _, _ =
+                SessionPatch.apply session.Graph boot.Registry boot.Contents boot.NextCounter patch
+
+            Assert.True(
+                DocumentRegistryOps.resolvePath (LogicalPath.Create targetPath) registry'
+                |> Option.isSome
+            )
+
+            let validation = GraphValidation.validate graph' registry'
             Assert.True(validation.IsValid, validation.Issues |> List.map (fun i -> i.Message) |> String.concat "; ")
         | Violated vs -> Assert.Fail(String.concat "; " vs)
 

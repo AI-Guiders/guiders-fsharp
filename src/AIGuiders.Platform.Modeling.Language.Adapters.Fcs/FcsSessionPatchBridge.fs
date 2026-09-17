@@ -5,6 +5,9 @@ open System.IO
 open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 open AIGuiders.Platform.Modeling.Language
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
 
 /// <summary>Map FCS semantic edits into federation <c>SessionPatch</c> (Δ_fs writes @ θ_rename).</summary>
 module FcsSessionPatchBridge =
@@ -28,13 +31,8 @@ module FcsSessionPatchBridge =
         |> List.map (fun (path, text) -> { Path = path; NewText = text })
         |> List.toArray
 
-    let private mergeSourceOverrides (contents: Map<string, string>) (overrides: Map<string, string>) =
-        overrides
-        |> Map.fold (fun acc path text -> Map.add (normalizePath path) text acc) contents
-
-    /// Host IO for adapter callers until Execution wires patch apply (slice A seam).
-    let hostLoadContentsFromDisk (graph: SolutionGraph) =
-        graph.FileOwnership
+    let hostLoadContentsFromDisk (ownership: Map<string, ProjectId>) =
+        ownership
         |> Map.keys
         |> Seq.choose (fun path ->
             if File.Exists path then
@@ -43,44 +41,44 @@ module FcsSessionPatchBridge =
                 None)
         |> Map.ofSeq
 
-    let private flushWrites (patch: SessionPatch) (contents: Map<string, string>) =
+    let private flushWrites (patch: SessionPatch) (registry: DocumentRegistry) (contents: Map<DocId, DocumentText>) =
         for path, _ in patch.FileSystem.Writes do
-            let full = normalizePath path
-
-            match Map.tryFind full contents with
-            | Some text -> File.WriteAllText(full, text)
-            | None ->
-                match
-                    contents
-                    |> Map.tryFindKey (fun key _ ->
-                        String.Equals(normalizePath key, full, StringComparison.OrdinalIgnoreCase))
-                with
-                | Some key -> File.WriteAllText(normalizePath key, contents.[key])
+            match DocumentRegistryOps.resolvePath (LogicalPath.Create path) registry with
+            | None -> ()
+            | Some docId ->
+                match Map.tryFind docId contents with
+                | Some (DocumentText text) -> File.WriteAllText(normalizePath path, text)
                 | None -> ()
 
-    /// Apply Δ through <c>SessionOrchestrator</c>; disk read via host <paramref name="loadContents" />.
-    let tryApplyPatch
-        (anchorPath: string)
-        (patch: SessionPatch)
-        (sourceOverrides: Map<string, string>)
-        (loadContents: SolutionGraph -> Map<string, string>)
-        : Result<unit, string> =
+    /// Apply Δ through <c>SessionOrchestrator</c>; disk read via slnx document ownership.
+    let tryApplyPatch (anchorPath: string) (patch: SessionPatch) (sourceOverrides: Map<string, string>) : Result<unit, string> =
         if List.isEmpty patch.FileSystem.Writes && List.isEmpty patch.FileSystem.Replacements then
             Ok()
         elif String.IsNullOrWhiteSpace anchorPath || not (File.Exists anchorPath) then
             Result.Error "apply requires solution_or_project_path for SessionOrchestrator."
         else
             try
+                let ownership = DotNetSlnxGraphPort.loadDocumentOwnership anchorPath
+
+                let pathContents =
+                    ownership
+                    |> Map.toSeq
+                    |> Seq.map (fun (path, _) ->
+                        let text =
+                            match Map.tryFind path sourceOverrides with
+                            | Some t -> t
+                            | None when File.Exists path -> File.ReadAllText path
+                            | _ -> ""
+
+                        path, text)
+
                 let session = DotNetSlnxGraphPort.loadSession anchorPath
-                let graph = session.Graph
-                let baseContents = loadContents graph
-                let contents = mergeSourceOverrides baseContents sourceOverrides
-                let runtime = SessionOrchestrator.create session contents
+                let runtime = SessionOrchestrator.create session pathContents ownership
 
                 match SessionOrchestrator.applyPatch runtime patch { Commit = None } with
                 | PatchRejected reasons -> Result.Error(String.concat "; " reasons)
                 | PatchApplied applied ->
-                    flushWrites patch applied.Contents
+                    flushWrites patch applied.Registry applied.Contents
                     Ok()
             with ex ->
                 Result.Error ex.Message

@@ -89,11 +89,11 @@ type GraphNodeId =
     | CapabilityNode of ProjectId * CapabilityKind
 
 module GraphNodeId =
-    let project (ProjectId _ as pid) = ProjectNode pid
+    let project pid = ProjectNode pid
 
     let capability pid kind = CapabilityNode(pid, kind)
 
     let key =
         function
-        | ProjectNode(ProjectId id) -> $"p:{id}"
-        | CapabilityNode(ProjectId pid, kind) -> $"c:{pid}:{CapabilityKind.id kind}"
+        | ProjectNode pid -> $"p:{ProjectId.value pid}"
+        | CapabilityNode(pid, kind) -> $"c:{ProjectId.value pid}:{CapabilityKind.id kind}"

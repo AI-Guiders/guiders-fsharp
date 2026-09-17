@@ -72,7 +72,7 @@ module CommitRef =
     let mint = Identity.mint
     let carrier = Identity.carrier
 
-[<Struct; CustomEquality; NoComparison>]
+[<CustomEquality; CustomComparison>]
 type ProjectId =
     | ProjectId of path: LogicalPath
 
@@ -88,9 +88,23 @@ type ProjectId =
         let (ProjectId p) = this
         StringComparer.OrdinalIgnoreCase.GetHashCode(p.Value)
 
+    interface System.IComparable with
+        member this.CompareTo(other: obj) =
+            match other with
+            | :? ProjectId as otherId ->
+                ProjectId.Comparison(this, otherId)
+            | _ -> invalidArg "other" "not a ProjectId"
+
+    static member Comparison((ProjectId left), (ProjectId right)) =
+        String.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase)
+
 module ProjectId =
     let create path = ProjectId path
     let path (ProjectId p) = p
+
+    /// Absolute filesystem path → normalized logical project id (session bootstrap).
+    let fromAbsolute (absolutePath: string) =
+        ProjectId(LogicalPath.Create(System.IO.Path.GetFullPath absolutePath))
 
 type GitPin = { Commit: CommitRef option }
 

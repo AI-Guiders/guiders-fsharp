@@ -50,14 +50,14 @@ module FcsProjectResolver =
 
         walk startDir
 
-    let private tryOwnerProjectPath (graph: SolutionGraph) (filePath: string) =
+    let private tryOwnerProjectPath (ownership: Map<string, ProjectId>) (graph: SolutionGraph) (filePath: string) =
         let full = normalizePath filePath
 
         let ownerId =
-            match Map.tryFind full graph.FileOwnership with
+            match Map.tryFind full ownership with
             | Some id -> Some id
             | None ->
-                graph.FileOwnership
+                ownership
                 |> Map.tryPick (fun ownedPath owner ->
                     if String.Equals(normalizePath ownedPath, full, StringComparison.OrdinalIgnoreCase) then
                         Some owner
@@ -74,7 +74,8 @@ module FcsProjectResolver =
         else
             try
                 let graph = DotNetSlnxGraphPort.load anchorPath
-                tryOwnerProjectPath graph filePath
+                let ownership = DotNetSlnxGraphPort.loadDocumentOwnership anchorPath
+                tryOwnerProjectPath ownership graph filePath
             with _ ->
                 None
 

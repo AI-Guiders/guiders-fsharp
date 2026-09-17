@@ -1,5 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Paths
+
 type SessionEdgeKind =
     | Requires
     | Invalidates
@@ -25,9 +27,8 @@ module SessionPolicy =
           EvictOnClose = true }
 
 type SolutionGraph =
-    { AnchorPath: string
+    { Anchor: LogicalPath
       Projects: ProjectNode list
-      FileOwnership: Map<string, ProjectId>
       ProjectEdges: ProjectEdge list
       Edges: SessionEdge list }
 
@@ -37,7 +38,7 @@ type SolutionSession =
       Policy: SessionPolicy }
 
 module SolutionSession =
-    let create anchorPath graph =
+    let create (anchor: LogicalPath) graph =
         { Graph = graph
           Phase = Unloaded
           Policy = SessionPolicy.defaultPolicy }
@@ -45,10 +46,9 @@ module SolutionSession =
     let withPhase phase (session: SolutionSession) = { session with Phase = phase }
 
 module SolutionGraph =
-    let create anchorPath projects fileOwnership edges projectEdges =
-        { AnchorPath = anchorPath
+    let create (anchor: LogicalPath) projects projectEdges edges =
+        { Anchor = anchor
           Projects = projects
-          FileOwnership = fileOwnership
           ProjectEdges = projectEdges
           Edges = edges }
 

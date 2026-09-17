@@ -12,11 +12,9 @@ module WorkspaceViewPort =
         | Gdl _ -> "gdl"
         | Planet { LanguageId = lid } -> lid
 
-
-
-    let private contentsUnion (frozen: FrozenTreeSnapshot) =
+    let private documentsUnion (frozen: FrozenTreeSnapshot) =
         frozen.Projects
-        |> List.fold (fun acc snap -> Map.fold (fun m k v -> Map.add k v m) acc snap.Contents) Map.empty
+        |> List.fold (fun acc snap -> Map.fold (fun m k v -> Map.add k v m) acc snap.Documents) Map.empty
 
     let emit (graph: SolutionGraph) (rootProjectId: ProjectId) (frozen: FrozenTreeSnapshot) : WorkspaceView =
         let projects =
@@ -30,8 +28,8 @@ module WorkspaceViewPort =
                       CompileFiles = [] }))
 
         { Revision = frozen.Revision
-          AnchorPath = graph.AnchorPath
+          Anchor = graph.Anchor
           Mode = frozen.Mode
           RootProjectId = rootProjectId
           Projects = projects
-          Contents = contentsUnion frozen }
+          Documents = documentsUnion frozen }

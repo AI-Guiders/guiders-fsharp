@@ -41,6 +41,9 @@ type SurfaceVersion = SurfaceVersion of value: int64
 
 type DocumentText = DocumentText of text: string
 
+module DocumentText =
+    let value (DocumentText t) = t
+
 type DocumentMeta =
     { Path: LogicalPath
       Owner: ProjectId

@@ -1,7 +1,9 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open Xunit
+open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 type InvalidationScopeTests() =
 
@@ -35,15 +37,15 @@ type GraphValidationWfTests() =
         let fromCap = GraphNodeId.capability fs.Id CompilerServices
         let toCap = GraphNodeId.capability cs.Id Build
 
-        let graph =
-            SolutionGraph.create
+        let graph, _ =
+            SessionTestFixtures.createGraph
                 @"D:\repo\App.slnx"
                 [ fs; cs ]
                 Map.empty
                 [ { From = fromCap; To = toCap; Kind = Requires; Attributes = Map.empty } ]
                 []
 
-        let result = GraphValidation.validate graph
+        let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
         Assert.Contains(result.Issues, fun i -> i.Message.Contains("WF7"))
 
@@ -58,8 +60,8 @@ type GraphValidationWfTests() =
         let pb =
             ProjectNode.create b (DotNet { Language = FSharp }) (ProjectId.value b) (CapabilityCatalog.defaultDotNet ())
 
-        let graph =
-            SolutionGraph.create
+        let graph, _ =
+            SessionTestFixtures.createGraph
                 @"D:\repo\App.slnx"
                 [ pa; pb ]
                 Map.empty
@@ -67,7 +69,7 @@ type GraphValidationWfTests() =
                 [ { From = a; To = b }
                   { From = b; To = a } ]
 
-        let result = GraphValidation.validate graph
+        let result = GraphValidation.validate graph Map.empty
         Assert.False(result.IsValid)
         Assert.Contains(result.Issues, fun i -> i.Message.Contains("WF8"))
 
@@ -86,21 +88,20 @@ module InvalidationTestFixtures =
         let libProject =
             ProjectNode.create libId (DotNet { Language = FSharp }) libPath (CapabilityCatalog.defaultDotNet ())
 
-        let graph =
-            SolutionGraph.create
-                @"D:\repo\App.slnx"
-                [ appProject; libProject ]
-                (Map.ofList [ appSource, appId; libSource, libId ])
-                []
-                []
+        let ownership = Map.ofList [ appSource, appId; libSource, libId ]
 
-        graph, appId, libId, appSource, libSource
+        let graph, _ =
+            SessionTestFixtures.createGraph @"D:\repo\App.slnx" [ appProject; libProject ] ownership [] []
+
+        let registry = SessionTestFixtures.registryForOwnership ownership
+
+        graph, registry, appId, libId, appSource, libSource
 
 type MaterializedInvalidationTests() =
 
     [<Fact>]
     member _.``ProjectFileCrud marks compiler stale without evicting other projects``() =
-        let graph, appId, libId, appSource, _ = InvalidationTestFixtures.twoProjectGraph ()
+        let graph, registry, appId, libId, appSource, _ = InvalidationTestFixtures.twoProjectGraph ()
 
         let state =
             MaterializedState.empty
@@ -114,7 +115,7 @@ type MaterializedInvalidationTests() =
                         Writes = [ (appSource, "let x = 1") ] } }
 
         let result =
-            MaterializedState.Invalidation.forScope (ProjectFileCrud) (graph) (patch) (state)
+            MaterializedState.Invalidation.forScope ProjectFileCrud graph registry patch state
 
         Assert.Equal(2, result.Entries.Count)
 
@@ -128,7 +129,7 @@ type MaterializedInvalidationTests() =
 
     [<Fact>]
     member _.``ProjectCrud evicts only affected project subtree``() =
-        let graph, appId, libId, _, _ = InvalidationTestFixtures.twoProjectGraph ()
+        let graph, registry, appId, libId, _, _ = InvalidationTestFixtures.twoProjectGraph ()
 
         let state =
             MaterializedState.empty
@@ -145,14 +146,14 @@ type MaterializedInvalidationTests() =
                 Graph = { GraphStructurePatch.empty with ProjectMetadataUpdates = [ updatedApp ] } }
 
         let result =
-            MaterializedState.Invalidation.forScope (ProjectCrud) (graph) (patch) (state)
+            MaterializedState.Invalidation.forScope ProjectCrud graph registry patch state
 
         Assert.False(Map.containsKey (GraphNodeId.capability appId CompilerServices) result.Entries)
         Assert.True(Map.containsKey (GraphNodeId.capability libId Build) result.Entries)
 
     [<Fact>]
     member _.``SolutionProjectCrud evicts removed project only``() =
-        let graph, appId, libId, _, _ = InvalidationTestFixtures.twoProjectGraph ()
+        let graph, registry, appId, libId, _, _ = InvalidationTestFixtures.twoProjectGraph ()
 
         let state =
             MaterializedState.empty
@@ -164,7 +165,7 @@ type MaterializedInvalidationTests() =
                 Graph = { GraphStructurePatch.empty with ProjectsRemoved = [ appId ] } }
 
         let result =
-            MaterializedState.Invalidation.forScope (SolutionProjectCrud) (graph) (patch) (state)
+            MaterializedState.Invalidation.forScope SolutionProjectCrud graph registry patch state
 
         Assert.False(Map.containsKey (GraphNodeId.capability appId CompilerServices) result.Entries)
         Assert.True(Map.containsKey (GraphNodeId.capability libId Build) result.Entries)

@@ -1,6 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.Paths
 
 module DotNetSlnxGraphPort =
     open System.IO
@@ -41,7 +42,7 @@ module DotNetSlnxGraphPort =
                         { From = ProjectId.create entry.AbsolutePath
                           To = toId }))
 
-    let buildFileOwnership (entries: DotNetProjectEntry list) =
+    let buildDocumentOwnership (entries: DotNetProjectEntry list) =
         entries
         |> List.collect (fun entry ->
             let owner = ProjectId.create entry.AbsolutePath
@@ -50,19 +51,40 @@ module DotNetSlnxGraphPort =
             |> List.map (fun source -> source, owner))
         |> List.fold (fun acc (source, owner) -> Map.add source owner acc) Map.empty
 
-    /// <summary>Parse slnx/sln/csproj/fsproj anchor into federation <c>SolutionGraph</c>.</summary>
+    /// <summary>Parse slnx/sln/csproj/fsproj anchor into federation topology graph (ω lives on runtime registry).</summary>
     let load (anchorPath: string) : SolutionGraph =
         let parsed = DotNetWorkspace.Load anchorPath
         let entries = parsed.Projects |> Seq.toList
 
         let projects = buildProjectNodes entries
         let projectEdges = buildProjectEdges entries
-        let ownership = buildFileOwnership entries
 
-        SolutionGraph.create parsed.SolutionPath projects ownership [] projectEdges
+        SolutionGraph.create (LogicalPath.Create parsed.SolutionPath) projects projectEdges []
+
+    let loadDocumentOwnership (anchorPath: string) : Map<string, ProjectId> =
+        let parsed = DotNetWorkspace.Load anchorPath
+        buildDocumentOwnership (parsed.Projects |> Seq.toList)
 
     let loadSession (anchorPath: string) : SolutionSession =
         let graph = load anchorPath
 
-        SolutionSession.create graph.AnchorPath graph
+        SolutionSession.create graph.Anchor graph
         |> SolutionSession.withPhase DesignTime
+
+    let loadRuntime (anchorPath: string) (sourceOverrides: Map<string, string>) : SessionRuntime =
+        let session = loadSession anchorPath
+        let ownership = loadDocumentOwnership anchorPath
+
+        let pathContents =
+            ownership
+            |> Map.toSeq
+            |> Seq.map (fun (path, _) ->
+                let text =
+                    match Map.tryFind path sourceOverrides with
+                    | Some t -> t
+                    | None when File.Exists path -> File.ReadAllText path
+                    | _ -> ""
+
+                path, text)
+
+        SessionOrchestrator.create session pathContents ownership

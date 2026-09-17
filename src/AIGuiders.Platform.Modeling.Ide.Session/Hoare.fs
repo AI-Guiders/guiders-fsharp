@@ -1,5 +1,9 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
+
 /// <summary>Result of a semantic / typecheck gate (port-provided in production).</summary>
 type TypecheckVerdict =
     | Passed
@@ -50,6 +54,11 @@ type SatResult =
     | Violated of violations: string list
 
 module ObsChecker =
+    let private pathKey (path: string) = LogicalPath.Create(path).Value
+
+    let private tryFindPath (path: string) (contents: Map<string, string>) =
+        Map.tryFind (pathKey path) contents
+
     let private checkRename (oldName: string) (newName: string) (contents: Map<string, string>) =
         let violations = ResizeArray()
 
@@ -80,12 +89,12 @@ module ObsChecker =
         let marker = typeDeclarationMarker typeName
         let violations = ResizeArray()
 
-        match Map.tryFind sourcePath contents with
+        match tryFindPath sourcePath contents with
         | Some text when text.Contains marker ->
             violations.Add($"TypeMoved: '{marker}' still present in source '{sourcePath}'.")
         | _ -> ()
 
-        match Map.tryFind targetPath contents with
+        match tryFindPath targetPath contents with
         | None -> violations.Add($"TypeMoved: target '{targetPath}' missing from contents.")
         | Some text when not (text.Contains marker) ->
             violations.Add($"TypeMoved: '{marker}' not found in target '{targetPath}'.")
@@ -112,6 +121,14 @@ module ObsChecker =
             if List.isEmpty violations then Satisfied else Violated violations
 
 module HoareChecker =
+    let private contentsByPath (registry: DocumentRegistry) (contents: Map<DocId, DocumentText>) =
+        registry
+        |> Map.toList
+        |> List.choose (fun (docId, meta) ->
+            Map.tryFind docId contents
+            |> Option.map (fun (DocumentText text) -> meta.Path.Value, text))
+        |> Map.ofList
+
     let private satTypes (requirement: TypecheckRequirement) (verdict: TypecheckVerdict) =
         match requirement, verdict with
         | TypesNotRequired, _ -> Satisfied
@@ -120,15 +137,15 @@ module HoareChecker =
         | TypesRequired, NotRun -> Violated [ "Q_types: typecheck required but not run (ST5)." ]
         | TypesRequired, Failed errs -> Violated([ "Q_types: typecheck failed." ] @ errs)
 
-    let satGraph (graph: SolutionGraph) =
-        let result = GraphValidation.validate graph
+    let satGraph (graph: SolutionGraph) (registry: DocumentRegistry) =
+        let result = GraphValidation.validate graph registry
 
         if result.IsValid then
             Satisfied
         else
             Violated(result.Issues |> List.map (fun i -> $"Q_wf: {i.Message}"))
 
-    let satPre (pre: HoarePrecondition) (sessionPhase: LifecyclePhase) (graph: SolutionGraph) =
+    let satPre (pre: HoarePrecondition) (sessionPhase: LifecyclePhase) (graph: SolutionGraph) (registry: DocumentRegistry) =
         let violations = ResizeArray()
 
         if not (LifecyclePhase.canAdvanceTo sessionPhase pre.MinPhase) then
@@ -137,7 +154,7 @@ module HoareChecker =
             )
 
         if pre.RequireGraphValid then
-            match satGraph graph with
+            match satGraph graph registry with
             | Satisfied -> ()
             | Violated vs -> vs |> List.iter violations.Add
 
@@ -146,11 +163,12 @@ module HoareChecker =
     let sat
         (post: HoarePostcondition)
         (graph: SolutionGraph)
+        (registry: DocumentRegistry)
         (contents: Map<string, string>)
         (typecheck: TypecheckVerdict)
         =
         let parts =
-            [ satGraph graph
+            [ satGraph graph registry
               satTypes post.Types typecheck
               ObsChecker.check post.Obs contents ]
 
@@ -168,23 +186,29 @@ module HoareChecker =
         (pre: HoarePrecondition)
         (sessionPhase: LifecyclePhase)
         (graph: SolutionGraph)
+        (ownership: Map<string, ProjectId>)
         (contents: Map<string, string>)
         (post: HoarePostcondition)
         (patch: SessionPatch)
         (typecheckAfter: TypecheckVerdict)
         =
-        match satPre pre sessionPhase graph with
+        let boot = DocumentRegistryOps.bootstrap (Map.toList contents) ownership 0L
+
+        match satPre pre sessionPhase graph boot.Registry with
         | Violated _ as v -> v
         | Satisfied ->
-            match satGraph graph with
+            match satGraph graph boot.Registry with
             | Violated _ as v -> v
             | Satisfied ->
-                let graph', contents' = SessionPatch.apply graph contents patch
+                let graph', registry', contents', _ =
+                    SessionPatch.apply graph boot.Registry boot.Contents boot.NextCounter patch
+
+                let contents'ByPath = contentsByPath registry' contents'
 
                 let parts =
-                    [ satGraph graph'
+                    [ satGraph graph' registry'
                       satTypes post.Types typecheckAfter
-                      ObsChecker.check post.Obs contents' ]
+                      ObsChecker.check post.Obs contents'ByPath ]
 
                 let violations =
                     parts

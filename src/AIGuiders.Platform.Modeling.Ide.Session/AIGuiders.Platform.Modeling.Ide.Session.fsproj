@@ -7,7 +7,13 @@
     <PackageId>AIGuiders.Platform.Modeling.Ide.Session</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Identifiers.fs" />
+    <Compile Include="DocumentRegistryOps.fs" />
     <Compile Include="Lifecycle.fs" />
     <Compile Include="InvalidationScope.fs" />
     <Compile Include="Topology.fs" />

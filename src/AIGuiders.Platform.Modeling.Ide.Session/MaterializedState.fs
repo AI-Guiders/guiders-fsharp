@@ -1,5 +1,9 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
+
 type MaterializedCapability =
     { Node: GraphNodeId
       Revision: int64
@@ -26,10 +30,8 @@ module MaterializedState =
     let evict (node: GraphNodeId) (state: MaterializedState) =
         { state with Entries = Map.remove node state.Entries }
 
-    /// §5.2 + I6: FileChange does not evict M; coarser scopes evict affected capabilities.
-    /// based on adr: docs/math/ide-session/02-invalidation.md §5.2 I1, I4, I6
     module Invalidation =
-        let private affectedProjectsFromFilePatch (patch: SessionPatch) (graph: SolutionGraph) =
+        let private affectedProjectsFromFilePatch (patch: SessionPatch) (registry: DocumentRegistry) =
             let paths =
                 [ yield! patch.FileSystem.Writes |> List.map fst
                   yield! patch.FileSystem.Deletes
@@ -38,10 +40,10 @@ module MaterializedState =
                       yield oldPath
                       yield newPath
 
-                  yield! patch.Graph.FileOwnershipUpdates |> List.map fst ]
+                  yield! patch.Graph.DocumentAssignments |> List.map fst ]
 
             paths
-            |> List.choose (fun path -> Map.tryFind path graph.FileOwnership)
+            |> List.choose (fun path -> DocumentRegistryOps.ownerOfPath path registry)
             |> List.distinct
 
         let private subtreeNodeIds (graph: SolutionGraph) (projectId: ProjectId) =
@@ -64,11 +66,17 @@ module MaterializedState =
         let private markCompilerServicesStale (projectId: ProjectId) (state: MaterializedState) =
             state |> markStale (GraphNodeId.capability projectId CompilerServices)
 
-        let forScope (scope: InvalidationScope) (graph: SolutionGraph) (patch: SessionPatch) (state: MaterializedState) =
+        let forScope
+            (scope: InvalidationScope)
+            (graph: SolutionGraph)
+            (registry: DocumentRegistry)
+            (patch: SessionPatch)
+            (state: MaterializedState)
+            =
             match scope with
             | FileChange -> state
             | ProjectFileCrud ->
-                (state, affectedProjectsFromFilePatch patch graph)
+                (state, affectedProjectsFromFilePatch patch registry)
                 ||> List.fold (fun acc projectId -> markCompilerServicesStale projectId acc)
             | ProjectCrud ->
                 (state,

@@ -1,5 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+open AIGuiders.Platform.Modeling.Paths
+
 /// Reader-port feeding the SolutionGraph IR from any source
 /// (msbuild slnx/sln/csproj, file graph, ...).
 /// Contract shape sealed by operator: { Name, Fingerprint, Entries, Relations }.
@@ -17,20 +19,11 @@ type ISolutionInfoProvider =
     abstract Relations: unit -> ProjectEdge list
 
 module SolutionProviders =
-    /// File → owner map assembled from provider entries.
-    let fileOwnership (entries: ProjectNode list) : Map<string, ProjectId> =
-        entries |> List.map (fun p -> p.AbsolutePath, p.Id) |> Map.ofList
-
-    /// Assemble the SolutionGraph from provider output (no semantic session edges).
+    /// Assemble topology graph from provider output (ω lives on SessionRuntime registry).
     let toGraph (anchorPath: string) (provider: ISolutionInfoProvider) : SolutionGraph =
         let entries = provider.Entries ()
 
-        SolutionGraph.create
-            anchorPath
-            entries
-            (fileOwnership entries)
-            []
-            (provider.Relations ())
+        SolutionGraph.create (LogicalPath.Create anchorPath) entries (provider.Relations ()) []
 
 /// Plugin-style provider catalog (ADR-0210 stage 1): the core knows only
 /// the contract + this registry; provider assemblies self-register.

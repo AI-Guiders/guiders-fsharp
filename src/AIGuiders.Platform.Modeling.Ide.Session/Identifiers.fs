@@ -1,10 +1,15 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
-/// <summary>Stable project identity within a session graph.</summary>
-[<Struct; StructuralEquality; StructuralComparison>]
-type ProjectId = ProjectId of string
+open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.Paths
+
+module CoreProjectId = AIGuiders.Platform.Modeling.Core.Identity.ProjectId
+
+/// Session project id — thin alias over Core.Identity (plan §2.4).
+type ProjectId = AIGuiders.Platform.Modeling.Core.Identity.ProjectId
 
 module ProjectId =
-    let value (ProjectId id) = id
-
-    let create path = ProjectId(System.IO.Path.GetFullPath path)
+    let create (absolutePath: string) = CoreProjectId.fromAbsolute absolutePath
+    let fromLogical path = CoreProjectId.create path
+    let path (ProjectId p) = p
+    let value (ProjectId p) = p.Value

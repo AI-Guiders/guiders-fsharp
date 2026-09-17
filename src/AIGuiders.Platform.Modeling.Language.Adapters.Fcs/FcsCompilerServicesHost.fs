@@ -56,10 +56,10 @@ module FcsCompilerServicesHost =
     /// Query MSBuild once per F# project @ revision; freeze CompileFiles + FSharpProjectOptions.
     let materialize (view: WorkspaceView) =
         let key =
-            if String.IsNullOrWhiteSpace view.AnchorPath then
+            if String.IsNullOrWhiteSpace view.Anchor.Value then
                 ""
             else
-                view.AnchorPath.Trim()
+                view.Anchor.Value.Trim()
 
         let projects = view.Projects |> List.map materializeProject
         let enriched = { view with Projects = projects }

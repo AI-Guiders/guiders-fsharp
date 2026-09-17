@@ -2,6 +2,8 @@ namespace AIGuiders.Platform.Modeling.Ide.Session
 
 open System
 open System.IO
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
 
 /// <summary>Result of <c>EnsureCompilerServices</c> — topology comes from capability attributes on the graph.</summary>
 [<CLIMutable>]
@@ -25,18 +27,14 @@ module CompilerServicesMaterialization =
         else
             Path.GetFullPath path
 
-    let tryResolveProjectId (graph: SolutionGraph) (filePath: string) =
+    let tryResolveProjectId (registry: DocumentRegistry) (filePath: string) =
         let full = normalizePath filePath
 
-        match Map.tryFind full graph.FileOwnership with
-        | Some id -> Some id
-        | None ->
-            graph.FileOwnership
-            |> Map.tryPick (fun ownedPath owner ->
-                if String.Equals(normalizePath ownedPath, full, StringComparison.OrdinalIgnoreCase) then
-                    Some owner
-                else
-                    None)
+        registry
+        |> Map.toList
+        |> List.tryFind (fun (_, meta) ->
+            String.Equals(normalizePath meta.Path.Value, full, StringComparison.OrdinalIgnoreCase))
+        |> Option.map (fun (_, meta) -> meta.Owner)
 
     let languageIdForProject (project: ProjectNode) =
         match project.Kind with
@@ -45,8 +43,6 @@ module CompilerServicesMaterialization =
         | Node _ -> "typescript"
         | Gdl _ -> "gdl"
         | Planet { LanguageId = lid } -> lid
-
-
 
     let resolveTopology (attrs: CapabilityAttributes) =
         match attrs.Topology with
