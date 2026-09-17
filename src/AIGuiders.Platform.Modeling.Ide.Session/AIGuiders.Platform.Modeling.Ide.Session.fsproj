@@ -24,6 +24,7 @@
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="RelationGraph.fs" />
     <Compile Include="CorrespondenceRelationGraph.fs" />
+    <Compile Include="CorrespondenceMaterialize.fs" />
     <Compile Include="TypeSystemProfile.fs" />
     <Compile Include="SceneProjection.fs" />
     <Compile Include="SolutionGraph.fs" />

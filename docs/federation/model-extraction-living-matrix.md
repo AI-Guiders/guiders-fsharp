@@ -53,5 +53,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | ReverseAnchor bridge | `ReverseAnchorBridge.tryToDocToCodeWitness` | CRS Execution unchanged; witness for attach/materialize | **shipped** ship-33 |
 | Correspondence RelationType | `CorrespondenceRelationGraph` + `GraphNodeRef.AdrObligation` | sort laws for Documents/ImplementsObligation/VerifiedBy | **shipped** ship-34 |
 | R5 adapter registration | — | `RelationSeamRegistry` + `RoslynDependencyRelationEmitStub.RegisterDefaults` | **shipped** ship-34 |
+| ReverseAnchor materialize | `CorrespondenceMaterialize.tryMaterializeReverseAnchor` | witness → validated `Relation` in G | **shipped** ship-35 |
+| Roslyn E_dep ingest v1 | `CorrespondenceMaterialize.buildUses` | `RoslynDependencyRelationIngest` field-type Uses | **shipped** ship-35 |
 
-**Next waves:** Plan §10 Phase 1 checklist · Roslyn E_dep ingest · CLIMutable strip · full ReverseAnchor materialize.
+**Next waves:** Plan §10 Phase 1 checklist · session Contents ingest hook · CLIMutable strip · full CompilerServices E_dep.

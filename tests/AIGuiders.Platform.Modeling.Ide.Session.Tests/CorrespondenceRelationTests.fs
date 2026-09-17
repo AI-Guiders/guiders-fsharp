@@ -53,3 +53,39 @@ type CorrespondenceRelationTests() =
         match RelationGraph.validateRelation relation with
         | Ok () -> ()
         | Error e -> Assert.Fail e.Message
+
+    [<Fact>]
+    member _.``ReverseAnchor materializes validated doc to code relation``() =
+        let anchor =
+            { DocPath = "docs/adr/0063.md"
+              DocTitle = "ADR-0063"
+              Provenance = Provenance.Bracket
+              Kind = Kind.Normates
+              File = "src/Foo.cs"
+              LineStart = None
+              LineEnd = None
+              MemberKey = Some "Bar"
+              Wire = "[F:src/Foo.cs; M:Bar]"
+              DocLineHint = None
+              Excerpt = None }
+
+        match CorrespondenceMaterialize.tryMaterializeReverseAnchor anchor with
+        | Some relation ->
+            Assert.Equal(RelationType.Normates, relation.Type)
+            match relation.From, relation.To with
+            | GraphNodeRef.Document _, GraphNodeRef.Semantic _ -> ()
+            | _ -> Assert.Fail "expected document to semantic edge"
+        | None -> Assert.Fail "expected materialized relation"
+
+    [<Fact>]
+    member _.``buildUses validates semantic pair``() =
+        let doc = DocumentRef.File(LogicalPath.Create "src/App.cs")
+        let consumer = { Container = []; Name = "Consumer"; Arity = None }
+        let helper = { Container = []; Name = "Helper"; Arity = None }
+        let project = ProjectId.create @"D:\repo\App.csproj"
+
+        let relation = CorrespondenceMaterialize.buildUses doc consumer helper project
+
+        match RelationGraph.validateRelation relation with
+        | Ok () -> Assert.Equal(RelationType.Uses, relation.Type)
+        | Error e -> Assert.Fail e.Message
