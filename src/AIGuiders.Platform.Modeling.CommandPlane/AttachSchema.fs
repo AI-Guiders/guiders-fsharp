@@ -72,6 +72,8 @@ module AttachSchema =
         | "manual" -> Some Manual
         | _ -> None
 
+    let tryParseVerbWire (wire: string) = tryParseVerb wire
+
     let validateSpecVector (verb: string) (targetCase: string) (steps: string list) =
         match tryParseVerb verb with
         | None -> [ $"unknown attach verb \"{verb}\"" ]
@@ -92,6 +94,18 @@ module AttachSchema =
             List.ofSeq errors
 
 module AttachSchemaCatalog =
+    [<Literal>]
+    let VerbSuggestionId = "federation.attach.verb"
+
+    let verbWireName =
+        function
+        | AttachVerb.Error -> "error"
+        | AttachVerb.Issue -> "issue"
+        | AttachVerb.Document -> "document"
+        | AttachVerb.Code -> "code"
+        | AttachVerb.Nav -> "nav"
+        | AttachVerb.Manual -> "manual"
+
     let allVerbs =
         [ AttachVerb.Error
           AttachVerb.Issue

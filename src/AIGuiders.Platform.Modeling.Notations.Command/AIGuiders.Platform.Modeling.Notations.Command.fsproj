@@ -36,6 +36,8 @@
 
     <Compile Include="SurfaceRegistry.fs" />
 
+    <Compile Include="AttachInvocation.fs" />
+
   </ItemGroup>
 
   <ItemGroup>

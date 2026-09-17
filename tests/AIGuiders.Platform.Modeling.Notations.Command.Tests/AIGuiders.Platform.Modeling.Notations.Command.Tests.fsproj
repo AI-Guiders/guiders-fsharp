@@ -13,6 +13,7 @@
     <Compile Include="InvocationConformanceTests.fs" />
     <Compile Include="SurfaceRegistryTests.fs" />
     <Compile Include="InvocationStageTests.fs" />
+    <Compile Include="AttachInvocationTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Notations.Command\AIGuiders.Platform.Modeling.Notations.Command.fsproj" />

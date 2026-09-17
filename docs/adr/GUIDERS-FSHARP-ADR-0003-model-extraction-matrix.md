@@ -138,6 +138,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `CommandPlane.PrefixArmed` | M/E | prefix-arm match algebra in `Modeling.CommandPlane` ✓ (shapes; profiles/coordinator stay E) | armed state machine |
 | `CommandPlane.PrefixArmed.Locale` | M | locale date parse algebra in `Modeling.CommandPlane` ✓ (fromPattern/completeness; culture adapter stays E) | — |
 | `CommandPlane.Constructors` | M/E | constructor definitions + completion rows in `Modeling.CommandPlane` ✓ (navigator/session stay E) | WPF/UI constructors |
+| `CommandPlane.AttachSchema` | M | `Modeling.CommandPlane.AttachSchema` — verb→`RelationSpec` step pipeline (plan §4.3) ✓ | `Execution.CommandPlane.ArgSuggestions` brokers |
 | `CommandPlane.ArgSuggestions` | E | — | live suggest (Roslyn/query) |
 
 #### 4.7 Cockpit
@@ -175,7 +176,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `Conformance.Schemas` | M | embedded JSON Schema texts stay E (mechanics); spec shapes in `Modeling.Conformance` ✓ | runner |
 | `LanguageIntelligence` | E | — | orchestration |
 | `LanguageIntelligence.Adapters.Roslyn` | E | — | Roslyn |
-| `LanguageIntelligence.*` | M/E | `Modeling.Gdl.Language` for neutral edits | adapters |
+| `LanguageIntelligence.*` | M/E | `Modeling.LanguageIntelligence.Relations` for `RelationSpec` kernel ✓ | adapters |
 | `Language.CSharp.*` / `Language.Xml.Anchors` | E | — | language-specific probes |
 
 #### 4.9.1 Language Resolver Center (LRC) — shipped slice (2026-09-03)
