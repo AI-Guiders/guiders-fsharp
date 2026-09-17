@@ -6,6 +6,8 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 |--------|------------------|-----------|--------|
 | Relations kernel | `LanguageIntelligence.Relations` | `Execution.LanguageIntelligence.Relations` | **shipped** Phase 1 |
 | Scene projection | `Ide.Session.SceneProjection` | `Navigation.Code` | **shipped** |
+| SceneProjectionBridge | `SceneProjection.toEdge` SSOT | `NavigationSceneBuilder.BuildSubgraph` + related neighbor projection | **shipped** ship-20 |
+| Homonyms codemod | `TypeSystemRelationKind` vs `CorrespondenceRelationKind` | platform `TypeSystemHomonymTests` gate | **shipped** ship-20 |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** |
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
 | FCS host IO | `FcsProbeWire` + guards (pure) | `FcsCompilerServicesHost` + probe + ProjInfo sources | **shipped** all FCS File/MSBuild IO @ Execution |
