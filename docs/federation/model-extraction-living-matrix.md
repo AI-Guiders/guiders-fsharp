@@ -24,5 +24,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `LegacyBracketRelationWire` boundary parse only | **shipped** obsolete shims deleted |
 | RelationSpec resolve path | `RelationSpec` + Kind: wire | `RelationSpecWireBoundary` + `RelationSpecLegacyBridge` + C# + Xml `TryResolve(spec)` | **shipped** v1 bridge |
 | Language C#/Xml resolve packages | — | `Execution.Language.CSharp.Relations` + `Language.Xml.Relations`; Anchors shims TypeForwardedTo | **shipped** ship-16 |
+| Documentation resolve packages | — | `Execution.Documentation.Relations`; Anchors shim TypeForwardedTo | **shipped** ship-17 |
+| anchor-resolve Kind vectors | Kind: wire in conformance spec | `RelationResolveSpecConformance` kind-spec mode + legacy-span dual path | **shipped** |
 
-**Next waves:** delete `LegacyBracketRelationWire` after CDP migrate · `Documentation.Anchors` rename · conformance anchor-resolve Kind vectors.
+**Next waves:** delete `LegacyBracketRelationWire` after full Kind cutover · Plan §10 Phase 1 checklist.
