@@ -39,6 +39,10 @@ let ``AttachSchema relationSpecCaseName roundtrips CodeEdit`` () =
     Assert.Equal("CodeEdit", AttachSchema.relationSpecCaseName spec)
 
 [<Fact>]
+let ``AttachSchema stepSuggestionId uses federation prefix`` () =
+    Assert.Equal("federation.attach.step.pick_diagnostic", AttachSchema.stepSuggestionId "pick_diagnostic")
+
+[<Fact>]
 let ``AttachSchema catalog exposes all attach verbs`` () =
     Assert.Equal(6, AttachSchemaCatalog.allVerbs.Length)
     Assert.Equal(6, AttachSchemaCatalog.schemas.Length)

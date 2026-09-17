@@ -74,6 +74,8 @@ module AttachSchema =
 
     let tryParseVerbWire (wire: string) = tryParseVerb wire
 
+    let stepSuggestionId (stepId: string) = $"federation.attach.step.{stepId}"
+
     let validateSpecVector (verb: string) (targetCase: string) (steps: string list) =
         match tryParseVerb verb with
         | None -> [ $"unknown attach verb \"{verb}\"" ]
