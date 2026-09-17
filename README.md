@@ -26,9 +26,9 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 | `Modeling.Gdl.Command.Binding` | IR.Binding port — targets, well-known keys, gesture entry | ✓ |
 | `Modeling.Gdl.Command.Melody` | IR.Melody port — articulation, line profiles, steps | ✓ |
 | `Modeling.Gdl.Core` | spine — GdlFragment DU, payloads from layer IRs, GdlProject | ✓ |
-| `Modeling.Gdl.Correspondence` | CRS wire shapes, anchor graph nodes, forward/reverse maps | ✓ |
+| `Modeling.Documentation.Correspondence` | CRS wire shapes, forward/reverse maps (was `Gdl.Correspondence`) | ✓ |
+| `Modeling.LanguageIntelligence.Relations` | RelationSpec kernel, Locus, NavSeed, wire canon (was `Gdl.Language` / IR.Language) | ✓ |
 | `Modeling.Gdl.Expression` | shared GDL expression IR — literals, compares, boolean ops | — |
-| `Modeling.Gdl.Language` | IR.Language port — tiers, loci, anchors, edits, sniper scopes | ✓ |
 | `Modeling.Gdl.Parse.CockpitLogic` | cockpit rule graph IR — rules, projectors, principles | — |
 | `Modeling.Gdl.Parse.Deck` | deck quarry parser — F# mirror of Platform Authoring.Deck | ✓¹ |
 | `Modeling.Gdl.Presentation` | presentation IR + TopologyNotation, screen binding | ✓ |
@@ -37,7 +37,7 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 | `Modeling.Ide.Session.Ports.DotNet` | slnx/sln/csproj → SolutionGraph port | ✓ |
 | `Modeling.Ide.Session.Ports.Workspace` | md/json/toml/yaml tree → WorkspaceGraph port | ✓ |
 | `Modeling.Language` | Language Resolver Center kernel envelopes | ✓ |
-| `Modeling.Language.Adapters.Fcs` | F# Compiler Service backend | ✓² |
+| `Modeling.Language.Adapters.Fcs` | FCS backend — pure transforms; IO via Execution-bound ports | ✓² |
 | `Modeling.Language.Adapters.Gdl` | GDL quarry backend for LRC | — |
 | `Modeling.Navigation` | navigation scene IR — anchor, nodes, edges, caps | ✓ |
 | `Modeling.Navigation.Policy` | related kinds, presets, merge, kind filter, profile | — |
