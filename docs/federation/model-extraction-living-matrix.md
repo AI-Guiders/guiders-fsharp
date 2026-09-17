@@ -33,4 +33,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | anchor-resolve Kind vectors | Kind: wire in conformance spec | `RelationResolveSpecConformance` kind-spec mode + legacy-span dual path | **shipped** |
 | Architecture hub Relations rows | — | hub EN/RU: `*.Relations` SSOT + Anchors shims + `RelationWireBoundary` | **shipped** ship-19 |
 
-**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · cdp-mcp FileOwnership → DocumentRegistry.
+| CDP federation pulse | `SessionRuntime.Registry` (DocumentRegistry ω) | `FederationSessionBridge` pulse/scene `document_registry_count` | **shipped** ship-24 |
+
+**Next waves:** Plan §10 Phase 1 checklist · delete `BracketAnchorSpan` from Modeling · `TransformClass` DU · `SessionEdgeKind`→`Relation` migration.
