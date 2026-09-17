@@ -60,3 +60,26 @@ module SolutionGraph =
                 for cap in project.Capabilities do
                     yield GraphNodeId.capability project.Id cap.Kind
         }
+
+    let private relationIdentity (relation: Relation) =
+        $"{relation.Type}-{relation.From}-{relation.To}-{relation.Scope}"
+
+    /// Append validated dependency/correspondence edges without duplicating existing identities.
+    let mergeRelations (incoming: Relation list) (graph: SolutionGraph) =
+        let mutable seen =
+            graph.Relations
+            |> List.map relationIdentity
+            |> Set.ofList
+
+        let additions = ResizeArray()
+
+        for relation in incoming do
+            let key = relationIdentity relation
+
+            match RelationGraph.validateRelation relation with
+            | Ok () when not (Set.contains key seen) ->
+                additions.Add relation
+                seen <- Set.add key seen
+            | _ -> ()
+
+        { graph with Relations = graph.Relations @ (additions |> Seq.toList) }

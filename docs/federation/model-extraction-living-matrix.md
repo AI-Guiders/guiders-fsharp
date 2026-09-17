@@ -55,5 +55,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | R5 adapter registration | — | `RelationSeamRegistry` + `RoslynDependencyRelationEmitStub.RegisterDefaults` | **shipped** ship-34 |
 | ReverseAnchor materialize | `CorrespondenceMaterialize.tryMaterializeReverseAnchor` | witness → validated `Relation` in G | **shipped** ship-35 |
 | Roslyn E_dep ingest v1 | `CorrespondenceMaterialize.buildUses` | `RoslynDependencyRelationIngest` field-type Uses | **shipped** ship-35 |
+| Session Contents E_dep hook | `DependencyRelationOps.ingest` + `SolutionGraph.mergeRelations` | `DependencyRelationIngest` @ `FederationSessionRuntime.Open` | **shipped** ship-36 |
 
-**Next waves:** Plan §10 Phase 1 checklist · session Contents ingest hook · CLIMutable strip · full CompilerServices E_dep.
+**Next waves:** Plan §10 Phase 1 checklist · CLIMutable strip · full CompilerServices E_dep.

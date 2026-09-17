@@ -39,6 +39,7 @@
     <Compile Include="RevisionLedger.fs" />
     <Compile Include="SessionRuntime.fs" />
     <Compile Include="DiagnosticIndexOps.fs" />
+    <Compile Include="DependencyRelationOps.fs" />
     <Compile Include="SessionGraphPickerChoices.fs" />
     <Compile Include="CompilerServicesMaterialization.fs" />
     <Compile Include="SessionOrchestrator.fs" />
