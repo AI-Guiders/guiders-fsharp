@@ -9,7 +9,7 @@ open FSharp.Compiler.CodeAnalysis
 
 /// <summary>Materialize F# CompilerServices from <c>WorkspaceView</c> @ revision — MSBuild/ProjInfo once, then frozen.</summary>
 module FcsCompilerServicesHost =
-    let private projInfo = FcsProbeProjectOptionsSource()
+    let private materializeLoader = FcsProbeProjectOptionsSource()
 
     let private views =
         ConcurrentDictionary<string, WorkspaceView>(StringComparer.OrdinalIgnoreCase)
@@ -50,7 +50,7 @@ module FcsCompilerServicesHost =
         if not (String.Equals(project.LanguageId, "fsharp", StringComparison.OrdinalIgnoreCase)) then
             project
         else
-            match (projInfo :> IFcsProjectOptionsSource).TryLoad project.ProjectPath with
+            match (materializeLoader :> IFcsProjectOptionsSource).TryLoad project.ProjectPath with
             | Ok options ->
                 let key = normalizeProject project.ProjectPath
                 optionsByProject[key] <- options

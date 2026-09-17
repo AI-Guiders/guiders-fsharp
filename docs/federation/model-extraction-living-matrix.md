@@ -8,11 +8,11 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Scene projection | `Ide.Session.SceneProjection` | `Navigation.Code` | **shipped** |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** |
 | Attach contextual | `SessionGraphPickerChoices` + registry/diagnostic pickers | full step broker matrix incl. manual browse-all | **shipped** |
-| FCS host IO | shapes in `Language.Adapters.Fcs` | `FcsExecutionHost` + `FcsExecutionProjectOptionsSource` bind | **shipped** options source @ Execution boundary |
+| Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` primary; `NavigationAnchor` obsolete shim | **shipped** scene/wire/json NavSeed-first |
+| FCS host IO | shapes in `Language.Adapters.Fcs` | `FcsExecutionHost` + `FcsExecutionProjectOptionsSource` bind for post-materialize reads | **shipped** options source @ Execution boundary; materialize IO pending host move |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
-| Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` + Code NavSeed-first APIs | **partial** shim + overloads |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | delete at boundary | `LegacyBracketRelationWire` transitional parse | **bounded** Obsolete + shim alias |
 
-**Next waves:** full `FcsCompilerServicesHost` File IO move · `NavigationAnchor` type removal · ADR-0063 full body.
+**Next waves:** full `FcsCompilerServicesHost` File IO move · delete `NavigationAnchor` type · ADR-0063 full body.
