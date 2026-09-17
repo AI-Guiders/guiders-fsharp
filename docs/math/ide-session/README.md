@@ -30,6 +30,7 @@
 | [09-decisions.md](09-decisions.md) | Решения / open questions | 9 |
 | [10-implementation.md](10-implementation.md) | Code map, example, evolution | 10–12 |
 | [11-conformance.md](11-conformance.md) | Golden sessions, Hoare/ST executable proofs | 11 |
+| [12-relation-spec.md](12-relation-spec.md) | `relation_spec_i` witness, wire projection, DocumentRef | — |
 
 ---
 
@@ -38,7 +39,7 @@
 1. **01** → **02** → **04** (граф + invalidation + jobs)
 2. **03** → **05** (snapshots + build)
 3. **06** → **07** (transforms + ledger)
-4. **09** → **10** → **11** (decisions + code + conformance)
+4. **09** → **10** → **11** → **12** (decisions + code + conformance + RelationSpec)
 
 ---
 

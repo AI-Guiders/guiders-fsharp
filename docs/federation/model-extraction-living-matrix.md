@@ -26,6 +26,9 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Config schema | `Modeling.Configurations` pure predicates + `KnowledgeWire` parse | `Execution.Configurations.Workspace.Sources` IO (`KnowledgeWireSources`, `ConfigurationContractSources`) | **shipped** ship-29 |
 | Session port IO | pure `DotNetSlnxGraphPort` + `WorkspaceGraphPort` builders | `Execution.Ide.Session.Sources` (`DotNetSlnxGraphSources`, `WorkspaceGraphSources`, `DotNetProjectFileSources`) | **shipped** ship-30 |
 | Gdl.Authoring file IO | pure `AuthoringSource.fromText`; project types + `PathBoundary` | `Authoring.Core` (`AuthoringSource.FromFile`, `AuthoringProjectLoader`); SAT bridges read disk | **shipped** ship-31 |
+| ship-3 IO-in-Modeling | zero `File.*` / `Directory.*` in `Platform.Modeling.*` | Config + session + GDL IO @ Execution sources | **shipped** ship-31 |
+| relation-spec-witness | `12-relation-spec.md` + `BracketRelationWire.tryParseRelationSpec` | `relation-spec-witness.spec.json` + `RelationSpecWitnessConformanceTests` | **shipped** ship-4 |
+| math §12 README map | `docs/math/ide-session/12-relation-spec.md` | — | **shipped** ship-4 |
 | GoldenEvidence scan IO | — | `Execution.Documentation.Correspondence.GoldenEvidence` workspace scan | **shipped** ship-28 |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `RelationWireBoundary` parse boundary only | **shipped** ship-23 shim deleted |
@@ -44,4 +47,4 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 
 | Legacy edge shims deleted | `RelationGraph.projectRef` + orchestration helpers | ports/tests use `Relation` only | **shipped** ship-27 |
 
-**Next waves:** Plan §10 Phase 1 checklist · ship-3 remainder · ship-4/5.
+**Next waves:** Plan §10 Phase 1 checklist · ship-5 attach body audit · R5 residual IO · Dependency kernel · ReverseAnchor→Relation.

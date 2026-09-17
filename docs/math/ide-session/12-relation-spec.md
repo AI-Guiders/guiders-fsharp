@@ -30,6 +30,23 @@ Bracket `Kind:` canon maps to `relation_spec_i` at parse boundary only:
 
 Legacy `F:`/`M:`/`L:` wires are not SSOT — transitional Execution parsers only.
 
+## Document identity (`doc_id` ↔ `DocumentRef`)
+
+Session registry `ω` assigns stable document ids:
+
+```text
+doc_id : DocId = Identity<Document, NumericId>
+```
+
+`DocumentRef` in witnesses is either:
+
+| Form | When |
+|------|------|
+| `DocId doc` | Post-bootstrap registry identity (graph `ω`, diagnostic index ingest) |
+| `File path` | Wire parse boundary before numeric id assignment |
+
+Kind-wire `File:` keys map to `DocumentRef.File(LogicalPath.Create path)` at parse time. Ingest binds `LogicalPath` → `DocId` via `DocumentRegistryOps`; subsequent `RelationSpec` materialization prefers `DocId` in stored `Locus`.
+
 ## Scene projection
 
 Navigation scene edges are **projections** of `Relation` or provisional related-neighbor discovery — see `SceneProjection.relationTypeWire`.

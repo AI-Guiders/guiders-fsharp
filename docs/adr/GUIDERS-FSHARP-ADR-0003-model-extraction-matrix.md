@@ -199,7 +199,7 @@ Legend: **M** = Modeling (F#) · **E** = Execution (C#) · **S** = Seam only · 
 | `Sources` | S/E | — | `ISource<T>` seam |
 | `Sources.File` / `.Toml` | E | — | transport |
 | `Configurations.Workspace` / `.Project` | M/E | settings **schema** IR | — |
-| `Configurations.*.Sources` | E | — | load/save |
+| `Configurations.*.Sources` | E | — | load/save (`Execution.Configurations.Workspace.Sources` — KnowledgeWire + contract SAT IO) ✓ |
 | `Utilities.Adoption.*` | E | — | audit runners (report shapes → Modeling if shared) |
 
 ### 5. Modeling package tree (target, consolidated)
@@ -225,6 +225,8 @@ Platform.Modeling.Ide.Session.*
 Platform.Modeling.Configurations
 Platform.Modeling.Conformance.*
 ```
+
+**Ship-3 closure (2026-09-18):** `Platform.Modeling.*` contains **zero** `File.*` / `Directory.*` calls. Session graph ports (`DotNetSlnxGraphPort`, `WorkspaceGraphPort`), config predicates (`KnowledgeWire`, `ContractPredicates`), and GDL authoring parsers accept **pre-loaded text** only; disk IO lives in `Execution.Configurations.Workspace.Sources`, `Execution.Ide.Session.Sources`, and `Authoring.Core`.
 
 **Retired names (do not recreate):** `Modeling.Gdl.Language`, `Modeling.Gdl.Correspondence`, `Modeling.Gdl.Agent`, `IntermediateRepresentation.Language`, `LanguageIntelligence.Anchors`, `NavigationAnchor`.
 
