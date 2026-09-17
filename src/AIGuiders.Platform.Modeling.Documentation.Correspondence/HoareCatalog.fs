@@ -8,12 +8,10 @@ open System.Text.RegularExpressions
 /// SSOT catalog for Hoare obligations and well-formedness ids declared in ADR facts (SAT-003).
 /// GUIDERS-FSHARP-ADR-0007 pilot entries: OB-H1..H3, WF-OB1..OB2.
 /// </summary>
-[<CLIMutable>]
 type HoareCatalogEntry =
     { Id: string
       AdrSource: string }
 
-[<CLIMutable>]
 type WellFormednessCatalogEntry =
     { Id: string
       AdrSource: string }

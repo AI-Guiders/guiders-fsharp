@@ -8,7 +8,6 @@ open System.Text.RegularExpressions
 /// ADR machine-facing facts block (GUIDERS-FSHARP-ADR-0006 / 0007).
 /// SSOT for parse IR; Execution Sat observers consume via thin C# bridge.
 /// </summary>
-[<CLIMutable>]
 type HoareObligation =
     { Id: string
       Precondition: string
@@ -16,10 +15,8 @@ type HoareObligation =
       Postcondition: string
       RawExpression: string }
 
-[<CLIMutable>]
 type AdrVerifiedByRow = { Subject: string; Evidence: string }
 
-[<CLIMutable>]
 type AdrFactsBlock =
     { SourcePath: string
       AdrId: string option

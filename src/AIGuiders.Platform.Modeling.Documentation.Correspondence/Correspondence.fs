@@ -8,8 +8,7 @@ open AIGuiders.Platform.Modeling.Paths
 /// Correspondence wire shapes — CRS SSOT (GUIDERS-FSHARP-ADR-0003 §4.8, ADR-0005/0006).
 /// Pure model: records, const-modules, bracket-wire grammar. No IO, no workspace scan —
 /// those are Execution consumers (Execution.Documentation.Correspondence.*).
-/// Records are <see cref="CLIMutable"/> 1:1 with the transitional C# shapes — one shape,
-/// one owner (this package); C# migrates to these types, never forks.
+/// C# seam maps via Execution <c>CorrespondenceModels</c> (constructors, not CLIMutable views).
 /// </summary>
 module Schema =
     [<Literal>]
@@ -54,19 +53,16 @@ module AdrLifecycleTag =
     [<Literal>]
     let Deprecated = "deprecated"
 
-[<CLIMutable>]
 type AdrReference =
     { Id: string
       Fragment: string option }
 
-[<CLIMutable>]
 type ForwardDoc =
     { Path: string
       Title: string
       Abs: string option
       Kind: string option }
 
-[<CLIMutable>]
 type ReverseAnchor =
     { DocPath: string
       DocTitle: string
@@ -80,7 +76,6 @@ type ReverseAnchor =
       DocLineHint: int option
       Excerpt: string option }
 
-[<CLIMutable>]
 type ExplicitCodeAnchor =
     { DocPath: string
       File: string
@@ -91,7 +86,6 @@ type ExplicitCodeAnchor =
       Kind: string
       DefaultKind: string }
 
-[<CLIMutable>]
 type CorrespondenceResult =
     { WorkspaceRoot: string
       FileRel: string option
@@ -103,7 +97,6 @@ type CorrespondenceResult =
       ActiveLayers: string array
       TomlPath: string }
 
-[<CLIMutable>]
 type ForwardMapResult =
     { FeatureLine: string option
       FeatureDocs: string array
