@@ -86,12 +86,12 @@ module ContractPredicates =
 
         if ids.Count > 0 then Some(ids.ToArray()) else None
 
-    let private tryLoadManifestL0 (manifestFullPath: string) =
-        if not (File.Exists manifestFullPath) then
+    let private tryLoadManifestL0FromJson (manifestJson: string) =
+        if String.IsNullOrWhiteSpace manifestJson then
             None
         else
             try
-                use doc = JsonDocument.Parse(File.ReadAllText(manifestFullPath))
+                use doc = JsonDocument.Parse manifestJson
 
                 let mutable l0El = Unchecked.defaultof<JsonElement>
 
@@ -162,10 +162,10 @@ module ContractPredicates =
         match fromSection with
         | Some fullPath -> fullPath
         | None ->
-            if File.Exists configuredManifestFullPath then
-                configuredManifestFullPath
-            else
+            if String.IsNullOrWhiteSpace configuredManifestFullPath then
                 resolveRelativeManifestPath personalRoot defaultManifestRelative
+            else
+                configuredManifestFullPath
 
     let private fail code message =
         { Satisfied = false
@@ -178,82 +178,74 @@ module ContractPredicates =
           Diagnostic = Unchecked.defaultof<ConfigPredicateDiagnostic> }
 
     /// <summary>
-    /// Ensures personal hot <c>agent-notes.md</c> exists and contains every L0 section id
-    /// declared in <c>memory-architecture-v1.json</c> (or the in-file ### L0 block fallback).
-    /// Paths come from <c>sources table</c> when present; otherwise pilot defaults from cdp-newcomer.
+    /// Pure predicate: hot notes + optional manifest JSON already loaded by Execution sources.
     /// </summary>
-    let evaluateHotL0SectionsPresent (workspaceRoot: string) (document: ConfigDocument) =
-        if String.IsNullOrWhiteSpace workspaceRoot then
-            fail "config-missing-workspace" "hot_l0_sections_present requires WorkspaceRoot in SatContext."
+    let evaluateHotL0SectionsPresent
+        (wire: KnowledgeWire.PersonalRootWire)
+        (hotNotesContent: string)
+        (manifestJsonContent: string option)
+        (document: ConfigDocument)
+        =
+        let hotTemplate = resolveSourcePath document "personal-hot" pilotHotNotesPath
+        let manifestTemplate = resolveSourcePath document "l0-manifest" pilotManifestPath
+        let notesPath = expandPathTemplate hotTemplate wire.PersonalRoot
+        let configuredManifestPath = expandPathTemplate manifestTemplate wire.PersonalRoot
+
+        if String.IsNullOrWhiteSpace hotNotesContent then
+            fail "config-hot-notes-missing" (sprintf "Personal hot file not found: '%s'." notesPath)
         else
-            match KnowledgeWire.tryResolvePersonalRoot workspaceRoot with
+            let slice =
+                document.Sources
+                |> Array.tryFind (fun s -> s.Id.Equals("personal-hot", StringComparison.OrdinalIgnoreCase))
+                |> Option.map (fun s -> s.Slice)
+                |> Option.defaultValue "above_public_cut"
+
+            let scopedContent =
+                if slice.Equals("above_public_cut", StringComparison.OrdinalIgnoreCase) then
+                    sliceAbovePublicCut hotNotesContent
+                else
+                    hotNotesContent
+
+            let sections = parseSections scopedContent
+
+            let manifestFullPath =
+                tryResolveManifestFullPath wire.PersonalRoot hotNotesContent configuredManifestPath
+
+            let l0Ids =
+                manifestJsonContent
+                |> Option.bind tryLoadManifestL0FromJson
+                |> Option.orElse (
+                    sections
+                    |> fun map ->
+                        if map.ContainsKey "memory-architecture-v1" then
+                            parseL0FromMemoryArchitectureSection map.["memory-architecture-v1"]
+                        else
+                            None
+                )
+
+            match l0Ids with
             | None ->
                 fail
-                    "config-personal-root-missing"
-                    (sprintf
-                        "Could not resolve personal knowledge root from agent-notes-mcp.toml under '%s'."
-                        workspaceRoot)
-            | Some wire ->
-                let hotTemplate = resolveSourcePath document "personal-hot" pilotHotNotesPath
-                let manifestTemplate = resolveSourcePath document "l0-manifest" pilotManifestPath
-                let notesPath = expandPathTemplate hotTemplate wire.PersonalRoot
-                let configuredManifestPath = expandPathTemplate manifestTemplate wire.PersonalRoot
+                    "config-l0-manifest-missing"
+                    (sprintf "No L0 ids from manifest '%s' or memory-architecture-v1 section." manifestFullPath)
+            | Some ids when ids.Length = 0 ->
+                fail "config-l0-empty" "L0 manifest resolved but contains no section ids."
+            | Some ids ->
+                let missing =
+                    ids
+                    |> Array.filter (fun id -> not (sections.ContainsKey id))
+                    |> Array.truncate 8
 
-                if not (File.Exists notesPath) then
-                    fail "config-hot-notes-missing" (sprintf "Personal hot file not found: '%s'." notesPath)
+                if missing.Length > 0 then
+                    let listed = String.Join(", ", missing)
+
+                    fail
+                        "config-l0-sections-missing"
+                        (sprintf "Missing L0 section(s) in '%s': %s." notesPath listed)
                 else
-                    let notesContent = File.ReadAllText notesPath
-                    let slice =
-                        document.Sources
-                        |> Array.tryFind (fun s -> s.Id.Equals("personal-hot", StringComparison.OrdinalIgnoreCase))
-                        |> Option.map (fun s -> s.Slice)
-                        |> Option.defaultValue "above_public_cut"
-
-                    let scopedContent =
-                        if slice.Equals("above_public_cut", StringComparison.OrdinalIgnoreCase) then
-                            sliceAbovePublicCut notesContent
-                        else
-                            notesContent
-
-                    let sections = parseSections scopedContent
-                    let manifestFullPath =
-                        tryResolveManifestFullPath wire.PersonalRoot notesContent configuredManifestPath
-
-                    let l0Ids =
-                        tryLoadManifestL0 manifestFullPath
-                        |> Option.orElse (
-                            sections
-                            |> fun map ->
-                                if map.ContainsKey "memory-architecture-v1" then
-                                    parseL0FromMemoryArchitectureSection map.["memory-architecture-v1"]
-                                else
-                                    None
-                        )
-
-                    match l0Ids with
-                    | None ->
-                        fail
-                            "config-l0-manifest-missing"
-                            (sprintf
-                                "No L0 ids from manifest '%s' or memory-architecture-v1 section."
-                                manifestFullPath)
-                    | Some ids when ids.Length = 0 ->
-                        fail "config-l0-empty" "L0 manifest resolved but contains no section ids."
-                    | Some ids ->
-                        let missing =
-                            ids
-                            |> Array.filter (fun id -> not (sections.ContainsKey id))
-                            |> Array.truncate 8
-
-                        if missing.Length > 0 then
-                            let listed = String.Join(", ", missing)
-                            fail
-                                "config-l0-sections-missing"
-                                (sprintf "Missing L0 section(s) in '%s': %s." notesPath listed)
-                        else
-                            ok
-                                (sprintf
-                                    "hot_l0_sections_present via '%s' (%d L0 section(s) from '%s')"
-                                    notesPath
-                                    ids.Length
-                                    manifestFullPath)
+                    ok
+                        (sprintf
+                            "hot_l0_sections_present via '%s' (%d L0 section(s) from '%s')"
+                            notesPath
+                            ids.Length
+                            manifestFullPath)

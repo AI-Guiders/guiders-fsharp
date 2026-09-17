@@ -72,6 +72,28 @@ sources table
     | Some doc -> doc
     | None -> failwith "pilot config parse failed"
 
+let private buildWire (workspace: string) =
+    let tomlPath = Path.Combine(workspace, "agent-notes-mcp.toml")
+
+    match KnowledgeWire.tryBuildPersonalRootWire tomlPath (File.ReadLines tomlPath) with
+    | Some wire -> wire
+    | None -> failwith "personal root wire build failed"
+
+let private readHotNotes (personalRoot: string) =
+    File.ReadAllText(Path.Combine(personalRoot, "agent-notes.md"))
+
+let private readManifest (personalRoot: string) =
+    let path = Path.Combine(personalRoot, "knowledge", "META", "memory-architecture-v1.json")
+
+    if File.Exists path then Some(File.ReadAllText path) else None
+
+let private evaluate workspace personalRoot document =
+    ContractPredicates.evaluateHotL0SectionsPresent
+        (buildWire workspace)
+        (readHotNotes personalRoot)
+        (readManifest personalRoot)
+        document
+
 [<Fact>]
 let ``hot_l0_sections_present passes when manifest l0 ids exist in agent-notes`` () =
     let workspace = Path.Combine(Path.GetTempPath(), "config-sat-" + Guid.NewGuid().ToString("N"))
@@ -81,7 +103,7 @@ let ``hot_l0_sections_present passes when manifest l0 ids exist in agent-notes``
     writeManifest personalRoot [| "alpha-l0"; "beta-l0" |]
     writeHotNotes personalRoot [| "alpha-l0"; "beta-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (emptyDocument ())
+    let result = evaluate workspace personalRoot (emptyDocument ())
 
     Assert.True(result.Satisfied)
     Assert.Contains("hot_l0_sections_present", result.Note)
@@ -100,7 +122,7 @@ let ``hot_l0_sections_present fails when l0 section missing`` () =
     writeManifest personalRoot [| "alpha-l0"; "beta-l0" |]
     writeHotNotes personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (emptyDocument ())
+    let result = evaluate workspace personalRoot (emptyDocument ())
 
     Assert.False(result.Satisfied)
     Assert.Equal("config-l0-sections-missing", result.Diagnostic.Code)
@@ -119,7 +141,7 @@ let ``hot_l0_sections_present uses pilot sources table paths`` () =
     writeManifest personalRoot [| "alpha-l0" |]
     writeHotNotes personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (pilotDocument ())
+    let result = evaluate workspace personalRoot (pilotDocument ())
 
     Assert.True(result.Satisfied)
 
@@ -151,7 +173,7 @@ l0_manifest: knowledge/META/memory-architecture-v1.json
     File.WriteAllText(Path.Combine(personalRoot, "agent-notes.md"), notes)
     writeManifest personalRoot [| "alpha-l0" |]
 
-    let result = ContractPredicates.evaluateHotL0SectionsPresent workspace (pilotDocument ())
+    let result = evaluate workspace personalRoot (pilotDocument ())
 
     Assert.True(result.Satisfied)
 

@@ -1,27 +1,17 @@
 namespace AIGuiders.Platform.Modeling.Configurations
 
 open System
-open System.IO
 
-/// <summary>Minimal TOML wire reads for agent-notes-mcp.toml (pilot SAT predicates).</summary>
+/// <summary>Pure TOML wire parse for agent-notes-mcp.toml (no File IO in Modeling).</summary>
 [<RequireQualifiedAccess>]
 module KnowledgeWire =
 
-    let private tryFindAgentNotesToml (workspaceRoot: string) =
-        let root = Path.GetFullPath workspaceRoot
-        let direct = Path.Combine(root, "agent-notes-mcp.toml")
+    type PersonalRootWire =
+        { TomlPath: string
+          PrimaryId: string
+          PersonalRoot: string }
 
-        if File.Exists direct then
-            Some direct
-        else
-            try
-                Directory.EnumerateFiles(root, "agent-notes-mcp.toml", SearchOption.AllDirectories)
-                |> Seq.tryHead
-            with
-            | :? IOException -> None
-            | :? UnauthorizedAccessException -> None
-
-    let private parseSectionValue (lines: string seq) (sectionName: string) (key: string) =
+    let parseSectionValue (lines: string seq) (sectionName: string) (key: string) =
         let target = $"[{sectionName}]"
         let mutable inSection = false
         let mutable found = None
@@ -41,42 +31,20 @@ module KnowledgeWire =
 
                     if eq > 0 then
                         let value = line[(eq + 1) ..].Trim().Trim('"', '\'')
+
                         if value.Length > 0 then
                             found <- Some value
 
         found
 
-    let tryReadKnowledgePrimary (tomlPath: string) =
-        if not (File.Exists tomlPath) then
-            None
-        else
-            parseSectionValue (File.ReadLines tomlPath) "knowledge" "primary"
-
-    let tryReadKnowledgeRootPath (tomlPath: string) (rootId: string) =
-        if not (File.Exists tomlPath) then
-            None
-        else
-            parseSectionValue (File.ReadLines tomlPath) "knowledge.roots" rootId
-
-    type PersonalRootResolution =
-        { TomlPath: string
-          PrimaryId: string
-          PersonalRoot: string }
-
-    let tryResolvePersonalRoot (workspaceRoot: string) =
-        if String.IsNullOrWhiteSpace workspaceRoot then
-            None
-        else
-            match tryFindAgentNotesToml workspaceRoot with
+    let tryBuildPersonalRootWire (tomlPath: string) (lines: string seq) =
+        match parseSectionValue lines "knowledge" "primary" with
+        | None -> None
+        | Some primary ->
+            match parseSectionValue lines "knowledge.roots" primary with
             | None -> None
-            | Some tomlPath ->
-                match tryReadKnowledgePrimary tomlPath with
-                | None -> None
-                | Some primary ->
-                    match tryReadKnowledgeRootPath tomlPath primary with
-                    | None -> None
-                    | Some personalRoot ->
-                        Some
-                            { TomlPath = tomlPath
-                              PrimaryId = primary
-                              PersonalRoot = personalRoot }
+            | Some personalRoot ->
+                Some
+                    { TomlPath = tomlPath
+                      PrimaryId = primary
+                      PersonalRoot = personalRoot }
