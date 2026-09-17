@@ -43,6 +43,14 @@ let ``AttachSchema stepSuggestionId uses federation prefix`` () =
     Assert.Equal("federation.attach.step.pick_diagnostic", AttachSchema.stepSuggestionId "pick_diagnostic")
 
 [<Fact>]
+let ``AttachSchemaCatalog stepEntries cover all verb steps`` () =
+    Assert.Equal(9, AttachSchemaCatalog.stepEntries.Length)
+
+    match AttachSchemaCatalog.tryFindStepBySuggestionId "federation.attach.step.pick_file" with
+    | Some entry -> Assert.Equal(AttachVerb.Code, entry.Verb)
+    | None -> Assert.Fail("expected pick_file step entry")
+
+[<Fact>]
 let ``AttachSchema catalog exposes all attach verbs`` () =
     Assert.Equal(6, AttachSchemaCatalog.allVerbs.Length)
     Assert.Equal(6, AttachSchemaCatalog.schemas.Length)

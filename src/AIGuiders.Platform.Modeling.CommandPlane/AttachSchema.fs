@@ -14,6 +14,11 @@ type AttachVerb =
 
 type AttachSchemaStep = { Id: string; Prompt: string }
 
+type AttachSchemaStepEntry =
+    { Verb: AttachVerb
+      Step: AttachSchemaStep
+      SuggestionId: string }
+
 type AttachSchema =
     { Verb: AttachVerb
       TargetCase: string
@@ -117,3 +122,20 @@ module AttachSchemaCatalog =
           AttachVerb.Manual ]
 
     let schemas = allVerbs |> List.map AttachSchema.forVerb
+
+    let stepEntries =
+        schemas
+        |> List.collect (fun schema ->
+            schema.Steps
+            |> List.map (fun step ->
+                { Verb = schema.Verb
+                  Step = step
+                  SuggestionId = AttachSchema.stepSuggestionId step.Id }))
+
+    let tryFindStepBySuggestionId (suggestionId: string) =
+        if String.IsNullOrWhiteSpace suggestionId then
+            None
+        else
+            stepEntries
+            |> List.tryFind (fun entry ->
+                String.Equals(entry.SuggestionId, suggestionId.Trim(), StringComparison.OrdinalIgnoreCase))
