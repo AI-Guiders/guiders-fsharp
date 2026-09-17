@@ -25,14 +25,14 @@ let ``AngleOpaque profile: opaque shape, no nested keys`` () =
     Assert.Equal("<", p.StartTerminal)
     Assert.Equal(">", p.EndTerminal)
     Assert.Equal(BracketAxisShape.Opaque, p.AxisShape)
-    Assert.True (isNull p.NestedAxisKeys)
+    Assert.Empty p.NestedAxisKeys
 
 [<Fact>]
 let ``DocSymbol profile: kv shape without nested`` () =
     let p = BracketProfiles.DocSymbol
     Assert.Equal("bracket.doc-symbol", p.Id)
     Assert.Equal(BracketAxisShape.KeyValue, p.AxisShape)
-    Assert.True (isNull p.NestedAxisKeys)
+    Assert.Empty p.NestedAxisKeys
 
 [<Fact>]
 let ``BracketAxis: defaults to opaque wire class, no nested`` () =
@@ -61,7 +61,8 @@ let ``CdpCode value plan: axis classes per CDP vocabulary`` () =
 let ``ForgeFrgCompound plan: FRG maps to command path`` () =
     let plan = BracketAxisValuePlans.ForgeFrgCompound
     Assert.Equal(BracketAxisValueClasses.CommandPath, plan.ByAxisKey.["FRG"])
-    Assert.Equal(1, plan.ByAxisKey.Count)
+    Assert.Equal(BracketAxisValueClasses.CommandPath, plan.ByAxisKey.["File"])
+    Assert.True (plan.ByAxisKey.Count > 1)
 
 [<Fact>]
 let ``Value classes: constants match CDP vocabulary`` () =

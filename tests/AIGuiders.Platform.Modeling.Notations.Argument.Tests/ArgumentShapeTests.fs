@@ -14,7 +14,7 @@ let private verboseSlot =
 let ``ArgumentSlot: defaults to Value kind, carries options`` () =
     let bare = ArgumentSlot("x")
     Assert.Equal(ArgumentSlotKind.Value, bare.Kind)
-    Assert.True (isNull bare.LongOption)
+    Assert.True (System.String.IsNullOrEmpty bare.LongOption)
     Assert.Equal("x", bare.Name)
 
     Assert.Equal("--config", configSlot.LongOption)

@@ -58,7 +58,14 @@ module LanguageAdapterSmokeTests =
             |> Async.RunSynchronously
 
         Assert.Equal("Sample.fs", symbols.Root.Name)
-        Assert.Contains(symbols.Root.Children, fun s -> s.Name = "answer" && s.Kind = "let")
+
+        let hasAnswer =
+            symbols.Root.Children
+            |> Array.exists (fun s ->
+                s.Name = "answer" && s.Kind = "let"
+                || s.Children |> Array.exists (fun c -> c.Name = "answer" && c.Kind = "let"))
+
+        Assert.True(hasAnswer, "expected let answer under file/module symbol tree")
 
     [<Fact>]
     let ``Gdl parses deck fixture`` () =

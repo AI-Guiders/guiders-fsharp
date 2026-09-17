@@ -4,6 +4,7 @@ open System
 open System.Collections.Concurrent
 open System.IO
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.Paths
 open FSharp.Compiler.CodeAnalysis
 
 /// <summary>Materialize F# CompilerServices from <c>WorkspaceView</c> @ revision — MSBuild/ProjInfo once, then frozen.</summary>
@@ -16,14 +17,20 @@ module FcsCompilerServicesHost =
     let private optionsByProject =
         ConcurrentDictionary<string, FSharpProjectOptions>(StringComparer.OrdinalIgnoreCase)
 
+    let private anchorKey (path: string) =
+        if String.IsNullOrWhiteSpace path then
+            ""
+        else
+            LogicalPath.Create(Path.GetFullPath(path.Trim())).Value
+
     let private normalizeProject (projectPath: string) =
         if String.IsNullOrWhiteSpace projectPath then
             ""
         else
-            Path.GetFullPath (projectPath.Trim())
+            Path.GetFullPath(projectPath.Trim())
 
     let tryGetView (anchorPath: string) =
-        let key = if String.IsNullOrWhiteSpace anchorPath then "" else anchorPath.Trim()
+        let key = anchorKey anchorPath
 
         match views.TryGetValue key with
         | true, view -> Some view
@@ -56,14 +63,14 @@ module FcsCompilerServicesHost =
     /// Query MSBuild once per F# project @ revision; freeze CompileFiles + FSharpProjectOptions.
     let materialize (view: WorkspaceView) =
         let key =
-            if String.IsNullOrWhiteSpace view.Anchor.Value then
+            if view.Anchor.IsEmpty then
                 ""
             else
-                view.Anchor.Value.Trim()
+                view.Anchor.Value
 
         let projects = view.Projects |> List.map materializeProject
         let enriched = { view with Projects = projects }
-        views[key] <- enriched
+        views[anchorKey key] <- enriched
         enriched
 
     let invalidate (anchorPath: string option) =
@@ -72,7 +79,7 @@ module FcsCompilerServicesHost =
             views.Clear()
             optionsByProject.Clear()
         | Some path when not (String.IsNullOrWhiteSpace path) ->
-            let key = path.Trim()
+            let key = anchorKey path
 
             match views.TryRemove key with
             | true, removed ->
