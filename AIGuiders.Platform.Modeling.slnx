@@ -51,6 +51,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/AIGuiders.Platform.Modeling.Language.Tests/AIGuiders.Platform.Modeling.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Combinations.Tests/AIGuiders.Platform.Modeling.Combinations.Tests.fsproj" />
+    <Project Path="tests/AIGuiders.Platform.Modeling.Core.Tests/AIGuiders.Platform.Modeling.Core.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests/AIGuiders.Platform.Modeling.Gdl.Agent.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Binding.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Tests.fsproj" />
