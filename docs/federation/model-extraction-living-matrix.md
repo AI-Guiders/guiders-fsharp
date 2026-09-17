@@ -51,5 +51,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Dependency kernel | `DependencyRelationKind` + E_dep sort laws in `RelationGraph` | `RoslynDependencyRelationEmitStub` + `AdapterSlotRegistry` | **shipped** ship-33 |
 | TypeSystem profile schema | `TypeSystemProfile.csharpRoslynProfile` | Execution registers `AdapterSlot` only | **shipped** ship-33 |
 | ReverseAnchor bridge | `ReverseAnchorBridge.tryToDocToCodeWitness` | CRS Execution unchanged; witness for attach/materialize | **shipped** ship-33 |
+| Correspondence RelationType | `CorrespondenceRelationGraph` + `GraphNodeRef.AdrObligation` | sort laws for Documents/ImplementsObligation/VerifiedBy | **shipped** ship-34 |
+| R5 adapter registration | — | `RelationSeamRegistry` + `RoslynDependencyRelationEmitStub.RegisterDefaults` | **shipped** ship-34 |
 
-**Next waves:** Plan §10 Phase 1 checklist · R5 adapter registration · Correspondence RelationType rows · CLIMutable strip.
+**Next waves:** Plan §10 Phase 1 checklist · Roslyn E_dep ingest · CLIMutable strip · full ReverseAnchor materialize.

@@ -16,6 +16,7 @@ type GraphNodeRef =
     | SessionProject of ProjectId
     | SessionCapability of ProjectId * CapabilityKind
     | Document of DocumentRef
+    | AdrObligation of AdrObligationId
     | Syntax of DocumentRef * NodeId
     | Semantic of DocumentRef * SymbolRef
     | ArtifactNode of ArtifactRef
@@ -30,7 +31,12 @@ type RelationType =
     | Binds
     | Imports
     | SyntaxDepends
+    | Documents
+    | ImplementsObligation
+    | Related
+    | Constrains
     | Normates
+    | VerifiedBy
     | ImplementsInterface
     | Extends
     | Instantiates
@@ -69,6 +75,7 @@ module RelationGraph =
         | GraphNodeRef.SessionProject _ -> NodeSort.SessionProject
         | GraphNodeRef.SessionCapability _ -> NodeSort.SessionCapability
         | GraphNodeRef.Document _ -> NodeSort.DocumentFragment
+        | GraphNodeRef.AdrObligation _ -> NodeSort.AdrObligation
         | GraphNodeRef.Syntax _ -> NodeSort.SyntaxNode
         | GraphNodeRef.Semantic _ -> NodeSort.SemanticSymbol
         | GraphNodeRef.ArtifactNode _ -> NodeSort.Artifact
@@ -163,10 +170,30 @@ module RelationGraph =
                 Ok()
             else
                 Error { Message = "Dependency SyntaxDepends: requires SyntaxNode -> SyntaxNode." }
+        | RelationType.Documents | RelationType.Related ->
+            if fromSort = NodeSort.DocumentFragment && toSort = NodeSort.DocumentFragment then
+                Ok()
+            else
+                Error { Message = $"Correspondence {relation.Type}: requires DocumentFragment -> DocumentFragment." }
+        | RelationType.ImplementsObligation ->
+            if fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.AdrObligation then
+                Ok()
+            else
+                Error { Message = "Correspondence ImplementsObligation: requires SemanticSymbol -> AdrObligation." }
+        | RelationType.Constrains ->
+            if fromSort = NodeSort.DocumentFragment && toSort = NodeSort.SemanticSymbol then
+                Ok()
+            else
+                Error { Message = "Correspondence Constrains: requires DocumentFragment -> SemanticSymbol." }
+        | RelationType.VerifiedBy ->
+            if fromSort = NodeSort.AdrObligation && toSort = NodeSort.Artifact then
+                Ok()
+            else
+                Error { Message = "Correspondence VerifiedBy: requires AdrObligation -> Artifact." }
         | RelationType.Normates ->
             if fromSort = NodeSort.DocumentFragment && toSort = NodeSort.SemanticSymbol then
                 Ok()
-            elif fromSort = NodeSort.SemanticSymbol && toSort = NodeSort.SemanticSymbol then
+            elif fromSort = NodeSort.DocumentFragment && toSort = NodeSort.AdrObligation then
                 Ok()
             else
                 Error { Message = $"Correspondence Normates: invalid sort pair {fromSort} -> {toSort}." }

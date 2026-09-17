@@ -10,6 +10,7 @@
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Documentation.Correspondence\AIGuiders.Platform.Modeling.Documentation.Correspondence.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Navigation\AIGuiders.Platform.Modeling.Navigation.fsproj" />
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +23,7 @@
     <Compile Include="Projects.fs" />
     <Compile Include="ProjectCapabilityCatalog.fs" />
     <Compile Include="RelationGraph.fs" />
+    <Compile Include="CorrespondenceRelationGraph.fs" />
     <Compile Include="TypeSystemProfile.fs" />
     <Compile Include="SceneProjection.fs" />
     <Compile Include="SolutionGraph.fs" />
