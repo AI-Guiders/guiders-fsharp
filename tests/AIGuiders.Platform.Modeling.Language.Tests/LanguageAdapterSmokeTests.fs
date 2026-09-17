@@ -8,6 +8,18 @@ open AIGuiders.Platform.Modeling.Language.Adapters.Fcs
 open AIGuiders.Platform.Modeling.Language.Adapters.Gdl
 
 module LanguageAdapterSmokeTests =
+    let private languageRequest file line column sourceText solution =
+        { FilePath = file
+          Line = line
+          Column = column
+          SourceText = sourceText
+          SolutionOrProjectPath = solution }
+
+    let private renameRequest req newName apply =
+        { Request = req
+          NewName = newName
+          Apply = apply }
+
     let private projInfoBackend () =
         FcsLanguageBackend(FcsProbeProjectOptionsSource() :> IFcsProjectOptionsSource)
         :> ILanguageBackend
@@ -30,11 +42,7 @@ module LanguageAdapterSmokeTests =
     let ``Fcs parses simple fs source`` () =
         let backend = FcsLanguageBackend() :> ILanguageBackend
         let req =
-            LanguageRequest(
-                FilePath = "Sample.fs",
-                Line = 1,
-                Column = 1,
-                SourceText = "module Sample\n\nlet answer = 42")
+            languageRequest "Sample.fs" 1 1 "module Sample\n\nlet answer = 42" null
 
         let result =
             backend.GetDiagnosticsAsync(req, CancellationToken.None)
@@ -63,7 +71,7 @@ module LanguageAdapterSmokeTests =
 
         let text = System.IO.File.ReadAllText(fixturePath)
         let backend = GdlLanguageBackend() :> ILanguageBackend
-        let req = LanguageRequest(fixturePath, 1, 1, text, null)
+        let req = languageRequest fixturePath 1 1 text null
 
         let result =
             backend.GetDiagnosticsAsync(req, CancellationToken.None)
@@ -99,7 +107,7 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 1, 1, null, null)
+            let req = languageRequest fs 1 1 null null
 
             let result =
                 backend.GetDiagnosticsAsync(req, System.Threading.CancellationToken.None)
@@ -137,7 +145,7 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 5, 16, null, fsproj)
+            let req = languageRequest fs 5 16 null fsproj
 
             let nav =
                 backend.GoToDefinitionAsync(req, CancellationToken.None)
@@ -174,7 +182,7 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+            let req = languageRequest fs 5 18 null fsproj
 
             let usages =
                 backend.FindUsagesAsync(req, CancellationToken.None)
@@ -208,7 +216,7 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 3, 5, null, fsproj)
+            let req = languageRequest fs 3 5 null fsproj
 
             let symbol =
                 backend.GetSymbolAtPositionAsync(req, CancellationToken.None)
@@ -241,7 +249,7 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 5, 18, null, fsproj)
+            let req = languageRequest fs 5 18 null fsproj
 
             let completions =
                 backend.GetCompletionsAsync(req, CancellationToken.None)
@@ -275,8 +283,8 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 5, 18, null, fsproj)
-            let renameReq = RenameSymbolRequest(req, "renamed", false)
+            let req = languageRequest fs 5 18 null fsproj
+            let renameReq = renameRequest req "renamed" false
 
             let result =
                 backend.RenameSymbolAsync(renameReq, CancellationToken.None)
@@ -315,8 +323,8 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 3, 10, null, fsproj)
-            let renameReq = RenameSymbolRequest(req, "Renamed", false)
+            let req = languageRequest fs 3 10 null fsproj
+            let renameReq = renameRequest req "Renamed" false
 
             let result =
                 backend.RenameSymbolAsync(renameReq, CancellationToken.None)
@@ -345,8 +353,8 @@ module LanguageAdapterSmokeTests =
         else
             materializeGuidersSlnx slnx kernelFs
             let backend = FcsLanguageBackend() :> ILanguageBackend
-            let req = LanguageRequest(kernelFs, 87, 10, null, slnx)
-            let renameReq = RenameSymbolRequest(req, "LanguageRequestPreview", false)
+            let req = languageRequest kernelFs 87 10 null slnx
+            let renameReq = renameRequest req "LanguageRequestPreview" false
 
             let result =
                 backend.RenameSymbolAsync(renameReq, CancellationToken.None)
@@ -442,7 +450,7 @@ module LanguageAdapterSmokeTests =
             materializeGuidersSlnx slnx backendFs
 
             let backend = FcsLanguageBackend() :> ILanguageBackend
-            let req = LanguageRequest(backendFs, 1, 1, null, slnx)
+            let req = languageRequest backendFs 1 1 null slnx
 
             let result =
                 backend.GetDiagnosticsAsync(req, CancellationToken.None)
@@ -505,8 +513,8 @@ module LanguageAdapterSmokeTests =
 
         try
             let backend = projInfoBackend ()
-            let req = LanguageRequest(fs, 5, 18, null, fsproj)
-            let renameReq = RenameSymbolRequest(req, "renamed", true)
+            let req = languageRequest fs 5 18 null fsproj
+            let renameReq = renameRequest req "renamed" true
 
             let result =
                 backend.RenameSymbolAsync(renameReq, CancellationToken.None)

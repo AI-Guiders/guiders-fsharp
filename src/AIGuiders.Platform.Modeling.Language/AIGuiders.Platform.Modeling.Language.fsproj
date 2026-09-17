@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Kernel.fs" />
+    <Compile Include="LanguageEdits.fs" />
     <Compile Include="LanguageBackend.fs" />
   </ItemGroup>
 </Project>
