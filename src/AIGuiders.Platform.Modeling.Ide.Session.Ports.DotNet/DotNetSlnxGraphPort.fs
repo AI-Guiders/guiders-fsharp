@@ -2,12 +2,20 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 open AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Paths
+open DotNetWorkspace.Core
+
+/// Pre-loaded project topology row — Execution reads csproj/fsproj from disk.
+type DotNetProjectTopologyRow =
+    { Entry: DotNetProjectEntry
+      ProjectReferences: string list
+      SourceFiles: string list }
+
+type DotNetSolutionTopology =
+    { SolutionPath: string
+      Fingerprint: string
+      Rows: DotNetProjectTopologyRow list }
 
 module DotNetSlnxGraphPort =
-    open System.IO
-    open DotNetWorkspace.Core
-    open ProjectFileReader
-
     let toProjectKind (entry: DotNetProjectEntry) =
         match entry.Kind with
         | DotNetWorkspace.Core.DotNetProjectKind.CSharp -> DotNet { Language = DotNetLanguage.CSharp }
@@ -25,64 +33,47 @@ module DotNetSlnxGraphPort =
                 entry.AbsolutePath
                 (ProjectCapabilityCatalog.forKind (toProjectKind entry)))
 
-    let buildProjectRefRelations (entries: DotNetProjectEntry list) =
+    let buildProjectRefRelations (rows: DotNetProjectTopologyRow list) =
         let byPath =
-            entries
-            |> List.map (fun e -> e.AbsolutePath, ProjectId.create e.AbsolutePath)
+            rows
+            |> List.map (fun row -> row.Entry.AbsolutePath, ProjectId.create row.Entry.AbsolutePath)
             |> Map.ofList
 
-        entries
-        |> List.collect (fun entry ->
-            readProjectReferences entry.AbsolutePath
+        rows
+        |> List.collect (fun row ->
+            row.ProjectReferences
             |> List.choose (fun refPath ->
                 match Map.tryFind refPath byPath with
                 | None -> None
                 | Some toId ->
-                    Some(RelationGraph.projectRef (ProjectId.create entry.AbsolutePath) toId)))
+                    Some(RelationGraph.projectRef (ProjectId.create row.Entry.AbsolutePath) toId)))
 
-    let buildDocumentOwnership (entries: DotNetProjectEntry list) =
-        entries
-        |> List.collect (fun entry ->
-            let owner = ProjectId.create entry.AbsolutePath
+    let buildDocumentOwnership (rows: DotNetProjectTopologyRow list) =
+        rows
+        |> List.collect (fun row ->
+            let owner = ProjectId.create row.Entry.AbsolutePath
 
-            readSourceFiles entry.AbsolutePath
-            |> List.map (fun source -> source, owner))
+            row.SourceFiles |> List.map (fun source -> source, owner))
         |> List.fold (fun acc (source, owner) -> Map.add source owner acc) Map.empty
 
-    /// <summary>Parse slnx/sln/csproj/fsproj anchor into federation topology graph (ω lives on runtime registry).</summary>
-    let load (anchorPath: string) : SolutionGraph =
-        let parsed = DotNetWorkspace.Load anchorPath
-        let entries = parsed.Projects |> Seq.toList
-
+    /// <summary>Pure federation topology graph from pre-loaded rows (ω lives on runtime registry).</summary>
+    let buildGraph (topology: DotNetSolutionTopology) : SolutionGraph =
+        let entries = topology.Rows |> List.map (fun row -> row.Entry)
         let projects = buildProjectNodes entries
-        let relations = buildProjectRefRelations entries
+        let relations = buildProjectRefRelations topology.Rows
 
-        SolutionGraph.create (LogicalPath.Create parsed.SolutionPath) projects relations
+        SolutionGraph.create (LogicalPath.Create topology.SolutionPath) projects relations
 
-    let loadDocumentOwnership (anchorPath: string) : Map<string, ProjectId> =
-        let parsed = DotNetWorkspace.Load anchorPath
-        buildDocumentOwnership (parsed.Projects |> Seq.toList)
-
-    let loadSession (anchorPath: string) : SolutionSession =
-        let graph = load anchorPath
+    let buildSession (topology: DotNetSolutionTopology) : SolutionSession =
+        let graph = buildGraph topology
 
         SolutionSession.create graph.Anchor graph
         |> SolutionSession.withPhase DesignTime
 
-    let loadRuntime (anchorPath: string) (sourceOverrides: Map<string, string>) : SessionRuntime =
-        let session = loadSession anchorPath
-        let ownership = loadDocumentOwnership anchorPath
-
-        let pathContents =
-            ownership
-            |> Map.toSeq
-            |> Seq.map (fun (path, _) ->
-                let text =
-                    match Map.tryFind path sourceOverrides with
-                    | Some t -> t
-                    | None when File.Exists path -> File.ReadAllText path
-                    | _ -> ""
-
-                path, text)
-
+    let buildRuntime
+        (topology: DotNetSolutionTopology)
+        (pathContents: seq<string * string>)
+        : SessionRuntime =
+        let session = buildSession topology
+        let ownership = buildDocumentOwnership topology.Rows
         SessionOrchestrator.create session pathContents ownership

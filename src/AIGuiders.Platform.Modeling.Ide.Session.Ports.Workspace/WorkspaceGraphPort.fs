@@ -5,6 +5,12 @@ open System.IO
 open System.Text.RegularExpressions
 open AIGuiders.Platform.Modeling.Ide.Session
 
+/// Snapshot row for pure workspace graph build (Execution reads disk).
+type WorkspaceDocumentSnapshot =
+    { Path: string
+      Content: string
+      LastWriteUtc: DateTime }
+
 module WorkspaceLinks =
     /// Document extensions whose content is scanned for links.
     let extensions = [| ".md"; ".json"; ".toml"; ".yaml"; ".yml" |]
@@ -23,33 +29,25 @@ module WorkspaceLinks =
             ||| RegexOptions.IgnoreCase
         )
 
-    let files (root: string) =
-        Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
-        |> Seq.filter isDocument
-        |> Seq.map Path.GetFullPath
-        |> Seq.toList
-
     let private externalRef (raw: string) =
         raw.StartsWith("http://")
         || raw.StartsWith("https://")
         || raw.StartsWith("mailto:")
         || raw.StartsWith("#")
 
-    /// Navigation links from one document to its siblings (physical layer enrichment).
-    let links (root: string) : WorkspaceLink list =
-        let docs = files root
-        let known = Set.ofList docs
+    /// Navigation links from pre-loaded document contents (physical layer enrichment).
+    let linksFromSnapshots (documents: WorkspaceDocumentSnapshot list) : WorkspaceLink list =
+        let known = documents |> List.map (fun d -> d.Path) |> Set.ofList
 
-        docs
-        |> List.collect (fun fromPath ->
-            let dir = Path.GetDirectoryName fromPath
-            let text = File.ReadAllText fromPath
+        documents
+        |> List.collect (fun doc ->
+            let dir = Path.GetDirectoryName doc.Path
 
             let matches =
-                if Path.GetExtension(fromPath).Equals(".md", StringComparison.OrdinalIgnoreCase) then
-                    mdLink.Matches(text)
+                if Path.GetExtension(doc.Path).Equals(".md", StringComparison.OrdinalIgnoreCase) then
+                    mdLink.Matches(doc.Content)
                 else
-                    pathLiteral.Matches(text)
+                    pathLiteral.Matches(doc.Content)
 
             matches
             |> Seq.cast<Match>
@@ -59,20 +57,20 @@ module WorkspaceLinks =
                 Path.GetFullPath(Path.Combine(dir, raw.Replace('/', Path.DirectorySeparatorChar))))
             |> Seq.filter known.Contains
             |> Seq.distinct
-            |> Seq.map (fun target -> { FromPath = fromPath; ToPath = target })
+            |> Seq.map (fun target -> { FromPath = doc.Path; ToPath = target })
             |> Seq.toList)
 
-/// Physical layer port: document tree + navigation links (no solution semantics).
+/// Physical layer port: pure graph from document snapshots (no File IO in Modeling).
 module WorkspaceGraphPort =
-    let fingerprint (root: string) =
-        let docs = WorkspaceLinks.files root
+    let build (root: string) (documents: WorkspaceDocumentSnapshot list) : WorkspaceGraph =
+        let paths = documents |> List.map (fun d -> d.Path)
+        let links = WorkspaceLinks.linksFromSnapshots documents
+        WorkspaceGraph.create root paths links
 
+    let fingerprint (root: string) (documents: WorkspaceDocumentSnapshot list) : string =
         let latest =
-            match docs |> List.map File.GetLastWriteTimeUtc with
+            match documents |> List.map (fun d -> d.LastWriteUtc) with
             | [] -> DateTime.MinValue
             | stamps -> List.max stamps
 
-        $"{root}|docs={List.length docs}|{latest:o}"
-
-    let load (root: string) : WorkspaceGraph =
-        WorkspaceGraph.create root (WorkspaceLinks.files root) (WorkspaceLinks.links root)
+        $"{root}|docs={List.length documents}|{latest:o}"

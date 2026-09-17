@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 open System.IO
 open Xunit
+open AIGuiders.Platform.Execution.Ide.Session
 open AIGuiders.Platform.Modeling.Ide.Session
 
 type MsBuildSolutionProviderTests() =
@@ -56,8 +57,10 @@ type MsBuildSolutionProviderTests() =
         let root = createWorkspace ()
 
         try
+            let topology = DotNetSlnxGraphSources.LoadTopology(Path.Combine(root, "Mixed.slnx"))
+
             let provider =
-                MsBuildSolutionProvider(Path.Combine(root, "Mixed.slnx"))
+                MsBuildSolutionProvider.create topology
                 :> ISolutionInfoProvider
 
             Assert.Equal("msbuild", provider.Name)
@@ -77,15 +80,19 @@ type MsBuildSolutionProviderTests() =
         let root = createWorkspace ()
 
         try
-            let provider = MsBuildSolutionProvider(Path.Combine(root, "Mixed.slnx")) :> ISolutionInfoProvider
+            let provider =
+                DotNetSlnxGraphSources.LoadTopology(Path.Combine(root, "Mixed.slnx"))
+                |> MsBuildSolutionProvider.create
+                :> ISolutionInfoProvider
+
             Assert.Equal(provider.Fingerprint(), provider.Fingerprint())
         finally
             Directory.Delete(root, true)
+
     [<Fact>]
     member _.``Provider self-registered in the plugin catalog (ADR-0210 stage 1)``() =
         Assert.Equal("msbuild", Registration.name)
 
-        Registration.init ()
+        DotNetSolutionProviderRegistration.Init()
 
         Assert.Contains("msbuild", SolutionProviderRegistry.names ())
-

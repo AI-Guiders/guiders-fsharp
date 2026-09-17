@@ -24,6 +24,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | ship-5 props/shims | `UseGuidersModelingRelations` documented | `eng/Guiders.Modeling.relations.props` bundle | **shipped** |
 | ship-5 product docs | GDL catalog + README | platform README + architecture hub IR.Language retired | **shipped** |
 | Config schema | `Modeling.Configurations` pure predicates + `KnowledgeWire` parse | `Execution.Configurations.Workspace.Sources` IO (`KnowledgeWireSources`, `ConfigurationContractSources`) | **shipped** ship-29 |
+| Session port IO | pure `DotNetSlnxGraphPort` + `WorkspaceGraphPort` builders | `Execution.Ide.Session.Sources` (`DotNetSlnxGraphSources`, `WorkspaceGraphSources`, `DotNetProjectFileSources`) | **shipped** ship-30 |
 | GoldenEvidence scan IO | — | `Execution.Documentation.Correspondence.GoldenEvidence` workspace scan | **shipped** ship-28 |
 | C# IR fork | deleted | seam types in `Execution.LanguageIntelligence` | **shipped** IR.Language project removed |
 | Legacy F/M/L wires | Kind: canon in `Notations.Bracket` | `RelationWireBoundary` parse boundary only | **shipped** ship-23 shim deleted |

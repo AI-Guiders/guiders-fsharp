@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace
 
 open System.IO
 open Xunit
+open AIGuiders.Platform.Execution.Ide.Session
 open AIGuiders.Platform.Modeling.Ide.Session
 
 type WorkspaceGraphPortTests() =
@@ -41,7 +42,7 @@ type WorkspaceGraphPortTests() =
         let root = createTree ()
 
         try
-            let graph = WorkspaceGraphPort.load root
+            let graph = WorkspaceGraphSources.Load root
 
             Assert.Equal(5, graph.Files.Length)
             Assert.Equal(5, graph.Links.Length)
@@ -67,7 +68,7 @@ type WorkspaceGraphPortTests() =
         let root = createTree ()
 
         try
-            let graph = WorkspaceGraphPort.load root
+            let graph = WorkspaceGraphSources.Load root
             let index = Path.Combine(root, "index.md")
 
             let fromIndex = graph.Links |> List.filter (fun l -> l.FromPath = index)
@@ -80,6 +81,6 @@ type WorkspaceGraphPortTests() =
         let root = createTree ()
 
         try
-            Assert.Equal(WorkspaceGraphPort.fingerprint root, WorkspaceGraphPort.fingerprint root)
+            Assert.Equal(WorkspaceGraphSources.Fingerprint root, WorkspaceGraphSources.Fingerprint root)
         finally
             Directory.Delete(root, true)

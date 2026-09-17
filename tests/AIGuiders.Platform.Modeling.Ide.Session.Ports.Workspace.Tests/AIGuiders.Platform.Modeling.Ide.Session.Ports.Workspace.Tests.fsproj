@@ -12,6 +12,7 @@
     <Compile Include="WorkspaceGraphPortTests.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Execution.Ide.Session.Sources\AIGuiders.Platform.Execution.Ide.Session.Sources.csproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace\AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.fsproj" />
   </ItemGroup>
 </Project>

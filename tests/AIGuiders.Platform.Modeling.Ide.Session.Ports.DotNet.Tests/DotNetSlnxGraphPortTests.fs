@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet
 
 open System.IO
 open Xunit
+open AIGuiders.Platform.Execution.Ide.Session
 open AIGuiders.Platform.Modeling.Paths
 open AIGuiders.Platform.Modeling.Ide.Session
 
@@ -58,8 +59,8 @@ type DotNetSlnxGraphPortTests() =
 
         try
             let slnx = Path.Combine(root, "Mixed.slnx")
-            let graph = DotNetSlnxGraphPort.load slnx
-            let ownership = DotNetSlnxGraphPort.loadDocumentOwnership slnx
+            let graph = DotNetSlnxGraphSources.Load slnx
+            let ownership = DotNetSlnxGraphSources.LoadDocumentOwnership slnx
 
             Assert.Equal(2, graph.Projects.Length)
             Assert.Equal(1, SolutionGraph.projectRefEdges graph |> List.length)
@@ -86,7 +87,7 @@ type DotNetSlnxGraphPortTests() =
         let root = createWorkspace ()
 
         try
-            let session = DotNetSlnxGraphPort.loadSession (Path.Combine(root, "Mixed.slnx"))
+            let session = DotNetSlnxGraphSources.LoadSession (Path.Combine(root, "Mixed.slnx"))
             Assert.Equal(DesignTime, session.Phase)
             Assert.Equal(2, session.Graph.Projects.Length)
         finally
