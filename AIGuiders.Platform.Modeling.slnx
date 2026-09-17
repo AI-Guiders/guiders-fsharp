@@ -26,7 +26,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Config/AIGuiders.Platform.Modeling.Config.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Expression/AIGuiders.Platform.Modeling.Gdl.Expression.fsproj" />
   
-    <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Language/AIGuiders.Platform.Modeling.Gdl.Language.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Command.Melody/AIGuiders.Platform.Modeling.Gdl.Command.Melody.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Config/AIGuiders.Platform.Modeling.Gdl.Parse.Config.fsproj" />
@@ -41,7 +41,6 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Navigation/AIGuiders.Platform.Modeling.Navigation.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Argument/AIGuiders.Platform.Modeling.Notations.Argument.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language/AIGuiders.Platform.Modeling.Language.fsproj" />
-    <Project Path="src/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations/AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Fcs/AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Gdl/AIGuiders.Platform.Modeling.Language.Adapters.Gdl.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.fsproj" />
@@ -68,7 +67,6 @@
     <Project Path="tests/AIGuiders.Platform.Modeling.Config.Tests/AIGuiders.Platform.Modeling.Config.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession.Tests/AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession.Tests.fsproj" />
   
-    <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Language.Tests/AIGuiders.Platform.Modeling.Gdl.Language.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests/AIGuiders.Platform.Modeling.Gdl.Command.Melody.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog.Tests/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog.Tests.fsproj" />
     <Project Path="tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests/AIGuiders.Platform.Modeling.Gdl.Presentation.Tests.fsproj" />

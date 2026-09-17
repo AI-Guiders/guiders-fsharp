@@ -21,7 +21,7 @@ module GraphValidation =
         $"{e.Kind}-{e.From}-{e.To}"
 
     let private requiresEdges (graph: SolutionGraph) =
-        graph.Edges |> List.filter (fun e -> e.Kind = Requires)
+        graph.Edges |> List.filter (fun e -> e.Kind = SessionEdgeKind.Requires)
 
     let private hasNode (graph: SolutionGraph) (node: GraphNodeId) =
         match node with

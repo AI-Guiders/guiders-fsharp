@@ -18,6 +18,7 @@
     <Compile Include="SnapshotJobTests.fs" />
     <Compile Include="FrozenSnapshotTests.fs" />
     <Compile Include="ConformanceGoldenSessionTests.fs" />
+    <Compile Include="RelationGraphTests.fs" />
     <Compile Include="OpenBuildGoldenTests.fs" />
     <Compile Include="SolutionProviderRegistryTests.fs" />
   </ItemGroup>
