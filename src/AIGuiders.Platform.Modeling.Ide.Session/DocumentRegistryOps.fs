@@ -109,3 +109,20 @@ module DocumentRegistryOps =
         pathsForProject projectId registry
         |> List.choose (fun (docId, _) -> Map.tryFind docId contents |> Option.map (fun t -> docId, t))
         |> Map.ofList
+
+    /// Attach picker rows scoped to session document registry ω (plan §4.4).
+    type RegistryPickerChoice = { Id: string; Label: string }
+
+    let documentPathPickerChoices (registry: DocumentRegistry) : RegistryPickerChoice list =
+        registry
+        |> Map.toList
+        |> List.map (fun (_, meta) ->
+            let path = meta.Path.Value
+            let name = System.IO.Path.GetFileName path
+
+            let label =
+                if System.String.IsNullOrEmpty name then path
+                else $"{name} — {path}"
+
+            { Id = path; Label = label })
+        |> List.sortBy (fun choice -> choice.Label)

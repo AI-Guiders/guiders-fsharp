@@ -56,3 +56,19 @@ let ``applyPathRename updates registry path`` () =
         DocumentRegistryOps.resolvePath (LogicalPath.Create oldPath) registry'
         |> Option.isNone
     )
+
+[<Fact>]
+let ``documentPathPickerChoices lists registry paths`` () =
+    let owner = ProjectId.create @"D:\repo\App.fsproj"
+
+    let boot =
+        DocumentRegistryOps.bootstrap
+            [ @"D:\repo\Alpha.fs", "a"; @"D:\repo\Beta.fs", "b" ]
+            (Map.ofList [ @"D:\repo\Alpha.fs", owner; @"D:\repo\Beta.fs", owner ])
+            0L
+
+    let choices = DocumentRegistryOps.documentPathPickerChoices boot.Registry
+
+    Assert.Equal(2, choices.Length)
+    Assert.Contains(choices, fun c -> c.Id.EndsWith("Alpha.fs", System.StringComparison.OrdinalIgnoreCase))
+    Assert.Contains(choices, fun c -> c.Id.EndsWith("Beta.fs", System.StringComparison.OrdinalIgnoreCase))

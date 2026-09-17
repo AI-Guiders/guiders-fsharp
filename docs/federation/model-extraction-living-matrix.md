@@ -7,12 +7,12 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Relations kernel | `LanguageIntelligence.Relations` | `Execution.LanguageIntelligence.Relations` | **shipped** Phase 1 |
 | Scene projection | `Ide.Session.SceneProjection` | `Navigation.Code` | **shipped** |
 | Attach contract | `CommandPlane.AttachSchema` | `CommandPlane.Catalog` + `ArgSuggestions` step brokers | **shipped** verb+step pickers |
-| Attach contextual | `DiagnosticIndexOps.pickerChoices` | `AttachDiagnosticArgSuggestionProvider` + `IAttachSessionAccessor` | **shipped** pick_diagnostic scoped to session G |
+| Attach contextual | `DiagnosticIndexOps` + `DocumentRegistryOps` pickers | diagnostic + registry path providers | **shipped** pick_diagnostic/file/doc/nav |
 | FCS host IO | shapes in `Language.Adapters.Fcs` | `FcsExecutionHost` + `FcsExecutionProjectOptionsSource` bind | **shipped** options source @ Execution boundary |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | Config schema | `Modeling.Configurations` | `Execution.Configurations.*.Sources` | **exists** |
-| Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` shim | **shipped** |
+| Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` + Code NavSeed-first APIs | **partial** shim + overloads |
 | C# IR fork | shim only | delete post-conformance | **open** |
 | Legacy F/M/L wires | delete at boundary | `LegacyBracketRelationWire` transitional parse | **bounded** Obsolete + shim alias |
 
-**Next waves:** IR fork deletion after green conformance · full `FcsCompilerServicesHost` File IO move to Execution · attach contextual for code/nav/manual browse-all · `NavigationAnchor` rename sweep.
+**Next waves:** IR fork deletion · full `FcsCompilerServicesHost` File IO move · attach pick_member symbols · `NavigationAnchor` type removal · ADR-0063 full body.
