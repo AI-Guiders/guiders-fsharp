@@ -92,7 +92,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 |------|--------|------|
 | **ship-61a–c** | **AUX** — chain · choose · direct ([CDP-ADR-0229](../../../cdp-mcp/docs/adr/CDP-ADR-0229-agent-ux-locus-policy.md); LinesForum 008) | AttachSchema + MCP suggest + citizen step-intent |
 | **ship-60** | Delete `LegacyNavWireIngest` | BracketResolveBoundary Kind-only | **shipped** |
-| **ship-62** | Semantic editor — RelationSpec/locus primary | Phase 1 scaffolding (`CodeCenterHost`) **shipped**; substrate [`federation-text-surface`](https://github.com/AI-Guiders/federation-text-surface) + mirror [`AvalonEdit`](https://github.com/AI-Guiders/AvalonEdit) @ v6.3.1 **shipped** (62b); guiders-wpf NuGet→substrate wire **pending** |
-| **ship-63** | DashSpec Studio return | dash-spec-studio | **blocked** until TextEngine uses substrate |
+| **ship-62** | Semantic editor — RelationSpec/locus primary | Phase 1 scaffolding + substrate wired (`TextEngine` → `federation-text-surface` @ v6.3.1) | **partial** — semantic session in editor pending |
+| **ship-63** | DashSpec Studio return | dash-spec-studio | **blocked** until semantic session layer |
 
 Maintain FederationPhase* gates on every wave.
