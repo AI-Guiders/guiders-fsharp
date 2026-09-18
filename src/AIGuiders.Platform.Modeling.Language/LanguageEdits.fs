@@ -23,20 +23,3 @@ module BufferEditOutcome =
           SelectionEnd = Some selectionEnd
           TextMode = None
           Edits = None }
-
-/// <summary>Resolve input for anchor (raw wire). Prefer NormalizedBracketWire from Notations.Bracket.</summary>
-type AnchorWire = { Value: string }
-
-/// <summary>EditSniper-style scope (CDP: from/till/wire/pad) — transitional until CodeEdit/NavSeed canon.</summary>
-type SniperScope =
-    { FromLine: int option
-      TillLine: int option
-      Wire: string option
-      Pad: string option }
-
-module SniperScope =
-    let empty : SniperScope =
-        { FromLine = None
-          TillLine = None
-          Wire = None
-          Pad = None }

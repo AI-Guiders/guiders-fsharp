@@ -61,5 +61,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Navigation CLIMutable strip | plain F# `Navigation.Scene` records | `NavigationModels` constructor seam | **shipped** ship-39 |
 | Phase 1 checklist gate | `FederationPhase1ChecklistTests` | platform green + living matrix | **shipped** ship-39 |
 | BuildDiagnostic ingest | `BuildDiagnosticOps` via `DiagnosticIndexOps.ingestMapped` | `BuildDiagnosticIngest` @ Execution | **shipped** ship-41 |
+| AnchorWire SniperScope Modeling delete | removed from `Modeling.Language` | `LanguageSeamModels` Execution-only seam | **shipped** ship-42 |
 
 **Next waves:** Phase 2 modeling tree (plan §10).

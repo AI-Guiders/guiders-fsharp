@@ -6,6 +6,7 @@ open Microsoft.FSharp.Core
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.Documentation.Correspondence
 open AIGuiders.Platform.Modeling.Ide.Session
+open AIGuiders.Platform.Modeling.Language
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 open AIGuiders.Platform.Modeling.Navigation
 open AIGuiders.Platform.Modeling.Paths
@@ -23,7 +24,7 @@ type FederationPhase1ChecklistTests() =
 
         match ParseCommit.parse hex with
         | Ok _ -> ()
-        | Error e -> Assert.Fail e
+        | Result.Error e -> Assert.Fail e
 
     [<Fact>]
     member _.``ResolveTier has Syntax and Semantic only``() =
@@ -65,7 +66,7 @@ type FederationPhase1ChecklistTests() =
 
         match RelationGraph.validateRelation iface, RelationGraph.validateRelation obligation with
         | Ok (), Ok () -> ()
-        | Error e, _ | _, Error e -> Assert.Fail e.Message
+        | Result.Error e, _ | _, Result.Error e -> Assert.Fail e.Message
 
     [<Fact>]
     member _.``SolutionGraph uses DocumentRegistry not FileOwnership map``() =
@@ -98,6 +99,12 @@ type FederationPhase1ChecklistTests() =
               typeof<CorrespondenceResult> ] do
             let attr = t.GetCustomAttribute(typeof<CLIMutableAttribute>)
             Assert.Null attr
+
+    [<Fact>]
+    member _.``Modeling Language has no AnchorWire or SniperScope legacy wire types``() =
+        let languageAssembly = typeof<TextEdit>.Assembly
+        Assert.Null(languageAssembly.GetType("AIGuiders.Platform.Modeling.Language.AnchorWire"))
+        Assert.Null(languageAssembly.GetType("AIGuiders.Platform.Modeling.Language.SniperScope"))
 
     [<Fact>]
     member _.``Dependency and TypeSystem profiles ship Phase 1 kernels``() =
