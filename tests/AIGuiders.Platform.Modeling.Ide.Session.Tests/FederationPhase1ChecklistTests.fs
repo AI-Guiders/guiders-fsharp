@@ -79,9 +79,16 @@ type FederationPhase1ChecklistTests() =
 
     [<Fact>]
     member _.``Navigation scene records are not CLIMutable seam views``() =
-        for t in [ typeof<Anchor>; typeof<Node>; typeof<Edge>; typeof<SceneCaps>; typeof<Scene> ] do
+        for t in [ typeof<Node>; typeof<Edge>; typeof<SceneCaps>; typeof<Scene> ] do
             let attr = t.GetCustomAttribute(typeof<CLIMutableAttribute>)
             Assert.Null attr
+
+    [<Fact>]
+    member _.``Navigation scene uses Relations NavSeed not parallel Anchor``() =
+        let seedField = typeof<Scene>.GetProperty("Seed")
+        Assert.NotNull seedField
+        Assert.Equal(typeof<NavSeed>, seedField.PropertyType)
+        Assert.Null(typeof<Scene>.Assembly.GetType("AIGuiders.Platform.Modeling.Navigation.Anchor"))
 
     [<Fact>]
     member _.``Correspondence wire records are not CLIMutable seam views``() =

@@ -12,6 +12,8 @@
     <Compile Include="NavigationPolicyTests.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Navigation\AIGuiders.Platform.Modeling.Navigation.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Navigation.Policy\AIGuiders.Platform.Modeling.Navigation.Policy.fsproj" />
   </ItemGroup>

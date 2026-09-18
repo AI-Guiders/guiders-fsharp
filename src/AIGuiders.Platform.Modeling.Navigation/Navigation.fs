@@ -1,10 +1,12 @@
 namespace AIGuiders.Platform.Modeling.Navigation
 
 open System.IO
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
+open AIGuiders.Platform.Modeling.Paths
 
 /// <summary>
 /// Navigation scene IR (GUIDERS-FSHARP-ADR-0003 §4.8, GUIDERS-ADR-0033) — F# SSOT.
-/// Pure shapes: anchor, nodes, edges, caps. Builders live in Execution (Navigation.Code).
+/// Pure shapes: nav seed, nodes, edges, caps. Builders live in Execution (Navigation.Code).
 /// </summary>
 module Schemes =
     [<Literal>]
@@ -25,12 +27,6 @@ type Domain =
     | Code
     | Docs
     | Workspace
-
-type Anchor =
-    { Path: string
-      Line: int option
-      Column: int option
-      SolutionPath: string option }
 
 type Node =
     { Id: string
@@ -57,7 +53,7 @@ type SceneCaps =
 type Scene =
     { Schema: string
       Mode: Mode
-      Anchor: Anchor
+      Seed: NavSeed
       Nodes: Node list
       Edges: Edge list
       Caps: SceneCaps
@@ -65,11 +61,11 @@ type Scene =
 
 module Scene =
     /// <summary>Empty scene — same summary semantics as the transitional C# shape.</summary>
-    let empty (anchor: Anchor) (mode: Mode) (caps: SceneCaps) : Scene =
-        let fileName = Path.GetFileName(anchor.Path)
+    let empty (seed: NavSeed) (mode: Mode) (caps: SceneCaps) : Scene =
+        let fileName = Path.GetFileName(seed.Path.Value)
         { Schema = Schemes.SceneV1
           Mode = mode
-          Anchor = anchor
+          Seed = seed
           Nodes = []
           Edges = []
           Caps = caps

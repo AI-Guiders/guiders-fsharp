@@ -1,8 +1,10 @@
 module AIGuiders.Platform.Modeling.Navigation.Tests.NavigationPolicyTests
 
 open Xunit
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 open AIGuiders.Platform.Modeling.Navigation
 open AIGuiders.Platform.Modeling.Navigation.Policy
+open AIGuiders.Platform.Modeling.Paths
 
 [<Fact>]
 let ``related kinds: canonical tokens and case-insensitive lookup`` () =
@@ -78,8 +80,15 @@ let ``profile: fromExplore defaults and caps`` () =
 [<Fact>]
 let ``scene: empty has schema caps and summary`` () =
     let caps = Profile.toCaps Profile.exploreDefault
-    let anchor = { Path = "src/Foo.cs"; Line = None; Column = None; SolutionPath = None }
-    let scene = Scene.empty anchor Mode.Related caps
+    let seed =
+        { Path = LogicalPath.Create "src/Foo.cs"
+          Line = None
+          Column = None
+          Command = None
+          Go = None
+          Solution = None }
+
+    let scene = Scene.empty seed Mode.Related caps
     Assert.Equal(Schemes.SceneV1, scene.Schema)
     Assert.Equal<Node list>([], scene.Nodes)
     Assert.Contains("Foo.cs", scene.Summary)
