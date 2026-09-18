@@ -16,6 +16,7 @@
     <Compile Include="GraphNodeKind.fs" />
     <Compile Include="EditTypes.fs" />
     <Compile Include="StructuralEditBridge.fs" />
+    <Compile Include="MechanicalEditBridge.fs" />
     <Compile Include="RefreshScope.fs" />
     <Compile Include="LedgerTypes.fs" />
     <Compile Include="RePlannableThetaRegistry.fs" />

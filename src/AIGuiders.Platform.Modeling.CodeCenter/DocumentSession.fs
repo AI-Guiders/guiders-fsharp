@@ -54,7 +54,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     member _.ProjectText() = state.Current.Text
 
-    member _.ApplyMechanicalEdit(edit: MechanicalEdit) =
+    member _.ApplyMechanicalEdit(edit: MechanicalEdit) : Result<DocumentSession, string> =
         let after = StructuralPlan.applyMechanical state.Rebuild state.Current edit
         let scope = RefreshScope.ofEditScope edit.Scope
 
