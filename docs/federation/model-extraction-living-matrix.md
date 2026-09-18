@@ -18,7 +18,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | FCS patch apply IO | `FcsSessionPatchBridge` (pure map) + `IFcsSessionPatchApplier` port | `FcsSessionPatchApplier` bound @ `FcsModelingBindings` | **shipped** |
 | FCS backend text/graph IO | `IFcsSourceTextSource` + `IFcsSolutionGraphSource` ports | `FcsWorkspaceIoSource` bound @ `FcsModelingBindings` | **shipped** |
 | FCS fsproj ownership IO | `IFcsProjectOwnershipSource` port; `FcsProjectResolver` thin delegate | `FcsProjectOwnershipSource` bound @ `FcsModelingBindings` | **shipped** all FCS File/Directory IO @ Execution |
-| Nav seed naming | `Relations.NavSeed` | `Navigation.NavSeed` primary; `NavigationAnchor` deleted | **shipped** |
+| Nav seed naming | `Relations.NavSeed` in `Navigation.Scene.Seed` | `Navigation.NavSeed` seam → Relations kernel | **shipped** ship-40 |
 | Kind: bracket wire | `Notations.Bracket` | `Notations.Bracket` + conformance | **shipped** canon vectors |
 | ADR-0063 TO-BE | — | `GUIDERS-ADR-0063` §9–§10 RelationSpec normative | **shipped** §10 body |
 | ADR-0003 tree amend | §4.8–§5 Relations/Agent/Correspondence | — | **shipped** |
@@ -60,5 +60,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | CompilerServices E_dep v2 | `buildExtends` / `buildImplementsInterface` / `buildTypeUses` | `RoslynDependencyRelationIngest.IngestProjectSources` + `IngestForProject` @ ensure | **shipped** ship-38 |
 | Navigation CLIMutable strip | plain F# `Navigation.Scene` records | `NavigationModels` constructor seam | **shipped** ship-39 |
 | Phase 1 checklist gate | `FederationPhase1ChecklistTests` | platform green + living matrix | **shipped** ship-39 |
+| BuildDiagnostic ingest | `BuildDiagnosticOps` via `DiagnosticIndexOps.ingestMapped` | `BuildDiagnosticIngest` @ Execution | **shipped** ship-41 |
 
 **Next waves:** Phase 2 modeling tree (plan §10).
