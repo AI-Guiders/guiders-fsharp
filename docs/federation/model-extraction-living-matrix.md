@@ -98,5 +98,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | **ship-63** | DashSpec Studio CodeCenter host + async diagnostics tag | dash-spec-studio + STUDIO-ADR-0005 | **shipped** |
 | **ship-64** | FormSurface + PreviewSurface in Studio | CodeCenterHost Form/Preview | **shipped** |
 | **ship-62** | Semantic editor — RelationSpec/locus primary | CodeCenter doc slice @ ide-session §2.12 | **shipped** |
+| **ship-avalonedit-phase4** | AvalonEdit mirror submodule + TextEngine substrate peel | `federation-text-surface` + no planet `ICSharpCode.*` | **shipped** |
 
 Maintain FederationPhase* gates on every wave.
