@@ -92,7 +92,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 |------|--------|------|
 | **ship-61a–c** | **AUX** — chain · choose · direct ([CDP-ADR-0229](../../../cdp-mcp/docs/adr/CDP-ADR-0229-agent-ux-locus-policy.md); LinesForum 008) | AttachSchema + MCP suggest + citizen step-intent |
 | **ship-60** | Delete `LegacyNavWireIngest` | BracketResolveBoundary Kind-only | **shipped** |
-| **ship-62** | Semantic editor — RelationSpec/locus primary | Code Center / STUDIO-ADR-0005 |
+| **ship-62** | Semantic editor — RelationSpec/locus primary | Code Center Phase 1 (`CodeCenterHost`, `SessionLocusResolver`) | **shipped** |
 | **ship-63** | DashSpec Studio return | dash-spec-studio |
 
 Maintain FederationPhase* gates on every wave.
