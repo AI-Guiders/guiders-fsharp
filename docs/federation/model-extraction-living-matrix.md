@@ -69,6 +69,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | ReverseAnchor wire delete | `DocToCodeWitness` + typed `CorrespondenceRelationKind`; `DocToCodeWitnessBridge` | `DocToCodeWitness` seam; `IngestDocToCodeWitnesses` | **shipped** ship-46 |
 | CRS ingest on Open | `CorrespondenceRelationOps` | `Open` + `IngestFromRegistry` when workspace root found | **shipped** ship-47 |
 | Correspondence.Kind canon | typed `CorrespondenceRelationKind` on witness | `CorrespondenceKind.NormalizeWire` @ resolver boundary | **shipped** ship-47 |
-| BracketAnchorSpan retirement | absent from Modeling | `[Obsolete]` legacy wire IR; RelationSpec resolve hot path | **in progress** ship-47 |
+| BracketAnchorSpan retirement | absent from Modeling | `BracketAnchorSpan` deleted; `CodeEditResolveAxes` + `LegacyWireSpan` boundary | **shipped** ship-48 |
 
-**Next waves:** BracketAnchorSpan type delete @ Execution, dotnet build diagnostic producer wiring, full §10 TO-BE review.
+**Next waves:** LegacyWireSpan F/M/L conformance retirement, dotnet build diagnostic producer wiring, full §10 TO-BE review.

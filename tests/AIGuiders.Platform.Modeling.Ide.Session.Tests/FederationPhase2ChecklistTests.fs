@@ -10,7 +10,7 @@ open Xunit
 type FederationPhase2ChecklistTests() =
 
     [<Fact>]
-    member _.``Modeling has no legacy BracketAnchorSpan wire type``() =
+    member _.``Modeling has no legacy BracketAnchorSpan or ReverseAnchor wire types``() =
         let languageAssembly = typeof<TextEdit>.Assembly
         Assert.Null(languageAssembly.GetType("AIGuiders.Platform.Modeling.Language.BracketAnchorSpan"))
 
