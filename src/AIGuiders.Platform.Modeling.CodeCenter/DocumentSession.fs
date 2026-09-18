@@ -23,6 +23,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
     member _.Revision = state.Revision
     member _.Text = state.Current.Text
     member _.CommittedCount = state.LambdaCommitted.Length
+    member _.EphemeralMechanicalCount = state.EphemeralMechanical.Length
     member _.RefreshScopes = state.RefreshScopes
     member _.PartialParse = state.PartialParse
     member _.LambdaCommitted = state.LambdaCommitted
@@ -67,7 +68,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
         Ok(DocumentSession(documentId, docId, gitPin, newState))
 
-    member _.CommitMechanicalBatch() =
+    member _.CommitMechanicalBatch() : Result<DocumentSession * LedgerEntryDoc, string> =
         if List.isEmpty state.EphemeralMechanical then
             Error "no ephemeral mechanical edits to commit"
         else
@@ -158,6 +159,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
                 { state with
                     Current = replayed
                     Revision = target
+                    LambdaCommitted = state.LambdaCommitted |> List.truncate target
                     EphemeralMechanical = [] }
 
             Ok(DocumentSession(documentId, docId, gitPin, newState))
