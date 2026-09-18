@@ -24,6 +24,7 @@
     <Compile Include="FederationPhase1ChecklistTests.fs" />
     <Compile Include="FederationPhase2ChecklistTests.fs" />
     <Compile Include="FederationPhase34ChecklistTests.fs" />
+    <Compile Include="FederationPhase10ChecklistTests.fs" />
     <Compile Include="CorrespondenceRelationTests.fs" />
     <Compile Include="CorrespondenceRelationOpsTests.fs" />
     <Compile Include="SessionGraphPickerChoicesTests.fs" />
@@ -38,6 +39,8 @@
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language.Adapters.Fcs\AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
-    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Agent\AIGuiders.Platform.Modeling.Agent.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Build\AIGuiders.Platform.Modeling.Build.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Notations.Bracket\AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />
   </ItemGroup>
 </Project>

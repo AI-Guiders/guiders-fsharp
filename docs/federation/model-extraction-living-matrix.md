@@ -72,5 +72,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | BracketAnchorSpan retirement | absent from Modeling | `BracketAnchorSpan` deleted; `CodeEditResolveAxes` + `LegacyWireSpan` boundary | **shipped** ship-48 |
 | Build diagnostic producer | `BuildDiagnosticOps` ingest | `BuildDiagnosticProducer` + `TryRunBuildAndIngestDiagnostics` | **shipped** ship-49 |
 | LegacyWireSpan conformance retirement | `CodeEditWireEncoding` Kind axes | anchor-resolve + canon specs kind-spec only; legacy-span conformance path removed | **shipped** ship-50 |
+| §10 TO-BE audit | requirement-by-requirement evidence table | `model-extraction-to-be-audit.md` + `FederationPhase10ChecklistTests` | **shipped** ship-51 (closure **BLOCKED** — 6 partials) |
 
-**Next waves:** full §10 TO-BE review.
+**Next waves:** LegacyWireSpan runtime boundary retirement, stale ADR/math refresh, goal closure when audit all `verified`.
