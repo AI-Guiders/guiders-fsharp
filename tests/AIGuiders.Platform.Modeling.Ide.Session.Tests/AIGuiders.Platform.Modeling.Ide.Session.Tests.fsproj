@@ -22,6 +22,7 @@
     <Compile Include="DependencyRelationTests.fs" />
     <Compile Include="DependencyRelationOpsTests.fs" />
     <Compile Include="FederationPhase1ChecklistTests.fs" />
+    <Compile Include="FederationPhase2ChecklistTests.fs" />
     <Compile Include="FederationPhase34ChecklistTests.fs" />
     <Compile Include="CorrespondenceRelationTests.fs" />
     <Compile Include="CorrespondenceRelationOpsTests.fs" />
