@@ -75,5 +75,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | §10 TO-BE audit | requirement-by-requirement evidence table | `model-extraction-to-be-audit.md` + `FederationPhase10ChecklistTests` | **shipped** ship-51 (closure **BLOCKED** — 5 partials) |
 | BracketResolveBoundary | Kind-first unified wire parse | `BracketResolveBoundary` + `buildCodeEdit` doc profile | **shipped** ship-52 |
 | P4-01 docs refresh | ADR-0042 IR.Language retirement; math ω → DocumentRegistry | Phase10 ADR/math gates | **shipped** ship-52 |
+| CDP BracketLocate migration | `BracketResolveBoundary` + `LegacyWireSpan`; no `BracketAnchorSpan` | guiders-core `Cdp.ScriptableIde` + `BracketLocateDelegationTests` | **shipped** ship-53 |
+| CDP CRS witness mapping | platform `DocToCodeWitness` | `WorkspaceCorrespondence` maps `DocToCodeWitnesses` (CDP `ReverseAnchor` façade) | **shipped** ship-53 |
 
-**Next waves:** LegacyWireSpan runtime delete, consumer Kind: codemod, goal closure when audit all `verified`.
+**Next waves:** LegacyWireSpan runtime delete, Kind: emit codemod, goal closure when audit all `verified`.
