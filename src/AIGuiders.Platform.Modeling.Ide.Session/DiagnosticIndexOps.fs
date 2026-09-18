@@ -22,9 +22,10 @@ module DiagnosticIndexOps =
             let v = DiagnosticRef.carrier ref |> NumericId.value
             max acc v) 0L
 
-    let ingest (incoming: IncomingDiagnostic seq) (runtime: SessionRuntime) : SessionRuntime =
+    let ingestMapped (incoming: IncomingDiagnostic list) (runtime: SessionRuntime) : SessionRuntime * DiagnosticRef list =
         let mutable counter = nextCounter runtime.Diagnostics
         let mutable index = runtime.Diagnostics
+        let refs = ResizeArray()
 
         for item in incoming do
             counter <- counter + 1L
@@ -41,8 +42,12 @@ module DiagnosticIndexOps =
                   SurfaceVersion = item.SurfaceVersion }
 
             index <- Map.add ref diagRecord index
+            refs.Add ref
 
-        { runtime with Diagnostics = index }
+        ({ runtime with Diagnostics = index }, refs |> Seq.toList)
+
+    let ingest (incoming: IncomingDiagnostic seq) (runtime: SessionRuntime) : SessionRuntime =
+        ingestMapped (incoming |> Seq.toList) runtime |> fst
 
     /// <summary>Replace session index for a language refresh scope (plan §2.4.2).</summary>
     let refresh (incoming: IncomingDiagnostic seq) (runtime: SessionRuntime) : SessionRuntime =

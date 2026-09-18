@@ -11,6 +11,7 @@
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Documentation.Correspondence\AIGuiders.Platform.Modeling.Documentation.Correspondence.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Build\AIGuiders.Platform.Modeling.Build.fsproj" />
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Navigation\AIGuiders.Platform.Modeling.Navigation.fsproj" />
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +40,7 @@
     <Compile Include="RevisionLedger.fs" />
     <Compile Include="SessionRuntime.fs" />
     <Compile Include="DiagnosticIndexOps.fs" />
+    <Compile Include="BuildDiagnosticOps.fs" />
     <Compile Include="DependencyRelationOps.fs" />
     <Compile Include="SessionGraphPickerChoices.fs" />
     <Compile Include="CompilerServicesMaterialization.fs" />
