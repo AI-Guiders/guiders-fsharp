@@ -28,7 +28,7 @@ Bracket `Kind:` canon maps to `relation_spec_i` at parse boundary only:
 | Diag | DiagnosticId | `Diag` |
 | Nav | File, Line?, Column?, Member?, Command?, Go?, Solution? | `Nav` |
 
-Legacy `F:`/`M:`/`L:` and `Family:navigation` wires are not SSOT — transitional Execution ingest only (`RelationWireBoundary.TryParseDocScan`, `LegacyNavWireIngest`); emit canon is `Kind:Nav` / `Kind:CodeEdit`.
+Legacy `F:`/`M:`/`L:` wires are not SSOT — transitional Execution ingest only (`RelationWireBoundary.TryParseDocScan`); nav emit/parse canon is `Kind:Nav` / `Kind:CodeEdit` only (ship-60).
 
 ## Document identity (`doc_id` ↔ `DocumentRef`)
 
