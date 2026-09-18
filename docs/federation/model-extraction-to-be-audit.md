@@ -5,7 +5,7 @@ Progress tracker (non-normative): [model-extraction-living-matrix.md](./model-ex
 
 **Closure rule:** goal closes only when every row below is `verified` against code/tests — not matrix ticks alone.
 
-**Summary (ship-58):** verified **30** · partial **1** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan delete).
+**Summary (ship-59):** verified **31** · partial **0** · gap **0** · **CLOSURE: CLOSED**
 
 Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim · **gap** = missing TO-BE behavior.
 
@@ -23,7 +23,7 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 | P1-06 | Relation + RelationType in Ide.Session; SessionEdgeKind → Relation | verified | `RelationGraph.fs`, `SolutionGraph` | Phase1 Relations field test |
 | P1-07 | Dependency kernel + TypeSystem profile; AdapterSlot Execution-only | verified | `DependencyRelationKind`, `TypeSystemProfile`, platform `AdapterSlotRegistry` | Phase1 + `DependencyKernelPlatformTests` |
 | P1-08 | Delete `Modeling.Gdl.Language`; props + IR shim | verified | no `Modeling.Gdl.Language` project; platform no `IR.Language` csproj | Phase10 Gdl.Language absent |
-| P1-09 | Notations.Bracket — Kind: canon; delete BracketAnchorSpan, AnchorWire, SniperScope | partial | Kind: + `BracketResolveBoundary`; CRS witness wires via `BuildCodeEdit`; doc reverse-scan still parses F/M/L prose; `LegacyWireSpan` runtime shim | Phase1 deletes; `CorrespondenceWireTests`, `DocReverseAnchorResolverTests` |
+| P1-09 | Notations.Bracket — Kind: canon; delete BracketAnchorSpan, AnchorWire, SniperScope | verified | Kind: + `BracketResolveBoundary`; `LegacyWireSpan` deleted; `RelationWireBoundary.TryParseDocScan` doc ingest only; `LegacyNavWireIngest` for nav legacy | Phase1 deletes; `CorrespondenceWireTests`, `DocReverseAnchorResolverTests`, Phase2/10 gates |
 | P1-10 | RelationAttributes; NavSeed; Navigation.Scene.Edge projection | verified | `RelationAttributes`, `NavSeed`, `SceneProjection` | Phase1 NavSeed / SceneProjection tests |
 | P1-11 | CLIMutable strip from kernel; seam/LRC only | verified | Navigation + Correspondence records plain F# | Phase1 CLIMutable tests |
 | P1-12 | Execution *Relations* rename; registry interfaces | verified | `Execution.Language.*.Relations`, `IResolveRelation` | matrix ship-16/17, `RelationSeamContractTests` |
@@ -60,9 +60,7 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 
 ## Partial items (block closure)
 
-| ID | What remains | Owner slice |
-|----|--------------|-------------|
-| P1-09 | Delete `LegacyWireSpan`; `RelationWireBoundary` doc-scan ingest only | ship-59+ boundary |
+None — all audit rows verified (ship-59).
 
 ---
 

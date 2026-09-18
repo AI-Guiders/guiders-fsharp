@@ -83,5 +83,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Kind:Nav wire boundary | `NavResolveAxes` + flatten legacy nested nav | `TryParseNav` / `TryFormatNav`; CDP nav Format → Kind:Nav | **shipped** ship-56 |
 | Kind:Nav command-only | `RelationSpec.Nav` without File when Command/Go set | `TryFormatNav` command-only; CitizenIntentRouter restore/go/flat Kind:Nav | **shipped** ship-57 |
 | Kind:Nav member flat | `NavSeed.Member` + flatten legacy nested nav | CitizenIntentRouter member emit; `TryFormatNav` Member axis | **shipped** ship-58 |
+| LegacyWireSpan delete | `CodeEditResolveAxes` / `NavResolveAxes` SSOT | `LegacyWireSpan` deleted; `RelationWireBoundary` doc-scan; `LegacyNavWireIngest` | **shipped** ship-59 · **CLOSURE: CLOSED** |
 
-**Next waves:** delete `LegacyWireSpan`, goal closure when audit all `verified`.
+**Next waves:** none — §10 audit closed; maintain gates on FederationPhase*.
