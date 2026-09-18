@@ -254,5 +254,3 @@ module DocumentGraph =
             | None -> false
             | Some node -> node.Start = location.Start && node.End = location.End
 
-    let tryFormatNodeIdWire (id: NodeId option) =
-        id |> Option.map DocumentNodeIdWire.format |> Option.toObj
