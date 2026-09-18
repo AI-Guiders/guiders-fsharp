@@ -55,6 +55,19 @@ let ``Kind CodeEdit Element parses xml wire encoding`` () =
     | Some _ -> Assert.Fail "unexpected spec case"
 
 [<Fact>]
+let ``Kind Nav command-only parses NavSeed without file`` () =
+    let wire =
+        { ProfileId = BracketProfiles.CdpSquareKeyValue.Id
+          Raw = "[Kind:Nav; Command:restore]"
+          Axes = [ BracketAxis("Kind", ':', "Nav"); BracketAxis("Command", ':', "restore") ] :> IReadOnlyList<_> }
+
+    match BracketRelationWire.tryParseRelationSpec wire with
+    | Some (RelationSpec.Nav seed) ->
+        Assert.True(seed.Path.IsEmpty)
+        Assert.Equal(Some "restore", seed.Command)
+    | _ -> failwith "expected Nav spec"
+
+[<Fact>]
 let ``Kind Nav parses NavSeed`` () =
     let wire =
         { ProfileId = BracketProfiles.CdpSquareKeyValue.Id

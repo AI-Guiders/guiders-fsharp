@@ -119,16 +119,33 @@ module BracketRelationWire =
                     | _ -> None
                 | None -> None
             | "Nav" ->
-                match axisValue wire "File" with
-                | Some path ->
-                    let seed =
-                        { Path = LogicalPath.Create path
-                          Line = axisValue wire "Line" |> Option.bind (fun s -> System.Int32.TryParse(s) |> function true, v -> Some v | _ -> None)
-                          Column = axisValue wire "Column" |> Option.bind (fun s -> System.Int32.TryParse(s) |> function true, v -> Some v | _ -> None)
-                          Command = axisValue wire "Command"
-                          Go = axisValue wire "Go"
-                          Solution = axisValue wire "Solution" |> Option.map LogicalPath.Create }
+                let line =
+                    axisValue wire "Line"
+                    |> Option.bind (fun s -> System.Int32.TryParse(s) |> function true, v -> Some v | _ -> None)
 
-                    RelationSpec.Nav seed |> Some
-                | None -> None
+                let column =
+                    axisValue wire "Column"
+                    |> Option.bind (fun s -> System.Int32.TryParse(s) |> function true, v -> Some v | _ -> None)
+
+                let command = axisValue wire "Command"
+                let go = axisValue wire "Go"
+
+                let solution =
+                    axisValue wire "Solution" |> Option.map LogicalPath.Create
+
+                let seed path =
+                    { Path = path
+                      Line = line
+                      Column = column
+                      Command = command
+                      Go = go
+                      Solution = solution }
+
+                match axisValue wire "File" with
+                | Some path when not (System.String.IsNullOrWhiteSpace path) ->
+                    RelationSpec.Nav(seed (LogicalPath.Create path)) |> Some
+                | _ ->
+                    match command, go with
+                    | None, None -> None
+                    | _ -> RelationSpec.Nav(seed LogicalPath.Empty) |> Some
             | _ -> None

@@ -5,7 +5,7 @@ Progress tracker (non-normative): [model-extraction-living-matrix.md](./model-ex
 
 **Closure rule:** goal closes only when every row below is `verified` against code/tests — not matrix ticks alone.
 
-**Summary (ship-56):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan delete; P1-13 command-only nav legacy).
+**Summary (ship-57):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan delete; P1-13 member-nested nav Family: emit).
 
 Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim · **gap** = missing TO-BE behavior.
 
@@ -27,7 +27,7 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 | P1-10 | RelationAttributes; NavSeed; Navigation.Scene.Edge projection | verified | `RelationAttributes`, `NavSeed`, `SceneProjection` | Phase1 NavSeed / SceneProjection tests |
 | P1-11 | CLIMutable strip from kernel; seam/LRC only | verified | Navigation + Correspondence records plain F# | Phase1 CLIMutable tests |
 | P1-12 | Execution *Relations* rename; registry interfaces | verified | `Execution.Language.*.Relations`, `IResolveRelation` | matrix ship-16/17, `RelationSeamContractTests` |
-| P1-13 | Codemod wires/tests | partial | `TryParseToAxes` Kind-only; CDP `Format` default Kind for code/xml/json; legacy ingest via `RelationWireBoundary` (nav + doc F/M/L) | `BracketResolveBoundaryTests`, `BracketLocateDelegationTests`, Phase2 gate |
+| P1-13 | Codemod wires/tests | partial | Kind:Nav command-only parse/format + CitizenIntentRouter restore/go/flat emit; member-nested nav still Family: | `BracketResolveBoundaryTests`, `BracketLocateDelegationTests`, `CitizenLandHostTests`, Phase2 gate |
 | P1-14 | Homonyms ImplementsInterface / ImplementsObligation | verified | distinct RelationType + CorrespondenceRelationKind | Phase1 homonym test |
 | P1-15 | DiagnosticIndex + ingest; LRC Id → Code at ingest | verified | `DiagnosticIndexOps`, `DiagnosticIndexIngest` | ship-22 tests |
 | P1-16 | SessionContents + DocumentRegistry; drop FileOwnership | verified | `DocumentRegistryOps`, `SessionRuntime.Contents` | Phase1 FileOwnership absent |
@@ -62,8 +62,8 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 
 | ID | What remains | Owner slice |
 |----|--------------|-------------|
-| P1-09 | Delete `LegacyWireSpan` / shrink `RelationWireBoundary` to doc-scan + nav ingest only | ship-56+ boundary |
-| P1-13 | Navigation Kind: wire + retire `RelationWireBoundary` parse path | nav codemod |
+| P1-09 | Delete `LegacyWireSpan`; `RelationWireBoundary` doc-scan ingest only | ship-57+ boundary |
+| P1-13 | Member-nested nav still Family:navigation emit (flat file nav → Kind:Nav done) | nav codemod ship-58 |
 
 ---
 

@@ -81,5 +81,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Kind-only resolve boundary | `TryParseToAxes` Kind-spec only | legacy F/M/L ingest via `RelationWireBoundary` @ `BracketLocate.Parse` | **shipped** ship-55 |
 | CDP default Kind emit | non-nav `Format` | code/xml/json/fsharp wires default `[Kind:CodeEdit; …]` | **shipped** ship-55 |
 | Kind:Nav wire boundary | `NavResolveAxes` + flatten legacy nested nav | `TryParseNav` / `TryFormatNav`; CDP nav Format → Kind:Nav | **shipped** ship-56 |
+| Kind:Nav command-only | `RelationSpec.Nav` without File when Command/Go set | `TryFormatNav` command-only; CitizenIntentRouter restore/go/flat Kind:Nav | **shipped** ship-57 |
 
-**Next waves:** delete `LegacyWireSpan`, command-only nav Kind:Nav, goal closure when audit all `verified`.
+**Next waves:** delete `LegacyWireSpan`, member-nested nav Kind:Nav, goal closure when audit all `verified`.
