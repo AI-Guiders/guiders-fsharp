@@ -40,6 +40,13 @@ type DocumentSnapshot =
 
 type DocumentGraphRebuild = string -> DocumentSnapshot
 
+type DocumentGraphNode =
+    { NodeWire: string
+      Kind: string
+      Name: string
+      Range: LineRange
+      ParentWire: string option }
+
 module DocumentGraph =
     let private nextNodeId (nodes: Map<NodeId, DocumentNode>) =
         let maxId =
@@ -85,6 +92,45 @@ module DocumentGraph =
 
     let classificationSpans (snapshot: DocumentSnapshot) : SessionClassificationSpan list =
         snapshot.TokenSpans
+
+    let formatNodeId (id: NodeId) =
+        $"node:{NumericId.value (NodeId.carrier id)}"
+
+    let listNodes (snapshot: DocumentSnapshot) : DocumentGraphNode list =
+        snapshot.Nodes
+        |> Map.toList
+        |> List.sortBy (fun (_, node) -> node.Start)
+        |> List.map (fun (_, node) ->
+            { NodeWire = formatNodeId node.Id
+              Kind = node.Kind
+              Name = node.Name
+              Range = LineRange.create node.Start node.End
+              ParentWire = node.Parent |> Option.map formatNodeId })
+
+    let private tryParseNodeWire (wire: string) =
+        if String.IsNullOrWhiteSpace wire then
+            None
+        elif not (wire.StartsWith("node:", StringComparison.Ordinal)) then
+            None
+        else
+            match Int64.TryParse(wire.Substring 5) with
+            | true, value -> Some value
+            | _ -> None
+
+    let tryResolveNodeWire (snapshot: DocumentSnapshot) (wire: string) =
+        match tryParseNodeWire wire with
+        | None -> None
+        | Some counter ->
+            let nodeId = NodeId.mint (NumericId.ofCounter counter)
+
+            match Map.tryFind nodeId snapshot.Nodes with
+            | None -> None
+            | Some node ->
+                Some
+                    { Start = node.Start
+                      End = node.End
+                      Tier = "Semantic"
+                      NodeId = Some node.Id }
 
     let renameNode (snapshot: DocumentSnapshot) (nodeId: NodeId) (newName: string) =
         match Map.tryFind nodeId snapshot.Nodes with
@@ -200,9 +246,6 @@ module DocumentGraph =
             match Map.tryFind id snapshot.Nodes with
             | None -> false
             | Some node -> node.Start = location.Start && node.End = location.End
-
-    let formatNodeId (id: NodeId) =
-        $"node:{NumericId.value (NodeId.carrier id)}"
 
     let tryFormatNodeIdWire (id: NodeId option) =
         id |> Option.map formatNodeId |> Option.toObj

@@ -39,6 +39,12 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
     member _.GetFoldingRegions() =
         state.Current.FoldingRegions :> System.Collections.Generic.IReadOnlyList<_>
 
+    member _.GetDocumentNodes() =
+        DocumentGraph.listNodes state.Current :> System.Collections.Generic.IReadOnlyList<_>
+
+    member _.TryResolveNodeWire(wire: string) =
+        DocumentGraph.tryResolveNodeWire state.Current wire
+
     member _.TryResolve(anchor: SessionAnchor) = DocumentGraph.tryResolve state.Current anchor
 
     member _.GetCompletions(anchor: SessionAnchor) = state.Completions state.Current anchor

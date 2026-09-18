@@ -161,3 +161,20 @@ module DocumentSessionConformanceTests =
             match entry.Theta with
             | Structural (InsertBlock _) -> Assert.Equal(1, session'.CommittedCount)
             | _ -> Assert.Fail("expected structural InsertBlock ledger entry")
+
+    [<Fact>]
+    let ``V12 graph nodes export and node wire resolve`` () =
+        let session = ConformanceFixtures.createDemoSession()
+        let nodes = session.GetDocumentNodes() |> Seq.toList
+        Assert.True(nodes.Length >= 2)
+
+        let tab =
+            nodes
+            |> List.find (fun node -> node.Name = "x")
+
+        match session.TryResolveNodeWire tab.NodeWire with
+        | None -> Assert.Fail("expected node wire locus")
+        | Some locus ->
+            Assert.Equal("Semantic", locus.Tier)
+            Assert.True(locus.NodeId.IsSome)
+            Assert.True(DocumentGraph.nodeIdRoundTrip (ConformanceFixtures.rebuild session.Text) locus)
