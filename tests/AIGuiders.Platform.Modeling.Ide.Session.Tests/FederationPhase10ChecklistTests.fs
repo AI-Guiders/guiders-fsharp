@@ -24,7 +24,7 @@ type FederationPhase10ChecklistTests() =
         Assert.Contains("Phase 2", text)
         Assert.Contains("Phase 3", text)
         Assert.Contains("Phase 4", text)
-        Assert.Contains("CLOSURE: BLOCKED", text)
+        Assert.Contains("CLOSURE: CLOSED", text)
         Assert.Contains("P4-01", text)
 
     [<Fact>]
