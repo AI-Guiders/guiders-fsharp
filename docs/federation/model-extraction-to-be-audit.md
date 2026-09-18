@@ -5,7 +5,7 @@ Progress tracker (non-normative): [model-extraction-living-matrix.md](./model-ex
 
 **Closure rule:** goal closes only when every row below is `verified` against code/tests — not matrix ticks alone.
 
-**Summary (ship-54):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09, P1-13 — LegacyWireSpan + legacy parse fallback remain).
+**Summary (ship-55):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan shim; P1-13 nav/ingest legacy).
 
 Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim · **gap** = missing TO-BE behavior.
 
@@ -27,7 +27,7 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 | P1-10 | RelationAttributes; NavSeed; Navigation.Scene.Edge projection | verified | `RelationAttributes`, `NavSeed`, `SceneProjection` | Phase1 NavSeed / SceneProjection tests |
 | P1-11 | CLIMutable strip from kernel; seam/LRC only | verified | Navigation + Correspondence records plain F# | Phase1 CLIMutable tests |
 | P1-12 | Execution *Relations* rename; registry interfaces | verified | `Execution.Language.*.Relations`, `IResolveRelation` | matrix ship-16/17, `RelationSeamContractTests` |
-| P1-13 | Codemod wires/tests | partial | conformance v2 kind-spec; `BracketResolveBoundary` Kind-first; CDP parse via `TryParseToAxes`; legacy fallback for nav/F/M/L until Kind: emit | `BracketResolveBoundaryTests`, Phase2 gate, cdp-mcp delegation |
+| P1-13 | Codemod wires/tests | partial | conformance v2 kind-spec; `TryFormatCodeEdit` + CDP `Format(preferCanonical)`; legacy fallback for nav/F/M/L parse | `BracketResolveBoundaryTests`, `BracketLocateDelegationTests`, Phase2 gate |
 | P1-14 | Homonyms ImplementsInterface / ImplementsObligation | verified | distinct RelationType + CorrespondenceRelationKind | Phase1 homonym test |
 | P1-15 | DiagnosticIndex + ingest; LRC Id → Code at ingest | verified | `DiagnosticIndexOps`, `DiagnosticIndexIngest` | ship-22 tests |
 | P1-16 | SessionContents + DocumentRegistry; drop FileOwnership | verified | `DocumentRegistryOps`, `SessionRuntime.Contents` | Phase1 FileOwnership absent |

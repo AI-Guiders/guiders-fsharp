@@ -78,5 +78,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | CDP BracketLocate migration | `BracketResolveBoundary` + `LegacyWireSpan`; no `BracketAnchorSpan` | guiders-core `Cdp.ScriptableIde` + `BracketLocateDelegationTests` | **shipped** ship-53 |
 | CDP CRS witness mapping | platform `DocToCodeWitness` | `WorkspaceCorrespondence` maps `DocToCodeWitnesses` (CDP `ReverseAnchor` façade) | **shipped** ship-53 |
 | Kind witness emit + format | `BuildCodeEdit` / `TryFormatCodeEdit` | CRS reverse wires Kind:; CDP `Format(preferCanonical)` | **shipped** ship-54 |
+| Kind-only resolve boundary | `TryParseToAxes` Kind-spec only | legacy F/M/L ingest via `RelationWireBoundary` @ `BracketLocate.Parse` | **shipped** ship-55 |
+| CDP default Kind emit | non-nav `Format` | code/xml/json/fsharp wires default `[Kind:CodeEdit; …]` | **shipped** ship-55 |
 
-**Next waves:** LegacyWireSpan runtime delete, default Kind: emit on CDP hot paths, goal closure when audit all `verified`.
+**Next waves:** delete `LegacyWireSpan`, nav Kind: codemod, goal closure when audit all `verified`.
