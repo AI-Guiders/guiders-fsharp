@@ -41,6 +41,17 @@ type FederationPhase10ChecklistTests() =
         Assert.True(File.Exists matrixPath, matrixPath)
 
     [<Fact>]
+    member _.``Ship 62d CodeCenter modeling package is shipped in living matrix``() =
+        let matrixPath = Path.Combine(repoRoot, "docs", "federation", "model-extraction-living-matrix.md") |> Path.GetFullPath
+        let text = File.ReadAllText matrixPath
+        Assert.Contains("ship-62d", text)
+        Assert.Contains("RePlannable", text)
+        Assert.Contains("**shipped**", text)
+
+        let codeCenterDir = Path.Combine(repoRoot, "src", "AIGuiders.Platform.Modeling.CodeCenter") |> Path.GetFullPath
+        Assert.True(Directory.Exists codeCenterDir, codeCenterDir)
+
+    [<Fact>]
     member _.``Modeling.Gdl.Language project is deleted``() =
         let candidate = Path.Combine(repoRoot, "src", "AIGuiders.Platform.Modeling.Gdl.Language") |> Path.GetFullPath
         Assert.False(Directory.Exists candidate, $"legacy package still present: {candidate}")

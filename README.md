@@ -15,6 +15,7 @@ Normative naming: [GUIDERS-FSHARP-ADR-0002](docs/adr/GUIDERS-FSHARP-ADR-0002-mod
 |------------------------------------------|---------|:-----:|
 | `Modeling.Core` | intent envelope shapes — IntentOutcome, RoutedIntent, pulse rules | — |
 | `Modeling.Build` | neutral build-result model — diagnostics with anchor wires | — |
+| `Modeling.CodeCenter` | document-scope semantic session — Λ_doc, RePlannableΘ, structural edit (ADR-0066) | ✓ |
 | `Modeling.Catalog` | profile-driven catalog index algebra — collision policies, layer merge | — |
 | `Modeling.Cockpit.Cds` | CDS routing decision shapes — attention, desk detail, go-map | — |
 | `Modeling.Cockpit.DataBus` | event catalog, dispatch policy, projection graph | ✓ |
