@@ -4,24 +4,15 @@ open AIGuiders.Platform.Modeling.Documentation.Correspondence
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 open AIGuiders.Platform.Modeling.Paths
 
-/// <summary>Materialize CRS reverse anchors into graph <see cref="Relation"/> edges (plan Phase 2).</summary>
+/// <summary>Materialize CRS doc→code witnesses into graph <see cref="Relation"/> edges (plan Phase 2).</summary>
 module CorrespondenceMaterialize =
-    let private relationTypeForKind (kindWire: string) =
-        match CorrespondenceRelationKind.tryParse kindWire with
-        | Some CorrespondenceRelationKind.Normates -> RelationType.Normates
-        | Some CorrespondenceRelationKind.Constrains -> RelationType.Constrains
-        | Some CorrespondenceRelationKind.ImplementsObligation -> RelationType.Constrains
-        | Some CorrespondenceRelationKind.Related -> RelationType.Constrains
-        | Some CorrespondenceRelationKind.Documents -> RelationType.Documents
-        | _ -> RelationType.Constrains
-
-    let tryMaterializeReverseAnchor (anchor: ReverseAnchor) : Relation option =
-        match ReverseAnchorBridge.tryToDocToCodeWitness anchor with
+    let tryMaterializeDocToCodeWitness (witness: DocToCodeWitness) : Relation option =
+        match DocToCodeWitnessBridge.tryToRelationSpec witness with
         | None -> None
         | Some(RelationSpec.DocToCode(DocumentPlace.Fragment(docPath, _), CodeTarget.Symbol(codeDoc, symbol))) ->
             let relation =
                 { From = GraphNodeRef.Document(DocumentRef.File docPath)
-                  Type = relationTypeForKind anchor.Kind
+                  Type = CorrespondenceRelationGraph.kindToRelationType witness.Kind
                   To = GraphNodeRef.Semantic(codeDoc, symbol)
                   Scope = SessionG
                   Attributes = RelationAttributes.empty }

@@ -66,5 +66,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | ReverseAnchor CRS boundary | `CorrespondenceRelationOps.ingestReverseAnchors` | `CorrespondenceRelationIngest` + `TryIngestCorrespondenceForFile` | **shipped** ship-44 |
 | Phase 3–4 verification gate | `FederationPhase34ChecklistTests` IO guard + attach + FCS ports | `FederationPhase34ChecklistTests` Execution sources + attach catalog | **shipped** ship-45 |
 | CompilerServices CRS hook | `CorrespondenceRelationOps` | `ApplyEnsure` ingests correspondence for active file | **shipped** ship-45 |
+| ReverseAnchor wire delete | `DocToCodeWitness` + typed `CorrespondenceRelationKind`; `DocToCodeWitnessBridge` | `DocToCodeWitness` seam; `IngestDocToCodeWitnesses` | **shipped** ship-46 |
 
-**Next waves:** TO-BE review prep (ReverseAnchor wire type delete, BracketAnchorSpan Execution retirement).
+**Next waves:** TO-BE review prep (BracketAnchorSpan Execution retirement, Correspondence.Kind string at Execution resolver boundary).

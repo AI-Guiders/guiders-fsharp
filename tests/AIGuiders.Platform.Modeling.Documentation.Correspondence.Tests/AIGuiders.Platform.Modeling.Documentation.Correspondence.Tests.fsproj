@@ -10,7 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CorrespondenceWireTests.fs" />
-    <Compile Include="ReverseAnchorBridgeTests.fs" />
+    <Compile Include="DocToCodeWitnessBridgeTests.fs" />
     <Compile Include="AdrFactsParserTests.fs" />
     <Compile Include="HoareCatalogTests.fs" />
   </ItemGroup>

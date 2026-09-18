@@ -9,16 +9,16 @@ open Xunit
 type CorrespondenceRelationOpsTests() =
 
     [<Fact>]
-    member _.``IngestReverseAnchors merges materialized relations into graph``() =
+    member _.``IngestDocToCodeWitnesses merges materialized relations into graph``() =
         let pid = ProjectId.create @"D:\repo\App.csproj"
         let graph, ownership = SessionTestFixtures.createGraph "repo" [] (Map [ "src/Foo.cs", pid ]) []
         let runtime = SessionTestFixtures.createRuntime graph ownership [ "src/Foo.cs", "class Bar {}" ] Unloaded
 
-        let anchor =
+        let witness =
             { DocPath = "docs/adr/0063.md"
               DocTitle = "ADR-0063"
               Provenance = Provenance.Bracket
-              Kind = Kind.Normates
+              Kind = CorrespondenceRelationKind.Normates
               File = "src/Foo.cs"
               LineStart = None
               LineEnd = None
@@ -28,7 +28,7 @@ type CorrespondenceRelationOpsTests() =
               Excerpt = None }
 
         let updated, materialized, skipped =
-            CorrespondenceRelationOps.ingestReverseAnchors [| anchor |] runtime
+            CorrespondenceRelationOps.ingestDocToCodeWitnesses [| witness |] runtime
 
         Assert.Equal(1, materialized)
         Assert.Equal(0, skipped)

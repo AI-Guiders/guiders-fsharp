@@ -13,7 +13,8 @@
   <ItemGroup>
     <Compile Include="Correspondence.fs" />
     <Compile Include="CorrespondenceRelationKind.fs" />
-    <Compile Include="ReverseAnchorBridge.fs" />
+    <Compile Include="DocToCodeWitness.fs" />
+    <Compile Include="DocToCodeWitnessBridge.fs" />
     <Compile Include="AdrFacts.fs" />
     <Compile Include="HoareCatalog.fs" />
   </ItemGroup>

@@ -92,9 +92,13 @@ type FederationPhase1ChecklistTests() =
         Assert.Null(typeof<Scene>.Assembly.GetType("AIGuiders.Platform.Modeling.Navigation.Anchor"))
 
     [<Fact>]
+    member _.``Legacy ReverseAnchor wire type is deleted``() =
+        Assert.Null(typeof<DocToCodeWitness>.Assembly.GetType("AIGuiders.Platform.Modeling.Documentation.Correspondence.ReverseAnchor"))
+
+    [<Fact>]
     member _.``Correspondence wire records are not CLIMutable seam views``() =
         for t in
-            [ typeof<ReverseAnchor>
+            [ typeof<DocToCodeWitness>
               typeof<ForwardDoc>
               typeof<CorrespondenceResult> ] do
             let attr = t.GetCustomAttribute(typeof<CLIMutableAttribute>)

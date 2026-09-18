@@ -1,16 +1,16 @@
-module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.ReverseAnchorBridgeTests
+module AIGuiders.Platform.Modeling.Documentation.Correspondence.Tests.DocToCodeWitnessBridgeTests
 
 open Xunit
 open AIGuiders.Platform.Modeling.Documentation.Correspondence
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 [<Fact>]
-let ``ReverseAnchor with member maps to DocToCode witness`` () =
-    let anchor =
+let ``DocToCodeWitness with member maps to DocToCode relation spec`` () =
+    let witness =
         { DocPath = "docs/adr/0063.md"
           DocTitle = "ADR-0063"
           Provenance = Provenance.Bracket
-          Kind = Kind.ImplementsObligation
+          Kind = CorrespondenceRelationKind.ImplementsObligation
           File = "src/Foo.cs"
           LineStart = Some 10
           LineEnd = None
@@ -19,7 +19,7 @@ let ``ReverseAnchor with member maps to DocToCode witness`` () =
           DocLineHint = None
           Excerpt = None }
 
-    match ReverseAnchorBridge.tryToDocToCodeWitness anchor with
+    match DocToCodeWitnessBridge.tryToRelationSpec witness with
     | Some(RelationSpec.DocToCode(source, CodeTarget.Symbol(_, symbol))) ->
         Assert.Equal("Bar", symbol.Name)
         match source with
@@ -28,12 +28,12 @@ let ``ReverseAnchor with member maps to DocToCode witness`` () =
     | _ -> failwith "expected DocToCode witness"
 
 [<Fact>]
-let ``ReverseAnchor without member does not emit witness`` () =
-    let anchor =
+let ``DocToCodeWitness without member does not emit relation spec`` () =
+    let witness =
         { DocPath = "docs/adr/0063.md"
           DocTitle = "ADR-0063"
           Provenance = Provenance.DocBody
-          Kind = Kind.Related
+          Kind = CorrespondenceRelationKind.Related
           File = "src/Foo.cs"
           LineStart = Some 10
           LineEnd = Some 20
@@ -42,4 +42,4 @@ let ``ReverseAnchor without member does not emit witness`` () =
           DocLineHint = None
           Excerpt = None }
 
-    Assert.True(ReverseAnchorBridge.tryToDocToCodeWitness anchor |> Option.isNone)
+    Assert.True(DocToCodeWitnessBridge.tryToRelationSpec witness |> Option.isNone)

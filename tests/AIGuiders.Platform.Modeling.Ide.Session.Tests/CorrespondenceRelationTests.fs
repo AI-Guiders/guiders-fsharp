@@ -55,12 +55,12 @@ type CorrespondenceRelationTests() =
         | Error e -> Assert.Fail e.Message
 
     [<Fact>]
-    member _.``ReverseAnchor materializes validated doc to code relation``() =
-        let anchor =
+    member _.``DocToCodeWitness materializes validated doc to code relation``() =
+        let witness =
             { DocPath = "docs/adr/0063.md"
               DocTitle = "ADR-0063"
               Provenance = Provenance.Bracket
-              Kind = Kind.Normates
+              Kind = CorrespondenceRelationKind.Normates
               File = "src/Foo.cs"
               LineStart = None
               LineEnd = None
@@ -69,7 +69,7 @@ type CorrespondenceRelationTests() =
               DocLineHint = None
               Excerpt = None }
 
-        match CorrespondenceMaterialize.tryMaterializeReverseAnchor anchor with
+        match CorrespondenceMaterialize.tryMaterializeDocToCodeWitness witness with
         | Some relation ->
             Assert.Equal(RelationType.Normates, relation.Type)
             match relation.From, relation.To with

@@ -4,23 +4,23 @@ open System
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 open AIGuiders.Platform.Modeling.Paths
 
-/// <summary>Reverse CRS anchor → federation <see cref="RelationSpec.DocToCode"/> witness (plan §2.5).</summary>
-module ReverseAnchorBridge =
-    let tryToDocToCodeWitness (anchor: ReverseAnchor) : RelationSpec option =
-        if String.IsNullOrWhiteSpace anchor.File then
+/// <summary>CRS doc→code witness → federation <see cref="RelationSpec.DocToCode"/> (plan §2.5).</summary>
+module DocToCodeWitnessBridge =
+    let tryToRelationSpec (witness: DocToCodeWitness) : RelationSpec option =
+        if String.IsNullOrWhiteSpace witness.File then
             None
         else
-            let docPath = LogicalPath.Create anchor.DocPath
-            let codePath = LogicalPath.Create anchor.File
+            let docPath = LogicalPath.Create witness.DocPath
+            let codePath = LogicalPath.Create witness.File
 
             let fragmentLabel =
-                match anchor.Excerpt with
+                match witness.Excerpt with
                 | Some excerpt when not (String.IsNullOrWhiteSpace excerpt) -> excerpt
-                | _ -> anchor.DocTitle
+                | _ -> witness.DocTitle
 
             let source = DocumentPlace.Fragment(docPath, fragmentLabel)
 
-            match anchor.MemberKey with
+            match witness.MemberKey with
             | Some memberName when not (String.IsNullOrWhiteSpace memberName) ->
                 let target =
                     CodeTarget.Symbol(

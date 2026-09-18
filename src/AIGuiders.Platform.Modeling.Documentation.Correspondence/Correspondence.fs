@@ -63,19 +63,6 @@ type ForwardDoc =
       Abs: string option
       Kind: string option }
 
-type ReverseAnchor =
-    { DocPath: string
-      DocTitle: string
-      Provenance: string
-      Kind: string
-      File: string
-      LineStart: int option
-      LineEnd: int option
-      MemberKey: string option
-      Wire: string
-      DocLineHint: int option
-      Excerpt: string option }
-
 type ExplicitCodeAnchor =
     { DocPath: string
       File: string
@@ -85,17 +72,6 @@ type ExplicitCodeAnchor =
       Provenance: string
       Kind: string
       DefaultKind: string }
-
-type CorrespondenceResult =
-    { WorkspaceRoot: string
-      FileRel: string option
-      FeatureLine: string option
-      FeatureDocs: string array
-      AdrLine: string
-      ForwardDocs: ForwardDoc array
-      ReverseAnchors: ReverseAnchor array
-      ActiveLayers: string array
-      TomlPath: string }
 
 type ForwardMapResult =
     { FeatureLine: string option
