@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.CodeCenter
 
 open System
 open AIGuiders.Platform.Modeling.Core.Identity
+open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 type DocumentNode =
     { Id: NodeId
@@ -28,8 +29,7 @@ type SessionAnchor =
       TierHint: string option }
 
 type FoldingRegion =
-    { Start: int
-      End: int
+    { Range: LineRange
       Name: string }
 
 type DocumentSnapshot =

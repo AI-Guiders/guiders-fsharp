@@ -7,6 +7,17 @@ type TextSpan = { StartLine: int; StartCol: int; EndLine: int; EndCol: int }
 
 type LineRangeHint = { StartLine: int; EndLine: int option }
 
+/// Buffer offset range [Start, End) in document text.
+[<Struct; StructuralEquality; StructuralComparison>]
+type LineRange = { Start: int; End: int }
+
+module LineRange =
+    let create start end_ = { Start = start; End = end_ }
+
+    let length (range: LineRange) = range.End - range.Start
+
+    let contains offset (range: LineRange) = range.Start <= offset && offset < range.End
+
 type SymbolRef =
     { Container: string list
       Name: string
