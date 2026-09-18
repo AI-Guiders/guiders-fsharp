@@ -22,6 +22,7 @@
     <Compile Include="DependencyRelationTests.fs" />
     <Compile Include="DependencyRelationOpsTests.fs" />
     <Compile Include="FederationPhase1ChecklistTests.fs" />
+    <Compile Include="FederationPhase34ChecklistTests.fs" />
     <Compile Include="CorrespondenceRelationTests.fs" />
     <Compile Include="CorrespondenceRelationOpsTests.fs" />
     <Compile Include="SessionGraphPickerChoicesTests.fs" />
@@ -32,6 +33,8 @@
     <Compile Include="SolutionProviderRegistryTests.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CommandPlane\AIGuiders.Platform.Modeling.CommandPlane.fsproj" />
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language.Adapters.Fcs\AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet\AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />

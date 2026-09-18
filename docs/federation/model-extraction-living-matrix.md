@@ -64,5 +64,7 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | AnchorWire SniperScope Modeling delete | removed from `Modeling.Language` | `LanguageSeamModels` Execution-only seam | **shipped** ship-42 |
 | Build runtime hook | `BuildDiagnosticOps` ingest | `FederationSessionRuntime.TryIngestBuildDiagnostics` | **shipped** ship-43 |
 | ReverseAnchor CRS boundary | `CorrespondenceRelationOps.ingestReverseAnchors` | `CorrespondenceRelationIngest` + `TryIngestCorrespondenceForFile` | **shipped** ship-44 |
+| Phase 3–4 verification gate | `FederationPhase34ChecklistTests` IO guard + attach + FCS ports | `FederationPhase34ChecklistTests` Execution sources + attach catalog | **shipped** ship-45 |
+| CompilerServices CRS hook | `CorrespondenceRelationOps` | `ApplyEnsure` ingests correspondence for active file | **shipped** ship-45 |
 
-**Next waves:** Phase 3–4 IO/docs/attach (plan §10).
+**Next waves:** TO-BE review prep (ReverseAnchor wire type delete, BracketAnchorSpan Execution retirement).
