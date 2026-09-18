@@ -5,7 +5,7 @@ Progress tracker (non-normative): [model-extraction-living-matrix.md](./model-ex
 
 **Closure rule:** goal closes only when every row below is `verified` against code/tests — not matrix ticks alone.
 
-**Summary (ship-55):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan shim; P1-13 nav/ingest legacy).
+**Summary (ship-56):** verified **29** · partial **2** · gap **0** · **CLOSURE: BLOCKED** (P1-09 LegacyWireSpan delete; P1-13 command-only nav legacy).
 
 Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim · **gap** = missing TO-BE behavior.
 
