@@ -85,4 +85,13 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Kind:Nav member flat | `NavSeed.Member` + flatten legacy nested nav | CitizenIntentRouter member emit; `TryFormatNav` Member axis | **shipped** ship-58 |
 | LegacyWireSpan delete | `CodeEditResolveAxes` / `NavResolveAxes` SSOT | `LegacyWireSpan` deleted; `RelationWireBoundary` doc-scan; `LegacyNavWireIngest` | **shipped** ship-59 · **CLOSURE: CLOSED** |
 
-**Next waves:** none — §10 audit closed; maintain gates on FederationPhase*.
+**Next waves (post-closure — operator 2026-09-18):**
+
+| Wave | Focus | SSOT |
+|------|--------|------|
+| **ship-61a–c** | **AUX** — chain · choose · direct ([CDP-ADR-0229](../../../cdp-mcp/docs/adr/CDP-ADR-0229-agent-ux-locus-policy.md); LinesForum 008) | AttachSchema + MCP suggest + citizen step-intent |
+| **ship-60** | Delete `LegacyNavWireIngest` | BracketResolveBoundary Kind-only |
+| **ship-62** | Semantic editor — RelationSpec/locus primary | Code Center / STUDIO-ADR-0005 |
+| **ship-63** | DashSpec Studio return | dash-spec-studio |
+
+Maintain FederationPhase* gates on every wave.
