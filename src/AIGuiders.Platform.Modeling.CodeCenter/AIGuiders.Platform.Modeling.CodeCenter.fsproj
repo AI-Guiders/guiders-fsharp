@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.CodeCenter</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.CodeCenter</AssemblyName>
+    <Description>Federation Code Center document session SSOT — structural edits, Λ_doc ledger, replay undo.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.CodeCenter</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Core\AIGuiders.Platform.Modeling.Core.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Paths\AIGuiders.Platform.Modeling.Paths.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations\AIGuiders.Platform.Modeling.LanguageIntelligence.Relations.fsproj" />
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EditTypes.fs" />
+    <Compile Include="StructuralEditBridge.fs" />
+    <Compile Include="RefreshScope.fs" />
+    <Compile Include="LedgerTypes.fs" />
+    <Compile Include="RePlannableThetaRegistry.fs" />
+    <Compile Include="DocumentGraph.fs" />
+    <Compile Include="StructuralPlan.fs" />
+    <Compile Include="Completion.fs" />
+    <Compile Include="DocumentSession.fs" />
+  </ItemGroup>
+</Project>

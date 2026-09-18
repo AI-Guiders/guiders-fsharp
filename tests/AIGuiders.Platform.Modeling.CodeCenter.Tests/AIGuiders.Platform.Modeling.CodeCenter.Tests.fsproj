@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RePlannableThetaRegistryTests.fs" />
+    <Compile Include="DocumentSessionConformanceTests.fs" />
+    <Compile Include="ReplayConformanceTests.fs" />
+    <Compile Include="PerfConformanceTests.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CodeCenter\AIGuiders.Platform.Modeling.CodeCenter.fsproj" />
+  </ItemGroup>
+</Project>

@@ -92,7 +92,11 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 |------|--------|------|
 | **ship-61a–c** | **AUX** — chain · choose · direct ([CDP-ADR-0229](../../../cdp-mcp/docs/adr/CDP-ADR-0229-agent-ux-locus-policy.md); LinesForum 008) | AttachSchema + MCP suggest + citizen step-intent |
 | **ship-60** | Delete `LegacyNavWireIngest` | BracketResolveBoundary Kind-only | **shipped** |
-| **ship-62** | Semantic editor — RelationSpec/locus primary | Phase 1 scaffolding + substrate wired (`TextEngine` → `federation-text-surface` @ v6.3.1) | **partial** — semantic session in editor pending |
-| **ship-63** | DashSpec Studio return | dash-spec-studio | **blocked** until semantic session layer |
+| **ship-62d** | CodeCenter F# Λ_doc + RePlannableΘ registry + replay undo | `Platform.Modeling.CodeCenter` + V1–V9,V8a–V8d,V14–V15,V2a | **shipped** |
+| **ship-62e** | PluginHost + projections + structural paste + LRC delegate | `Surface.Wpf.CodeCenter` + DashSpec plugin | **shipped** |
+| **ship-62f** | Diagram/tree cross-projection nav | V12 conformance | **shipped** |
+| **ship-63** | DashSpec Studio CodeCenter host + async diagnostics tag | dash-spec-studio + STUDIO-ADR-0005 | **shipped** |
+| **ship-64** | FormSurface + PreviewSurface in Studio | CodeCenterHost Form/Preview | **shipped** |
+| **ship-62** | Semantic editor — RelationSpec/locus primary | CodeCenter doc slice @ ide-session §2.12 | **shipped** |
 
 Maintain FederationPhase* gates on every wave.

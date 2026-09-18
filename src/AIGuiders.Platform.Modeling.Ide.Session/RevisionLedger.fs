@@ -1,5 +1,6 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session
 
+/// <summary>Solution-level revision ledger (ide-session §2.12). Document-scope slice: Platform.Modeling.CodeCenter LedgerEntryDoc.</summary>
 open AIGuiders.Platform.Modeling.Core.Identity
 
 type TransformClass =
