@@ -71,5 +71,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | Correspondence.Kind canon | typed `CorrespondenceRelationKind` on witness | `CorrespondenceKind.NormalizeWire` @ resolver boundary | **shipped** ship-47 |
 | BracketAnchorSpan retirement | absent from Modeling | `BracketAnchorSpan` deleted; `CodeEditResolveAxes` + `LegacyWireSpan` boundary | **shipped** ship-48 |
 | Build diagnostic producer | `BuildDiagnosticOps` ingest | `BuildDiagnosticProducer` + `TryRunBuildAndIngestDiagnostics` | **shipped** ship-49 |
+| LegacyWireSpan conformance retirement | `CodeEditWireEncoding` Kind axes | anchor-resolve + canon specs kind-spec only; legacy-span conformance path removed | **shipped** ship-50 |
 
-**Next waves:** LegacyWireSpan F/M/L conformance retirement, full §10 TO-BE review.
+**Next waves:** full §10 TO-BE review.

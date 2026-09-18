@@ -72,3 +72,24 @@ let ``Kind Nav parses NavSeed`` () =
         Assert.Equal(Some 10, seed.Line)
         Assert.Equal(Some "open", seed.Command)
     | _ -> Assert.Fail "expected Nav spec"
+
+[<Fact>]
+let ``Kind CodeEdit line and scope encode wire hints`` () =
+    let wire =
+        { ProfileId = BracketProfiles.CdpSquareKeyValue.Id
+          Raw = "[Kind:CodeEdit; File:a.cs; Member:Foo; Line:10; Scope:for; ScopeIndex:2]"
+          Axes =
+            [ BracketAxis("Kind", ':', "CodeEdit")
+              BracketAxis("File", ':', "a.cs")
+              BracketAxis("Member", ':', "Foo")
+              BracketAxis("Line", ':', "10")
+              BracketAxis("Scope", ':', "for")
+              BracketAxis("ScopeIndex", ':', "2") ]
+            :> IReadOnlyList<_> }
+
+    match BracketRelationWire.tryParseRelationSpec wire with
+    | Some (RelationSpec.CodeEdit (CodeTarget.Symbol(_, sym))) ->
+        Assert.Equal("Foo", sym.Name)
+        Assert.Contains("@line:10", sym.Container)
+        Assert.Contains("@scope:for:2", sym.Container)
+    | _ -> Assert.Fail "expected CodeEdit spec"
