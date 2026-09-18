@@ -154,7 +154,7 @@ module DocumentSessionConformanceTests =
         let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
 
-        match session.ApplyStructural(InsertBlock(node.NodeId.Value, "tab", "newTab as \"N\"")) with
+        match session.ApplyStructural(InsertBlock(node.NodeId.Value, GraphNodeKind.Block, "tab newTab as \"N\"")) with
         | Error e -> Assert.Fail e
         | Ok(session', entry) ->
             Assert.Contains("newTab", session'.Text)
@@ -163,7 +163,7 @@ module DocumentSessionConformanceTests =
             | _ -> Assert.Fail("expected structural InsertBlock ledger entry")
 
     [<Fact>]
-    let ``V12 graph nodes export and node wire resolve`` () =
+    let ``V12 graph nodes export and node resolve`` () =
         let session = ConformanceFixtures.createDemoSession()
         let nodes = session.GetDocumentNodes() |> Seq.toList
         Assert.True(nodes.Length >= 2)
@@ -172,8 +172,8 @@ module DocumentSessionConformanceTests =
             nodes
             |> List.find (fun node -> node.Name = "x")
 
-        match session.TryResolveNodeWire tab.NodeWire with
-        | None -> Assert.Fail("expected node wire locus")
+        match session.TryResolveNode tab.Id with
+        | None -> Assert.Fail("expected node locus")
         | Some locus ->
             Assert.Equal("Semantic", locus.Tier)
             Assert.True(locus.NodeId.IsSome)

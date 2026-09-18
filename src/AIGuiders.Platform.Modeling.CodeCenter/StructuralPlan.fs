@@ -33,9 +33,9 @@ module StructuralPlan =
                 (Some(RenameMember(nodeId, (Map.find nodeId before.Nodes).Name)))
                 InverseQuality.Exact
 
-        | InsertBlock(anchorId, blockKind, body) ->
+        | InsertBlock(anchorId, kind, sourceLine) ->
             apply
-                (fun s -> DocumentGraph.insertBlock s anchorId blockKind body)
+                (fun s -> DocumentGraph.insertBlock s anchorId kind sourceLine)
                 None
                 InverseQuality.Unspecified
 

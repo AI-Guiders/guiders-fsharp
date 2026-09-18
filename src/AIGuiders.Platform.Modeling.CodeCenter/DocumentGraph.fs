@@ -6,7 +6,7 @@ open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 type DocumentNode =
     { Id: NodeId
-      Kind: string
+      Kind: GraphNodeKind
       Name: string
       Start: int
       End: int
@@ -41,11 +41,31 @@ type DocumentSnapshot =
 type DocumentGraphRebuild = string -> DocumentSnapshot
 
 type DocumentGraphNode =
-    { NodeWire: string
-      Kind: string
+    { Id: NodeId
+      Kind: GraphNodeKind
       Name: string
       Range: LineRange
-      ParentWire: string option }
+      Parent: NodeId option }
+
+/// Wire format for node anchors at migration boundaries only (`node:{counter}`).
+module DocumentNodeIdWire =
+    let format (id: NodeId) =
+        $"node:{NumericId.value (NodeId.carrier id)}"
+
+    let tryParse (wire: string) : NodeId option =
+        if String.IsNullOrWhiteSpace wire then
+            None
+        elif not (wire.StartsWith("node:", StringComparison.Ordinal)) then
+            None
+        else
+            match Int64.TryParse(wire.Substring 5) with
+            | true, value -> Some(NodeId.mint (NumericId.ofCounter value))
+            | _ -> None
+
+    let toCounter (id: NodeId) = NumericId.value (NodeId.carrier id)
+
+    let fromCounter (counter: int64) : NodeId =
+        NodeId.mint (NumericId.ofCounter counter)
 
 module DocumentGraph =
     let private nextNodeId (nodes: Map<NodeId, DocumentNode>) =
@@ -93,44 +113,26 @@ module DocumentGraph =
     let classificationSpans (snapshot: DocumentSnapshot) : SessionClassificationSpan list =
         snapshot.TokenSpans
 
-    let formatNodeId (id: NodeId) =
-        $"node:{NumericId.value (NodeId.carrier id)}"
-
     let listNodes (snapshot: DocumentSnapshot) : DocumentGraphNode list =
         snapshot.Nodes
         |> Map.toList
         |> List.sortBy (fun (_, node) -> node.Start)
         |> List.map (fun (_, node) ->
-            { NodeWire = formatNodeId node.Id
+            { Id = node.Id
               Kind = node.Kind
               Name = node.Name
               Range = LineRange.create node.Start node.End
-              ParentWire = node.Parent |> Option.map formatNodeId })
+              Parent = node.Parent })
 
-    let private tryParseNodeWire (wire: string) =
-        if String.IsNullOrWhiteSpace wire then
-            None
-        elif not (wire.StartsWith("node:", StringComparison.Ordinal)) then
-            None
-        else
-            match Int64.TryParse(wire.Substring 5) with
-            | true, value -> Some value
-            | _ -> None
-
-    let tryResolveNodeWire (snapshot: DocumentSnapshot) (wire: string) =
-        match tryParseNodeWire wire with
+    let tryResolveNode (snapshot: DocumentSnapshot) (nodeId: NodeId) =
+        match Map.tryFind nodeId snapshot.Nodes with
         | None -> None
-        | Some counter ->
-            let nodeId = NodeId.mint (NumericId.ofCounter counter)
-
-            match Map.tryFind nodeId snapshot.Nodes with
-            | None -> None
-            | Some node ->
-                Some
-                    { Start = node.Start
-                      End = node.End
-                      Tier = "Semantic"
-                      NodeId = Some node.Id }
+        | Some node ->
+            Some
+                { Start = node.Start
+                  End = node.End
+                  Tier = "Semantic"
+                  NodeId = Some node.Id }
 
     let renameNode (snapshot: DocumentSnapshot) (nodeId: NodeId) (newName: string) =
         match Map.tryFind nodeId snapshot.Nodes with
@@ -156,20 +158,25 @@ module DocumentGraph =
 
                 Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
-    let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (blockKind: string) (body: string) =
+    let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (kind: GraphNodeKind) (sourceLine: string) =
         match Map.tryFind anchorId snapshot.Nodes with
         | None -> Error $"anchor {anchorId} not found"
         | Some anchor ->
-            let insertion = Environment.NewLine + blockKind + " " + body + Environment.NewLine
+            let insertion = Environment.NewLine + sourceLine + Environment.NewLine
             let insertAt = anchor.End
             let newText = snapshot.Text.Insert(insertAt, insertion)
             let delta = insertion.Length
             let newId = nextNodeId snapshot.Nodes
 
+            let nameToken =
+                sourceLine.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                |> Array.tryItem 1
+                |> Option.defaultValue "new"
+
             let newNode =
                 { Id = newId
-                  Kind = blockKind
-                  Name = body.Split(' ').[0]
+                  Kind = kind
+                  Name = nameToken
                   Start = insertAt + Environment.NewLine.Length
                   End = insertAt + insertion.Length - Environment.NewLine.Length
                   Parent = Some anchorId }
@@ -214,7 +221,7 @@ module DocumentGraph =
 
             let newNode =
                 { Id = newId
-                  Kind = "extracted"
+                  Kind = GraphNodeKind.Synthetic
                   Name = extractedName
                   Start = insertAt + Environment.NewLine.Length
                   End = newText.Length
@@ -248,4 +255,4 @@ module DocumentGraph =
             | Some node -> node.Start = location.Start && node.End = location.End
 
     let tryFormatNodeIdWire (id: NodeId option) =
-        id |> Option.map formatNodeId |> Option.toObj
+        id |> Option.map DocumentNodeIdWire.format |> Option.toObj

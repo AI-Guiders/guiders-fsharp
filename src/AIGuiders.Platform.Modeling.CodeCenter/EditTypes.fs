@@ -14,7 +14,7 @@ type MechanicalEdit =
 
 type StructuralEdit =
     | RenameMember of nodeId: NodeId * newName: string
-    | InsertBlock of anchorId: NodeId * blockKind: string * body: string
+    | InsertBlock of anchorId: NodeId * kind: GraphNodeKind * sourceLine: string
     | MoveMember of nodeId: NodeId * targetParentId: NodeId * index: int
     | Extract of nodeId: NodeId * extractedName: string
 

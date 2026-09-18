@@ -42,8 +42,8 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
     member _.GetDocumentNodes() =
         DocumentGraph.listNodes state.Current :> System.Collections.Generic.IReadOnlyList<_>
 
-    member _.TryResolveNodeWire(wire: string) =
-        DocumentGraph.tryResolveNodeWire state.Current wire
+    member _.TryResolveNode(nodeId: NodeId) =
+        DocumentGraph.tryResolveNode state.Current nodeId
 
     member _.TryResolve(anchor: SessionAnchor) = DocumentGraph.tryResolve state.Current anchor
 
