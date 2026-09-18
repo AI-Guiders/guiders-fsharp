@@ -7,11 +7,9 @@ open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 module DocumentSessionConformanceTests =
 
-    let sampleText = "@dashboard demo\n    tab x as \"T\"\nend dashboard\n"
-
     [<Fact>]
     let ``V1 NodeId round trip at Semantic tier`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let anchor = { Offset = 18; TierHint = Some "Semantic" }
 
         match session.TryResolve anchor with
@@ -19,11 +17,11 @@ module DocumentSessionConformanceTests =
         | Some locus ->
             Assert.Equal("Semantic", locus.Tier)
             Assert.True(locus.NodeId.IsSome)
-            Assert.True(DocumentGraph.nodeIdRoundTrip (DocumentGraph.rebuildFromText session.Text) locus)
+            Assert.True(DocumentGraph.nodeIdRoundTrip (ConformanceFixtures.rebuild session.Text) locus)
 
     [<Fact>]
     let ``V2 applyStructural RenameMember projects text`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 14; TierHint = None }).Value
 
         match session.ApplyStructural(RenameMember(node.NodeId.Value, "renamedDash")) with
@@ -34,7 +32,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V2a RelationSpec CodeEdit routes to applyStructural`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 14; TierHint = None }).Value
         let docRef = DocumentRef.File(AIGuiders.Platform.Modeling.Paths.LogicalPath.Create "doc://demo")
         let spec = RelationSpec.CodeEdit(CodeTarget.TreeNode(docRef, node.NodeId.Value))
@@ -45,7 +43,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V3 kind wire resolves syntax locus`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
 
         match session.TryResolve({ Offset = 14; TierHint = None }) with
         | None -> Assert.Fail("expected syntax locus")
@@ -53,7 +51,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V4 mechanical point edit`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let edit = { Scope = Point; RemovedSpan = (0, 0); InsertedText = "//" }
 
         match session.ApplyMechanicalEdit edit with
@@ -64,7 +62,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V4b mechanical region edit`` () =
-        let session = DocumentSession.Create("doc://demo", "hello world")
+        let session = ConformanceFixtures.createSession "doc://demo" "hello world"
         let edit = { Scope = Region; RemovedSpan = (0, 5); InsertedText = "bye" }
 
         match session.ApplyMechanicalEdit edit with
@@ -73,31 +71,31 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V4c mechanical document sync`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let session' = session.SyncFromText("@dashboard broken\n")
         Assert.Equal(1, session'.Revision)
 
     [<Fact>]
     let ``V5 completions stub returns items`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let items = session.GetCompletions({ Offset = 5; TierHint = None })
         Assert.NotEmpty(items)
 
     [<Fact>]
     let ``V6 rename keeps NodeId stable for untouched nodes`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let dash =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session.Text) "demo"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session.Text) "demo"
             |> Option.defaultWith (fun () -> failwith "dashboard missing")
 
         let tab =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session.Text) "x"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session.Text) "x"
             |> Option.defaultWith (fun () -> failwith "tab missing")
 
         match session.ApplyStructural(RenameMember(dash.Id, "main")) with
         | Ok(session', _) ->
             let tabAfter =
-                DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session'.Text) "x"
+                DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session'.Text) "x"
 
             Assert.True(tabAfter.IsSome)
 
@@ -108,7 +106,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V7 structural input uses NodeId not text offsets`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
         let edit = RenameMember(node.NodeId.Value, "main")
 
@@ -118,13 +116,13 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V9 partial parse survives broken syntax`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let broken = session.SyncFromText("@dashboard oops")
         Assert.True(broken.PartialParse || broken.Text.Contains("@dashboard"))
 
     [<Fact>]
     let ``V14 RelationSpec stub applyFromRelationSpec`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
         let docRef = DocumentRef.File(AIGuiders.Platform.Modeling.Paths.LogicalPath.Create "doc://demo")
         let spec = RelationSpec.CodeEdit(CodeTarget.TreeNode(docRef, node.NodeId.Value))
@@ -135,7 +133,7 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V8a RenameMember inverse field is Exact`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
 
         match session.ApplyStructural(RenameMember(node.NodeId.Value, "main")) with
@@ -146,14 +144,14 @@ module DocumentSessionConformanceTests =
 
     [<Fact>]
     let ``V16 structural completions only legal blocks`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let items = session.GetStructuralCompletions({ Offset = 5; TierHint = None })
         Assert.NotEmpty(items)
         Assert.True(items |> List.forall (fun i -> i.Edit |> function InsertBlock _ -> true | _ -> false))
 
     [<Fact>]
     let ``V10 structural paste commits InsertBlock not mechanical`` () =
-        let session = DocumentSession.Create("doc://demo", sampleText)
+        let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
 
         match session.ApplyStructural(InsertBlock(node.NodeId.Value, "tab", "newTab as \"N\"")) with

@@ -60,16 +60,16 @@ module StructuralPlan =
         planStructural docId snapshot edit
         |> Result.map (fun (patch, after, _, _) -> patch, after)
 
-    let applyPatch (docId: DocId) (snapshot: DocumentSnapshot) (patch: SessionPatch) =
+    let applyPatch (rebuild: DocumentGraphRebuild) (docId: DocId) (snapshot: DocumentSnapshot) (patch: SessionPatch) =
         let replacement =
             patch.FileSystem.Replacements
             |> List.tryFind (fun r -> r.DocId = docId)
 
         match replacement with
         | None -> snapshot
-        | Some r -> DocumentGraph.rebuildFromText r.New
+        | Some r -> rebuild r.New
 
-    let applyMechanical (snapshot: DocumentSnapshot) (edit: MechanicalEdit) =
+    let applyMechanical (rebuild: DocumentGraphRebuild) (snapshot: DocumentSnapshot) (edit: MechanicalEdit) =
         let text = snapshot.Text
         let start, length = edit.RemovedSpan
         let endExclusive = min text.Length (start + length)
@@ -80,4 +80,4 @@ module StructuralPlan =
             else
                 text.Substring(0, start) + edit.InsertedText + text.Substring(endExclusive)
 
-        DocumentGraph.rebuildFromText newText
+        rebuild newText

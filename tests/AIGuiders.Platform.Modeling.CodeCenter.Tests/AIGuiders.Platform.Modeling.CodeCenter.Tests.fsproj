@@ -9,6 +9,7 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConformanceFixtures.fs" />
     <Compile Include="RePlannableThetaRegistryTests.fs" />
     <Compile Include="DocumentSessionConformanceTests.fs" />
     <Compile Include="ReplayConformanceTests.fs" />
@@ -16,5 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CodeCenter\AIGuiders.Platform.Modeling.CodeCenter.fsproj" />
+    <ProjectReference Include="..\..\..\dash-spec\src\DashSpec.Modeling.CodeCenter\DashSpec.Modeling.CodeCenter.fsproj" />
   </ItemGroup>
 </Project>

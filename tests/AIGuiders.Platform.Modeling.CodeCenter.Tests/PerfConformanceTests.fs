@@ -17,7 +17,8 @@ module PerfConformanceTests =
 
     [<Fact>]
     let ``V15 mechanical perf point and region within SLA envelope`` () =
-        let session0 = DocumentSession.Create("doc://mechanical-perf", perfFixture)
+        let session0 =
+            ConformanceFixtures.createSession "doc://mechanical-perf" perfFixture
         Assert.True(session0.Text.Length >= 500)
 
         let pointTimes = ResizeArray()

@@ -18,7 +18,8 @@ module RePlannableThetaRegistryTests =
 
     [<Fact>]
     let ``V8d committed ledger entries satisfy registry rows`` () =
-        let session = DocumentSession.Create("doc://demo", "@dashboard demo\nend dashboard\n")
+        let session =
+            ConformanceFixtures.createSession "doc://demo" "@dashboard demo\nend dashboard\n"
         let node = session.TryResolve({ Offset = 5; TierHint = Some "Semantic" }).Value
 
         match session.ApplyStructural(RenameMember(node.NodeId.Value, "renamed")) with

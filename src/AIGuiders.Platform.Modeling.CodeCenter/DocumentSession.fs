@@ -11,7 +11,10 @@ type DocumentSessionState =
       LambdaCommitted: LedgerEntryDoc list
       EphemeralMechanical: MechanicalEdit list
       RefreshScopes: RefreshScope list
-      PartialParse: bool }
+      PartialParse: bool
+      Rebuild: DocumentGraphRebuild
+      Completions: DocumentCompletions
+      StructuralCompletions: DocumentStructuralCompletions }
 
 type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, state: DocumentSessionState) =
 
@@ -28,21 +31,25 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     member private _.WithState newState = DocumentSession(documentId, docId, gitPin, newState)
 
+    member private _.Refresh snapshot = state.Rebuild snapshot.Text
+
     member _.GetClassificationSpans() =
         DocumentGraph.classificationSpans state.Current :> System.Collections.Generic.IReadOnlyList<_>
 
+    member _.GetFoldingRegions() =
+        state.Current.FoldingRegions :> System.Collections.Generic.IReadOnlyList<_>
+
     member _.TryResolve(anchor: SessionAnchor) = DocumentGraph.tryResolve state.Current anchor
 
-    member _.GetCompletions(anchor: SessionAnchor) = Completion.getCompletions state.Current anchor
+    member _.GetCompletions(anchor: SessionAnchor) = state.Completions state.Current anchor
 
     member _.GetStructuralCompletions(anchor: SessionAnchor) =
-        Completion.getStructuralCompletions state.Current anchor
+        state.StructuralCompletions state.Current anchor
 
     member _.ProjectText() = state.Current.Text
 
     member _.ApplyMechanicalEdit(edit: MechanicalEdit) =
-        let row = RePlannableThetaRegistry.require (MechanicalEdit.kind edit)
-        let after = StructuralPlan.applyMechanical state.Current edit
+        let after = StructuralPlan.applyMechanical state.Rebuild state.Current edit
         let scope = RefreshScope.ofEditScope edit.Scope
 
         let newState =
@@ -62,7 +69,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
             let after =
                 state.EphemeralMechanical
-                |> List.fold (fun snap edit -> StructuralPlan.applyMechanical snap edit) before
+                |> List.fold (fun snap edit -> StructuralPlan.applyMechanical state.Rebuild snap edit) before
 
             let headEdit = List.head state.EphemeralMechanical
             let row = RePlannableThetaRegistry.require (MechanicalEdit.kind headEdit)
@@ -98,13 +105,13 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             Ok(DocumentSession(documentId, docId, gitPin, newState), entry)
 
     member _.ApplyStructural(edit: StructuralEdit) =
-        let kind = StructuralEdit.kind edit
-        let row = RePlannableThetaRegistry.require kind
-        let phiRef = DocumentSession.makePhiRef state.Revision state.Current
+        let row = RePlannableThetaRegistry.require (StructuralEdit.kind edit)
 
         match StructuralPlan.planStructural docId state.Current edit with
         | Error e -> Error e
         | Ok(patch, after, inverse, inverseQuality) ->
+            let after = DocumentSession(documentId, docId, gitPin, state).Refresh after
+
             let entry =
                 DocumentSession.createLedgerEntry
                     (state.Revision + 1)
@@ -138,7 +145,8 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
         elif target > state.LambdaCommitted.Length then
             Error $"target revision {target} exceeds committed count {state.LambdaCommitted.Length}"
         else
-            let replayed = DocumentSession.replayCommitted docId state.G0 state.LambdaCommitted target
+            let replayed =
+                DocumentSession.replayCommitted docId state.Rebuild state.G0 state.LambdaCommitted target
 
             let newState =
                 { state with
@@ -155,7 +163,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             DocumentSession(documentId, docId, gitPin, state).ReplayToRevision(state.LambdaCommitted.Length - 1)
 
     member _.SyncFromText(newText: string) =
-        let rebuilt = DocumentGraph.rebuildFromText newText
+        let rebuilt = state.Rebuild newText
         let partial = rebuilt.Nodes.IsEmpty && not (System.String.IsNullOrWhiteSpace newText)
 
         let newState =
@@ -167,8 +175,8 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
         DocumentSession(documentId, docId, gitPin, newState)
 
-    static member Create(documentId: string, initialText: string, ?gitPin: GitPin) =
-        let g0 = DocumentGraph.rebuildFromText initialText
+    static member Create(documentId: string, initialText: string, rebuild: DocumentGraphRebuild, ?gitPin: GitPin) =
+        let g0 = rebuild initialText
         let pin = defaultArg gitPin { GitPin.Commit = None }
 
         DocumentSession(
@@ -181,7 +189,38 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
               LambdaCommitted = []
               EphemeralMechanical = []
               RefreshScopes = []
-              PartialParse = false }
+              PartialParse = false
+              Rebuild = rebuild
+              Completions = Completion.empty
+              StructuralCompletions = Completion.emptyStructural }
+        )
+
+    static member CreateWithProviders
+        (
+            documentId: string,
+            initialText: string,
+            rebuild: DocumentGraphRebuild,
+            completions: DocumentCompletions,
+            structuralCompletions: DocumentStructuralCompletions,
+            ?gitPin: GitPin
+        ) =
+        let g0 = rebuild initialText
+        let pin = defaultArg gitPin { GitPin.Commit = None }
+
+        DocumentSession(
+            documentId,
+            DocId.mint (NumericId.ofCounter 1L),
+            pin,
+            { G0 = g0
+              Current = g0
+              Revision = 0
+              LambdaCommitted = []
+              EphemeralMechanical = []
+              RefreshScopes = []
+              PartialParse = false
+              Rebuild = rebuild
+              Completions = completions
+              StructuralCompletions = structuralCompletions }
         )
 
     static member private makePhiRef revision snapshot =
@@ -216,7 +255,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
           Inverse = inverse
           InverseQuality = inverseQuality }
 
-    static member private replayEntry (docId: DocId) (snapshot: DocumentSnapshot) (entry: LedgerEntryDoc) =
+    static member private replayEntry (docId: DocId) (rebuild: DocumentGraphRebuild) (snapshot: DocumentSnapshot) (entry: LedgerEntryDoc) =
         let row =
             match entry.Theta with
             | Structural edit -> RePlannableThetaRegistry.require (StructuralEdit.kind edit)
@@ -228,22 +267,28 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             match entry.Theta with
             | Structural edit ->
                 StructuralPlan.replanStructural docId snapshot edit
-                |> Result.map snd
+                |> Result.map (fun (_, after) -> rebuild after.Text)
             | Mechanical _ -> Error $"entry {entry.Revision} mechanical requires delta"
-        | _, Some patch -> Ok(StructuralPlan.applyPatch docId snapshot patch)
+        | _, Some patch -> Ok(StructuralPlan.applyPatch rebuild docId snapshot patch)
         | DeltaOrReplan, None ->
             match entry.Theta with
             | Structural edit ->
                 StructuralPlan.replanStructural docId snapshot edit
-                |> Result.map snd
+                |> Result.map (fun (_, after) -> rebuild after.Text)
             | Mechanical _ -> Error $"entry {entry.Revision} missing delta or theta"
 
-    static member private replayCommitted (docId: DocId) (g0: DocumentSnapshot) (entries: LedgerEntryDoc list) target =
+    static member private replayCommitted
+        (docId: DocId)
+        (rebuild: DocumentGraphRebuild)
+        (g0: DocumentSnapshot)
+        (entries: LedgerEntryDoc list)
+        target
+        =
         let rec loop snapshot remaining =
             match remaining with
             | [] -> snapshot
             | entry :: rest ->
-                match DocumentSession.replayEntry docId snapshot entry with
+                match DocumentSession.replayEntry docId rebuild snapshot entry with
                 | Ok next -> loop next rest
                 | Error _ -> snapshot
 
@@ -251,4 +296,14 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
         loop g0 take
 
 module DocumentSession =
-    let create = DocumentSession.Create
+    let create documentId initialText rebuild =
+        DocumentSession.Create(documentId, initialText, rebuild)
+
+    let createNeutral documentId initialText =
+        DocumentSession.Create(documentId, initialText, DocumentGraph.emptySnapshot)
+
+    let createWithRebuild documentId initialText rebuild =
+        DocumentSession.Create(documentId, initialText, rebuild)
+
+    let createWithProviders documentId initialText rebuild completions structuralCompletions =
+        DocumentSession.CreateWithProviders(documentId, initialText, rebuild, completions, structuralCompletions)

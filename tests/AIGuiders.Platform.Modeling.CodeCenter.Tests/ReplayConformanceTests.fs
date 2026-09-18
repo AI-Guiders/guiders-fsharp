@@ -6,13 +6,11 @@ open AIGuiders.Platform.Modeling.Core.Identity
 
 module ReplayConformanceTests =
 
-    let sampleText = "@dashboard demo\n    tab x as \"T\"\nend dashboard\n"
-
     [<Fact>]
     let ``V8b Extract undo via tryUndo restores pre-edit graph`` () =
-        let session0 = DocumentSession.Create("doc://demo", sampleText)
+        let session0 = ConformanceFixtures.createDemoSession()
         let tab =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session0.Text) "x"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session0.Text) "x"
             |> Option.defaultWith (fun () -> failwith "tab missing")
         let beforeText = session0.Text
 
@@ -28,9 +26,9 @@ module ReplayConformanceTests =
 
     [<Fact>]
     let ``V8c replayToRevision matches sequential apply`` () =
-        let session0 = DocumentSession.Create("doc://demo", sampleText)
+        let session0 = ConformanceFixtures.createDemoSession()
         let dash =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session0.Text) "demo"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session0.Text) "demo"
             |> Option.defaultWith (fun () -> failwith "dash missing")
 
         let session1 =
@@ -39,7 +37,7 @@ module ReplayConformanceTests =
             | Error e -> Assert.Fail e; session0
 
         let tab =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session1.Text) "x"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session1.Text) "x"
             |> Option.defaultWith (fun () -> failwith "tab missing")
 
         let session2 =
@@ -53,7 +51,7 @@ module ReplayConformanceTests =
 
     [<Fact>]
     let ``V8c replan replay path works for RenameMember without delta storage simulation`` () =
-        let session0 = DocumentSession.Create("doc://demo", sampleText)
+        let session0 = ConformanceFixtures.createDemoSession()
         let node = session0.TryResolve({ Offset = 5; TierHint = None }).Value
 
         match session0.ApplyStructural(RenameMember(node.NodeId.Value, "dashRenamed")) with
@@ -62,19 +60,19 @@ module ReplayConformanceTests =
             Assert.True(entry.PhiRef.IsSome)
 
             match session1.TryUndo() with
-            | Ok undone -> Assert.Equal(sampleText, undone.Text)
+            | Ok undone -> Assert.Equal(ConformanceFixtures.sampleText, undone.Text)
             | Error e -> Assert.Fail e
         | Error e -> Assert.Fail e
 
     [<Fact>]
     let ``MoveMember compact inverse is Partial not replay result`` () =
-        let session0 = DocumentSession.Create("doc://demo", sampleText)
+        let session0 = ConformanceFixtures.createDemoSession()
         let tab =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session0.Text) "x"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session0.Text) "x"
             |> Option.defaultWith (fun () -> failwith "tab missing")
 
         let dash =
-            DocumentGraph.findNodeByName (DocumentGraph.rebuildFromText session0.Text) "demo"
+            DocumentGraph.findNodeByName (ConformanceFixtures.rebuild session0.Text) "demo"
             |> Option.defaultWith (fun () -> failwith "dash missing")
 
         match session0.ApplyStructural(MoveMember(tab.Id, dash.Id, 0)) with

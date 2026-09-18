@@ -27,9 +27,18 @@ type SessionAnchor =
     { Offset: int
       TierHint: string option }
 
+type FoldingRegion =
+    { Start: int
+      End: int
+      Name: string }
+
 type DocumentSnapshot =
     { Text: string
-      Nodes: Map<NodeId, DocumentNode> }
+      Nodes: Map<NodeId, DocumentNode>
+      TokenSpans: SessionClassificationSpan list
+      FoldingRegions: FoldingRegion list }
+
+type DocumentGraphRebuild = string -> DocumentSnapshot
 
 module DocumentGraph =
     let private nextNodeId (nodes: Map<NodeId, DocumentNode>) =
@@ -45,7 +54,7 @@ module DocumentGraph =
     let findNodeAt (snapshot: DocumentSnapshot) (offset: int) =
         snapshot.Nodes
         |> Map.toList
-        |> List.sortBy (fun (_, n) -> -(n.End - n.Start))
+        |> List.sortBy (fun (_, n) -> n.End - n.Start)
         |> List.tryFind (fun (_, n) -> n.Start <= offset && offset < n.End)
         |> Option.map snd
 
@@ -55,83 +64,12 @@ module DocumentGraph =
         |> List.tryFind (fun (_, n) -> n.Name = name)
         |> Option.map snd
 
-    let private classifyKind (kind: string) =
-        if kind.StartsWith("@", StringComparison.Ordinal) then kind
-        elif kind = "tab" || kind = "end" then kind
-        else "token"
-
-    let private lineLength (line: string) = line.Length + 1
-
-    let rebuildFromText (text: string) : DocumentSnapshot =
-        let lines = text.Split([| '\r'; '\n' |], StringSplitOptions.None)
-        let mutable offset = 0
-        let mutable nodes = Map.empty
-        let mutable nodeCounter = 1L
-        let mutable dashboardParent = None
-
-        let mintId () =
-            let id = NodeId.mint (NumericId.ofCounter nodeCounter)
-            nodeCounter <- nodeCounter + 1L
-            id
-
-        for line in lines do
-            let trimmed = line.TrimStart()
-
-            if trimmed.StartsWith("@", StringComparison.Ordinal) then
-                let parts = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-
-                if parts.Length >= 2 then
-                    let kind = parts.[0]
-                    let name = parts.[1]
-                    let id = mintId ()
-                    dashboardParent <- Some id
-
-                    nodes <-
-                        nodes
-                        |> Map.add
-                            id
-                            { Id = id
-                              Kind = kind
-                              Name = name
-                              Start = offset
-                              End = offset + line.Length
-                              Parent = None }
-            elif trimmed.StartsWith("tab ", StringComparison.Ordinal) then
-                let parts = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-
-                if parts.Length >= 2 then
-                    let id = mintId ()
-
-                    nodes <-
-                        nodes
-                        |> Map.add
-                            id
-                            { Id = id
-                              Kind = "tab"
-                              Name = parts.[1]
-                              Start = offset
-                              End = offset + line.Length
-                              Parent = dashboardParent }
-            elif trimmed.StartsWith("end ", StringComparison.Ordinal) then
-                let parts = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-
-                if parts.Length >= 2 then
-                    let id = mintId ()
-
-                    nodes <-
-                        nodes
-                        |> Map.add
-                            id
-                            { Id = id
-                              Kind = "end"
-                              Name = parts.[1]
-                              Start = offset
-                              End = offset + line.Length
-                              Parent = dashboardParent }
-
-            offset <- offset + lineLength line
-
-        { Text = text; Nodes = nodes }
+    /// Language-neutral snapshot shell — graph content comes from planet <c>DocumentGraphRebuild</c> only.
+    let emptySnapshot (text: string) : DocumentSnapshot =
+        { Text = text
+          Nodes = Map.empty
+          TokenSpans = []
+          FoldingRegions = [] }
 
     let private shiftSpans (delta: int) (position: int) (nodes: Map<NodeId, DocumentNode>) =
         nodes
@@ -146,13 +84,7 @@ module DocumentGraph =
                 node)
 
     let classificationSpans (snapshot: DocumentSnapshot) : SessionClassificationSpan list =
-        snapshot.Nodes
-        |> Map.toList
-        |> List.map (fun (_, n) ->
-            { Start = n.Start
-              Length = max 1 (n.End - n.Start)
-              Kind = classifyKind n.Kind
-              NodeId = Some n.Id })
+        snapshot.TokenSpans
 
     let renameNode (snapshot: DocumentSnapshot) (nodeId: NodeId) (newName: string) =
         match Map.tryFind nodeId snapshot.Nodes with
@@ -176,7 +108,7 @@ module DocumentGraph =
                     |> Map.add nodeId { node with Name = newName; End = node.End + delta }
                     |> shiftSpans delta (node.End)
 
-                Ok { Text = newText; Nodes = nodes }
+                Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
     let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (blockKind: string) (body: string) =
         match Map.tryFind anchorId snapshot.Nodes with
@@ -201,7 +133,7 @@ module DocumentGraph =
                 |> shiftSpans delta insertAt
                 |> Map.add newId newNode
 
-            Ok { Text = newText; Nodes = nodes }
+            Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
     let moveMember (snapshot: DocumentSnapshot) (nodeId: NodeId) (_targetParentId: NodeId) (_index: int) =
         match Map.tryFind nodeId snapshot.Nodes with
@@ -216,21 +148,27 @@ module DocumentGraph =
                 |> shiftSpans delta node.End
                 |> Map.add nodeId { node with End = node.End + delta }
 
-            Ok { Text = newText; Nodes = nodes }
+            Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
     let extractMember (snapshot: DocumentSnapshot) (nodeId: NodeId) (extractedName: string) =
         match Map.tryFind nodeId snapshot.Nodes with
         | None -> Error $"node {nodeId} not found"
         | Some node ->
             let blockText = snapshot.Text.Substring(node.Start, node.End - node.Start)
-            let wrapper = Environment.NewLine + "@extracted " + extractedName + Environment.NewLine + blockText + Environment.NewLine
+            let wrapper =
+                Environment.NewLine
+                + "extracted "
+                + extractedName
+                + Environment.NewLine
+                + blockText
+                + Environment.NewLine
             let insertAt = snapshot.Text.Length
             let newText = snapshot.Text + wrapper
             let newId = nextNodeId snapshot.Nodes
 
             let newNode =
                 { Id = newId
-                  Kind = "@extracted"
+                  Kind = "extracted"
                   Name = extractedName
                   Start = insertAt + Environment.NewLine.Length
                   End = newText.Length
@@ -238,7 +176,9 @@ module DocumentGraph =
 
             Ok
                 { Text = newText
-                  Nodes = snapshot.Nodes |> Map.add newId newNode }
+                  Nodes = snapshot.Nodes |> Map.add newId newNode
+                  TokenSpans = []
+                  FoldingRegions = [] }
 
     let tryResolve (snapshot: DocumentSnapshot) (anchor: SessionAnchor) =
         match findNodeAt snapshot anchor.Offset with
