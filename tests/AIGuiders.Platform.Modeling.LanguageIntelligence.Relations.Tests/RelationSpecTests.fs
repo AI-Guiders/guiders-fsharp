@@ -50,6 +50,7 @@ let ``NavSeed uses LogicalPath not bare string`` () =
           Column = None
           Command = Some "go"
           Go = None
-          Solution = None }
+          Solution = None
+          Member = None }
 
     Assert.Equal("src/App.fs", seed.Path.Value)

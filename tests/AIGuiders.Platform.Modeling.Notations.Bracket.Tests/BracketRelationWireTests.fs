@@ -68,6 +68,26 @@ let ``Kind Nav command-only parses NavSeed without file`` () =
     | _ -> failwith "expected Nav spec"
 
 [<Fact>]
+let ``Kind Nav member parses NavSeed`` () =
+    let wire =
+        { ProfileId = BracketProfiles.CdpSquareKeyValue.Id
+          Raw = "[Kind:Nav; File:CitizenRouteHost.cs; Line:50; Member:RunLand; Command:open]"
+          Axes =
+            [ BracketAxis("Kind", ':', "Nav")
+              BracketAxis("File", ':', "CitizenRouteHost.cs")
+              BracketAxis("Line", ':', "50")
+              BracketAxis("Member", ':', "RunLand")
+              BracketAxis("Command", ':', "open") ] :> IReadOnlyList<_> }
+
+    match BracketRelationWire.tryParseRelationSpec wire with
+    | Some (RelationSpec.Nav seed) ->
+        Assert.Equal("CitizenRouteHost.cs", seed.Path.Value)
+        Assert.Equal(Some 50, seed.Line)
+        Assert.Equal(Some "RunLand", seed.Member)
+        Assert.Equal(Some "open", seed.Command)
+    | _ -> failwith "expected Nav spec"
+
+[<Fact>]
 let ``Kind Nav parses NavSeed`` () =
     let wire =
         { ProfileId = BracketProfiles.CdpSquareKeyValue.Id

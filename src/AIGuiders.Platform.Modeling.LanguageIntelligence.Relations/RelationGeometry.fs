@@ -33,7 +33,8 @@ type NavSeed =
       Column: int option
       Command: string option
       Go: string option
-      Solution: LogicalPath option }
+      Solution: LogicalPath option
+      Member: string option }
 
 type ResourcePath = ResourcePath of path: LogicalPath
 

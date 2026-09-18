@@ -129,6 +129,7 @@ module BracketRelationWire =
 
                 let command = axisValue wire "Command"
                 let go = axisValue wire "Go"
+                let navMember = axisValue wire "Member"
 
                 let solution =
                     axisValue wire "Solution" |> Option.map LogicalPath.Create
@@ -139,7 +140,8 @@ module BracketRelationWire =
                       Column = column
                       Command = command
                       Go = go
-                      Solution = solution }
+                      Solution = solution
+                      Member = navMember }
 
                 match axisValue wire "File" with
                 | Some path when not (System.String.IsNullOrWhiteSpace path) ->

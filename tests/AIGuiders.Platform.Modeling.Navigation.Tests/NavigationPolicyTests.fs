@@ -86,7 +86,8 @@ let ``scene: empty has schema caps and summary`` () =
           Column = None
           Command = None
           Go = None
-          Solution = None }
+          Solution = None
+          Member = None }
 
     let scene = Scene.empty seed Mode.Related caps
     Assert.Equal(Schemes.SceneV1, scene.Schema)
