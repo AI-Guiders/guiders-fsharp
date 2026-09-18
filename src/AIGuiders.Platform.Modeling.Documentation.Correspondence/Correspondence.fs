@@ -81,8 +81,9 @@ type ForwardMapResult =
       ForwardDocs: ForwardDoc array }
 
 /// <summary>
-/// Bracket wire grammar: `[F:path; M:member]` / `[F:path; L:start; L2:end]`.
-/// Pure functions (no IO). Keys F/M/L/L2/S/K are the cross-planet anchor vocabulary.
+/// Bracket wire grammar for **correspondence doc reverse-scan** (GUIDERS-FSHARP-ADR-0006).
+/// Legacy F/M/L profile — human-readable in ADR prose; Execution resolve prefers Kind: via `BracketResolveBoundary`.
+/// Pure functions (no IO). Keys F/M/L/L2/S/K are the cross-planet doc-scan vocabulary.
 /// </summary>
 [<RequireQualifiedAccess>]
 module BracketWire =
@@ -103,6 +104,22 @@ module BracketWire =
                 | Some le when le <> ls -> parts.Add($"L2:{le}")
                 | _ -> ()
             | None -> ()
+        "[" + String.Join("; ", parts) + "]"
+
+    /// <summary>Kind: canon wire for Execution resolve boundary (plan §10).</summary>
+    let buildCodeEdit (file: string) (memberKey: string option) (line: int option) : string =
+        let parts = ResizeArray<string>()
+        parts.Add("Kind:CodeEdit")
+        parts.Add($"File:{LogicalPathOps.normalize file}")
+
+        match memberKey with
+        | Some m when not (String.IsNullOrWhiteSpace m) -> parts.Add($"Member:{m}")
+        | _ -> ()
+
+        match line with
+        | Some ln -> parts.Add($"Line:{ln}")
+        | None -> ()
+
         "[" + String.Join("; ", parts) + "]"
 
     /// <summary>

@@ -14,7 +14,7 @@
 | \( V \) | `GraphNodeId` = `ProjectNode` \| `CapabilityNode` |
 | \( E_{\mathsf{proj}} \) | `RelationType.ProjectRef` in `SolutionGraph.Relations`; port `Ports.DotNet.DotNetSlnxGraphPort` |
 | \( E_{\mathsf{req}} \) | `RelationType.Requires|Invalidates|Feeds` orchestration; WF7 local-only |
-| \( \omega \) | `SolutionGraph.FileOwnership` |
+| \( \omega \) | `DocumentRegistry` on `SessionRuntime` (`DocumentRegistryOps`; legacy name `FileOwnership` retired) |
 | \( \mathcal{S} \) | `SolutionSession` |
 | \( \rho_0 \) | `SessionPolicy` (v0 face; → merge в graph) |
 | \( \psi \), \( E_{\mathsf{gov}} \) | **ещё нет** |

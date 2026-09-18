@@ -4,6 +4,11 @@ open Xunit
 open AIGuiders.Platform.Modeling.Documentation.Correspondence
 
 [<Fact>]
+let ``buildCodeEdit emits Kind canon wire`` () =
+    let wire = BracketWire.buildCodeEdit "src/Foo.cs" (Some "Bar") (Some 10)
+    Assert.Equal("[Kind:CodeEdit; File:src/Foo.cs; Member:Bar; Line:10]", wire)
+
+[<Fact>]
 let ``build: member wins over line span`` () =
     let wire = BracketWire.build "docs/adr/x.md" (Some 10) (Some 20) (Some "Foo")
     Assert.Equal("[F:docs/adr/x.md; M:Foo]", wire)

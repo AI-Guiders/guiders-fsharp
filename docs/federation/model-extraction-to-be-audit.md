@@ -5,9 +5,9 @@ Progress tracker (non-normative): [model-extraction-living-matrix.md](./model-ex
 
 **Closure rule:** goal closes only when every row below is `verified` against code/tests — not matrix ticks alone.
 
-**Summary (ship-51):** verified **28** · partial **6** · gap **0** · **CLOSURE: BLOCKED** (partials remain).
+**Summary (ship-52):** verified **29** · partial **5** · gap **0** · **CLOSURE: BLOCKED** (partials remain).
 
-Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim / stale docs · **gap** = missing TO-BE behavior.
+Legend: **verified** = code + automated gate · **partial** = shipped subset / boundary shim · **gap** = missing TO-BE behavior.
 
 ---
 
@@ -23,11 +23,11 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 | P1-06 | Relation + RelationType in Ide.Session; SessionEdgeKind → Relation | verified | `RelationGraph.fs`, `SolutionGraph` | Phase1 Relations field test |
 | P1-07 | Dependency kernel + TypeSystem profile; AdapterSlot Execution-only | verified | `DependencyRelationKind`, `TypeSystemProfile`, platform `AdapterSlotRegistry` | Phase1 + `DependencyKernelPlatformTests` |
 | P1-08 | Delete `Modeling.Gdl.Language`; props + IR shim | verified | no `Modeling.Gdl.Language` project; platform no `IR.Language` csproj | Phase10 Gdl.Language absent |
-| P1-09 | Notations.Bracket — Kind: canon; delete BracketAnchorSpan, AnchorWire, SniperScope | partial | Kind: canon + conformance v2; **LegacyWireSpan** @ Execution boundary; Correspondence `BracketWire` still F/M/L for doc wires | Phase1 AnchorWire/SniperScope; Phase2 BracketAnchorSpan; Phase10 boundary |
+| P1-09 | Notations.Bracket — Kind: canon; delete BracketAnchorSpan, AnchorWire, SniperScope | partial | Kind: + `BracketResolveBoundary`; Correspondence `BracketWire` F/M/L = **doc reverse-scan profile** + `buildCodeEdit`; `LegacyWireSpan` runtime shim | Phase1 deletes; Phase2/10 boundary |
 | P1-10 | RelationAttributes; NavSeed; Navigation.Scene.Edge projection | verified | `RelationAttributes`, `NavSeed`, `SceneProjection` | Phase1 NavSeed / SceneProjection tests |
 | P1-11 | CLIMutable strip from kernel; seam/LRC only | verified | Navigation + Correspondence records plain F# | Phase1 CLIMutable tests |
 | P1-12 | Execution *Relations* rename; registry interfaces | verified | `Execution.Language.*.Relations`, `IResolveRelation` | matrix ship-16/17, `RelationSeamContractTests` |
-| P1-13 | Codemod wires/tests | partial | anchor-resolve + kind-canon specs v2; legacy runtime parse retained | `RelationResolveConformanceTests`, Phase2 kind-spec gate |
+| P1-13 | Codemod wires/tests | partial | conformance v2 kind-spec; `BracketResolveBoundary` Kind-first unified entry; legacy fallback until consumers migrate | `BracketResolveBoundaryTests`, Phase2 gate |
 | P1-14 | Homonyms ImplementsInterface / ImplementsObligation | verified | distinct RelationType + CorrespondenceRelationKind | Phase1 homonym test |
 | P1-15 | DiagnosticIndex + ingest; LRC Id → Code at ingest | verified | `DiagnosticIndexOps`, `DiagnosticIndexIngest` | ship-22 tests |
 | P1-16 | SessionContents + DocumentRegistry; drop FileOwnership | verified | `DocumentRegistryOps`, `SessionRuntime.Contents` | Phase1 FileOwnership absent |
@@ -52,7 +52,7 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 
 | ID | Requirement | Status | Evidence | Gate |
 |----|-------------|--------|----------|------|
-| P4-01 | ADR/math amend (§9) | partial | ADR-0003/0063 updated; **ADR-0042**, math `10-implementation.md` still cite retired names | manual doc debt |
+| P4-01 | ADR/math amend (§9) | verified | ADR-0042 amendment (IR.Language retired); math `10-implementation.md` DocumentRegistry ω | Phase10 ADR/math gates |
 | P4-02 | AttachSchema + CommandPlane catalog + conformance vectors | verified | `AttachSchemaCatalog`, `FederationAttachCatalog`, attach-schema.spec.json | Phase34 attach test |
 | P4-03 | Living matrix doc | verified | `model-extraction-living-matrix.md` | Phase10 matrix exists |
 
@@ -62,9 +62,8 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 
 | ID | What remains | Owner slice |
 |----|--------------|-------------|
-| P1-09 | Retire `LegacyWireSpan` / `RelationWireBoundary` from runtime; migrate Correspondence `BracketWire` to Kind: or keep doc-only F/M/L profile | ship-51+ boundary |
-| P1-13 | Remove legacy parse paths outside conformance (CDP, Correspondence ingest) once consumers migrate | consumer codemod |
-| P4-01 | Refresh ADR-0042, math ide-session docs for Relation-first vocabulary | docs wave |
+| P1-09 | Delete `LegacyWireSpan` / shrink `RelationWireBoundary`; migrate CDP/consumers to `BracketResolveBoundary` + Kind: | ship-53+ boundary |
+| P1-13 | Remove legacy fallback once CDP + correspondence consumers emit Kind: | consumer codemod |
 
 ---
 
@@ -73,9 +72,9 @@ Legend: **verified** = code + automated gate · **partial** = shipped subset / b
 | Gate | Repo | Covers |
 |------|------|--------|
 | `FederationPhase1ChecklistTests` | fsharp | P1-01…P1-16 core |
-| `FederationPhase2ChecklistTests` | fsharp + platform | P2-02, P1-09 deletes, build/CRS hooks |
+| `FederationPhase2ChecklistTests` | fsharp + platform | P2-02, P1-09 deletes, build/CRS, `BracketResolveBoundary` |
 | `FederationPhase34ChecklistTests` | fsharp + platform | P3-01, P4-02 |
-| `FederationPhase10ChecklistTests` | fsharp + platform | §10 audit presence + cross-phase closure |
+| `FederationPhase10ChecklistTests` | fsharp + platform | §10 audit + P4-01 doc gates |
 
 Re-run before claiming closure:
 

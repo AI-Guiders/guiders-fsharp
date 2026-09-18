@@ -25,6 +25,15 @@ type FederationPhase10ChecklistTests() =
         Assert.Contains("Phase 3", text)
         Assert.Contains("Phase 4", text)
         Assert.Contains("CLOSURE: BLOCKED", text)
+        Assert.Contains("P4-01", text)
+
+    [<Fact>]
+    member _.``Math ide-session maps omega to DocumentRegistry``() =
+        let mathPath = Path.Combine(repoRoot, "docs", "math", "ide-session", "10-implementation.md") |> Path.GetFullPath
+        Assert.True(File.Exists mathPath, mathPath)
+        let text = File.ReadAllText mathPath
+        Assert.Contains("DocumentRegistry", text)
+        Assert.DoesNotContain("SolutionGraph.FileOwnership", text)
 
     [<Fact>]
     member _.``Living matrix tracker exists``() =

@@ -72,6 +72,8 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | BracketAnchorSpan retirement | absent from Modeling | `BracketAnchorSpan` deleted; `CodeEditResolveAxes` + `LegacyWireSpan` boundary | **shipped** ship-48 |
 | Build diagnostic producer | `BuildDiagnosticOps` ingest | `BuildDiagnosticProducer` + `TryRunBuildAndIngestDiagnostics` | **shipped** ship-49 |
 | LegacyWireSpan conformance retirement | `CodeEditWireEncoding` Kind axes | anchor-resolve + canon specs kind-spec only; legacy-span conformance path removed | **shipped** ship-50 |
-| §10 TO-BE audit | requirement-by-requirement evidence table | `model-extraction-to-be-audit.md` + `FederationPhase10ChecklistTests` | **shipped** ship-51 (closure **BLOCKED** — 6 partials) |
+| §10 TO-BE audit | requirement-by-requirement evidence table | `model-extraction-to-be-audit.md` + `FederationPhase10ChecklistTests` | **shipped** ship-51 (closure **BLOCKED** — 5 partials) |
+| BracketResolveBoundary | Kind-first unified wire parse | `BracketResolveBoundary` + `buildCodeEdit` doc profile | **shipped** ship-52 |
+| P4-01 docs refresh | ADR-0042 IR.Language retirement; math ω → DocumentRegistry | Phase10 ADR/math gates | **shipped** ship-52 |
 
-**Next waves:** LegacyWireSpan runtime boundary retirement, stale ADR/math refresh, goal closure when audit all `verified`.
+**Next waves:** LegacyWireSpan runtime delete, consumer Kind: codemod, goal closure when audit all `verified`.
