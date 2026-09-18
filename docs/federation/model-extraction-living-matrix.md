@@ -70,5 +70,6 @@ Tracks ADR-0003 §4 matrix rows against `model_execution_split_audit` plan. Upda
 | CRS ingest on Open | `CorrespondenceRelationOps` | `Open` + `IngestFromRegistry` when workspace root found | **shipped** ship-47 |
 | Correspondence.Kind canon | typed `CorrespondenceRelationKind` on witness | `CorrespondenceKind.NormalizeWire` @ resolver boundary | **shipped** ship-47 |
 | BracketAnchorSpan retirement | absent from Modeling | `BracketAnchorSpan` deleted; `CodeEditResolveAxes` + `LegacyWireSpan` boundary | **shipped** ship-48 |
+| Build diagnostic producer | `BuildDiagnosticOps` ingest | `BuildDiagnosticProducer` + `TryRunBuildAndIngestDiagnostics` | **shipped** ship-49 |
 
-**Next waves:** LegacyWireSpan F/M/L conformance retirement, dotnet build diagnostic producer wiring, full §10 TO-BE review.
+**Next waves:** LegacyWireSpan F/M/L conformance retirement, full §10 TO-BE review.
