@@ -170,7 +170,7 @@ module DocumentSessionConformanceTests =
 
         let tab =
             nodes
-            |> List.find (fun node -> node.Name = "x")
+            |> List.find (fun node -> node.Name = "tab x")
 
         match session.TryResolveNode tab.Id with
         | None -> Assert.Fail("expected node locus")

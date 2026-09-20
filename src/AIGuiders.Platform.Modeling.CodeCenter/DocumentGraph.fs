@@ -88,7 +88,9 @@ module DocumentGraph =
     let findNodeByName (snapshot: DocumentSnapshot) (name: string) =
         snapshot.Nodes
         |> Map.toList
-        |> List.tryFind (fun (_, n) -> n.Name = name)
+        |> List.tryFind (fun (_, n) ->
+            n.Name = name
+            || n.Name.EndsWith(" " + name, StringComparison.Ordinal))
         |> Option.map snd
 
     /// Language-neutral snapshot shell — graph content comes from planet <c>DocumentGraphRebuild</c> only.
@@ -134,11 +136,21 @@ module DocumentGraph =
                   Tier = "Semantic"
                   NodeId = Some node.Id }
 
+    let private renameIdentifier (label: string) (newName: string) =
+        match label.LastIndexOf(' ') with
+        | -1 -> newName
+        | index -> label.Substring(0, index + 1) + newName
+
+    let private renameToken (label: string) =
+        match label.LastIndexOf(' ') with
+        | -1 -> label
+        | index -> label.Substring(index + 1)
+
     let renameNode (snapshot: DocumentSnapshot) (nodeId: NodeId) (newName: string) =
         match Map.tryFind nodeId snapshot.Nodes with
         | None -> Error $"node {nodeId} not found"
         | Some node ->
-            let oldToken = node.Name
+            let oldToken = renameToken node.Name
             let text = snapshot.Text
 
             let idx = text.IndexOf(oldToken, node.Start, node.End - node.Start, StringComparison.Ordinal)
@@ -153,7 +165,7 @@ module DocumentGraph =
 
                 let nodes =
                     snapshot.Nodes
-                    |> Map.add nodeId { node with Name = newName; End = node.End + delta }
+                    |> Map.add nodeId { node with Name = renameIdentifier node.Name newName; End = node.End + delta }
                     |> shiftSpans delta (node.End)
 
                 Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
