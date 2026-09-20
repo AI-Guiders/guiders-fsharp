@@ -14,7 +14,7 @@ type MechanicalEdit =
 
 type StructuralEdit =
     | RenameMember of nodeId: NodeId * newName: string
-    | InsertBlock of anchorId: NodeId * kind: GraphNodeKind * sourceLine: string
+    | InsertBlock of anchorId: NodeId * sourceLine: string
     | MoveMember of nodeId: NodeId * targetParentId: NodeId * index: int
     | Extract of nodeId: NodeId * extractedName: string
 
@@ -22,6 +22,20 @@ type InverseQuality =
     | Exact
     | Partial
     | Unspecified
+
+/// Coarse projection family (C# ProjectionKind parity). Plugin identity is PluginId string.
+type DocumentProjectionKind =
+    | Text = 0
+    | Diagram = 1
+    | Tree = 2
+    | Form = 3
+    | Preview = 4
+
+type ProjectionDescriptor =
+    { Kind: DocumentProjectionKind
+      PluginId: string
+      NodeId: string option
+      Dialect: string option }
 
 module StructuralEdit =
     let kind =
@@ -37,3 +51,20 @@ module MechanicalEdit =
         | Point -> "MechanicalPoint"
         | Region -> "MechanicalRegion"
         | Document -> "MechanicalDocument"
+
+module ProjectionDescriptor =
+    let text =
+        { Kind = DocumentProjectionKind.Text
+          PluginId = "core.text"
+          NodeId = None
+          Dialect = None }
+
+    let treeOutline =
+        { Kind = DocumentProjectionKind.Tree
+          PluginId = "tree.outline"
+          NodeId = None
+          Dialect = None }
+
+    /// Default session advertisement; host intersects with installed plugins.
+    let defaultAvailable () : ProjectionDescriptor list =
+        [ text; treeOutline ]

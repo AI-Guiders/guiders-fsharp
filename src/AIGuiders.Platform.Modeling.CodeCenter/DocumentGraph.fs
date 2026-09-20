@@ -6,7 +6,6 @@ open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
 type DocumentNode =
     { Id: NodeId
-      Kind: GraphNodeKind
       Name: string
       Start: int
       End: int
@@ -42,7 +41,6 @@ type DocumentGraphRebuild = string -> DocumentSnapshot
 
 type DocumentGraphNode =
     { Id: NodeId
-      Kind: GraphNodeKind
       Name: string
       Range: LineRange
       Parent: NodeId option }
@@ -121,7 +119,6 @@ module DocumentGraph =
         |> List.sortBy (fun (_, node) -> node.Start)
         |> List.map (fun (_, node) ->
             { Id = node.Id
-              Kind = node.Kind
               Name = node.Name
               Range = LineRange.create node.Start node.End
               Parent = node.Parent })
@@ -170,7 +167,7 @@ module DocumentGraph =
 
                 Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
-    let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (kind: GraphNodeKind) (sourceLine: string) =
+    let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (sourceLine: string) =
         match Map.tryFind anchorId snapshot.Nodes with
         | None -> Error $"anchor {anchorId} not found"
         | Some anchor ->
@@ -187,7 +184,6 @@ module DocumentGraph =
 
             let newNode =
                 { Id = newId
-                  Kind = kind
                   Name = nameToken
                   Start = insertAt + Environment.NewLine.Length
                   End = insertAt + insertion.Length - Environment.NewLine.Length
@@ -233,7 +229,6 @@ module DocumentGraph =
 
             let newNode =
                 { Id = newId
-                  Kind = GraphNodeKind.Synthetic
                   Name = extractedName
                   Start = insertAt + Environment.NewLine.Length
                   End = newText.Length

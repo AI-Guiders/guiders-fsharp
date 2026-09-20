@@ -159,7 +159,7 @@ module DocumentSessionConformanceTests =
         let session = ConformanceFixtures.createDemoSession()
         let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
 
-        match session.ApplyStructural(InsertBlock(node.NodeId.Value, GraphNodeKind.Block, "tab newTab as \"N\"")) with
+        match session.ApplyStructural(InsertBlock(node.NodeId.Value, "tab newTab as \"N\"")) with
         | Error e -> Assert.Fail e
         | Ok(session', entry) ->
             Assert.Contains("newTab", session'.Text)

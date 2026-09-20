@@ -13,7 +13,6 @@
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Ide.Session\AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GraphNodeKind.fs" />
     <Compile Include="EditTypes.fs" />
     <Compile Include="StructuralEditBridge.fs" />
     <Compile Include="MechanicalEditBridge.fs" />

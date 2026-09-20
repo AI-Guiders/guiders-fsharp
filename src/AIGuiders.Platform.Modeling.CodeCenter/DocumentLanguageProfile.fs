@@ -45,8 +45,8 @@ module StructuralPlanGraph =
                 InverseQuality.Exact
                 (fun s -> DocumentGraph.renameNode s nodeId newName)
 
-        | InsertBlock(anchorId, kind, sourceLine) ->
-            map None InverseQuality.Unspecified (fun s -> DocumentGraph.insertBlock s anchorId kind sourceLine)
+        | InsertBlock(anchorId, sourceLine) ->
+            map None InverseQuality.Unspecified (fun s -> DocumentGraph.insertBlock s anchorId sourceLine)
 
         | MoveMember(nodeId, targetParentId, index) ->
             map
