@@ -76,6 +76,11 @@ module DocumentSessionConformanceTests =
         Assert.Equal(1, session'.Revision)
 
     [<Fact>]
+    let ``V4d DashSpec session exposes Language Profile`` () =
+        let session = ConformanceFixtures.createDemoSession()
+        Assert.Equal("dashspec.block", session.LanguageProfile.ProfileRef.ProfileId)
+
+    [<Fact>]
     let ``V5 completions stub returns items`` () =
         let session = ConformanceFixtures.createDemoSession()
         let items = session.GetCompletions({ Offset = 5; TierHint = None })

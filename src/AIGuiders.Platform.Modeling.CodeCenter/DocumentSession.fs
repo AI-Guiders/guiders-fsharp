@@ -12,7 +12,7 @@ type DocumentSessionState =
       EphemeralMechanical: MechanicalEdit list
       RefreshScopes: RefreshScope list
       PartialParse: bool
-      Rebuild: DocumentGraphRebuild
+      Profile: IDocumentLanguageProfile
       Completions: DocumentCompletions
       StructuralCompletions: DocumentStructuralCompletions }
 
@@ -32,7 +32,9 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     member private _.WithState newState = DocumentSession(documentId, docId, gitPin, newState)
 
-    member private _.Refresh snapshot = state.Rebuild snapshot.Text
+    member _.LanguageProfile = state.Profile
+
+    member private _.Refresh snapshot = state.Profile.Rebuild snapshot.Text
 
     member _.GetClassificationSpans() =
         DocumentGraph.classificationSpans state.Current :> System.Collections.Generic.IReadOnlyList<_>
@@ -55,8 +57,13 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     member _.ProjectText() = state.Current.Text
 
+    /// Session-advertised projections; host intersects with installed plugin catalog.
+    member _.AvailableProjections() =
+        ProjectionDescriptor.defaultAvailable ()
+        :> System.Collections.Generic.IReadOnlyList<_>
+
     member _.ApplyMechanicalEdit(edit: MechanicalEdit) : Result<DocumentSession, string> =
-        let after = StructuralPlan.applyMechanical state.Rebuild state.Current edit
+        let after = StructuralPlan.applyMechanical state.Profile.Rebuild state.Current edit
         let scope = RefreshScope.ofEditScope edit.Scope
 
         let newState =
@@ -76,7 +83,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
             let after =
                 state.EphemeralMechanical
-                |> List.fold (fun snap edit -> StructuralPlan.applyMechanical state.Rebuild snap edit) before
+                |> List.fold (fun snap edit -> StructuralPlan.applyMechanical state.Profile.Rebuild snap edit) before
 
             let headEdit = List.head state.EphemeralMechanical
             let row = RePlannableThetaRegistry.require (MechanicalEdit.kind headEdit)
@@ -114,7 +121,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
     member _.ApplyStructural(edit: StructuralEdit) =
         let row = RePlannableThetaRegistry.require (StructuralEdit.kind edit)
 
-        match StructuralPlan.planStructural docId state.Current edit with
+        match StructuralPlan.planStructural state.Profile docId state.Current edit with
         | Error e -> Error e
         | Ok(patch, after, inverse, inverseQuality) ->
             let after = DocumentSession(documentId, docId, gitPin, state).Refresh after
@@ -153,7 +160,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             Error $"target revision {target} exceeds committed count {state.LambdaCommitted.Length}"
         else
             let replayed =
-                DocumentSession.replayCommitted docId state.Rebuild state.G0 state.LambdaCommitted target
+                DocumentSession.replayCommitted docId state.Profile state.G0 state.LambdaCommitted target
 
             let newState =
                 { state with
@@ -171,7 +178,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             DocumentSession(documentId, docId, gitPin, state).ReplayToRevision(state.LambdaCommitted.Length - 1)
 
     member _.SyncFromText(newText: string) =
-        let rebuilt = state.Rebuild newText
+        let rebuilt = state.Profile.Rebuild newText
         let partial = rebuilt.Nodes.IsEmpty && not (System.String.IsNullOrWhiteSpace newText)
 
         let newState =
@@ -183,8 +190,8 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
         DocumentSession(documentId, docId, gitPin, newState)
 
-    static member Create(documentId: string, initialText: string, rebuild: DocumentGraphRebuild, ?gitPin: GitPin) =
-        let g0 = rebuild initialText
+    static member Create(documentId: string, initialText: string, profile: IDocumentLanguageProfile, ?gitPin: GitPin) =
+        let g0 = profile.Rebuild initialText
         let pin = defaultArg gitPin { GitPin.Commit = None }
 
         DocumentSession(
@@ -198,7 +205,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
               EphemeralMechanical = []
               RefreshScopes = []
               PartialParse = false
-              Rebuild = rebuild
+              Profile = profile
               Completions = Completion.empty
               StructuralCompletions = Completion.emptyStructural }
         )
@@ -207,12 +214,12 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
         (
             documentId: string,
             initialText: string,
-            rebuild: DocumentGraphRebuild,
+            profile: IDocumentLanguageProfile,
             completions: DocumentCompletions,
             structuralCompletions: DocumentStructuralCompletions,
             ?gitPin: GitPin
         ) =
-        let g0 = rebuild initialText
+        let g0 = profile.Rebuild initialText
         let pin = defaultArg gitPin { GitPin.Commit = None }
 
         DocumentSession(
@@ -226,7 +233,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
               EphemeralMechanical = []
               RefreshScopes = []
               PartialParse = false
-              Rebuild = rebuild
+              Profile = profile
               Completions = completions
               StructuralCompletions = structuralCompletions }
         )
@@ -263,7 +270,12 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
           Inverse = inverse
           InverseQuality = inverseQuality }
 
-    static member private replayEntry (docId: DocId) (rebuild: DocumentGraphRebuild) (snapshot: DocumentSnapshot) (entry: LedgerEntryDoc) =
+    static member private replayEntry
+        (docId: DocId)
+        (profile: IDocumentLanguageProfile)
+        (snapshot: DocumentSnapshot)
+        (entry: LedgerEntryDoc)
+        =
         let row =
             match entry.Theta with
             | Structural edit -> RePlannableThetaRegistry.require (StructuralEdit.kind edit)
@@ -274,20 +286,20 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
         | RePlannable, None ->
             match entry.Theta with
             | Structural edit ->
-                StructuralPlan.replanStructural docId snapshot edit
-                |> Result.map (fun (_, after) -> rebuild after.Text)
+                StructuralPlan.replanStructural profile docId snapshot edit
+                |> Result.map (fun (_, after) -> profile.Rebuild after.Text)
             | Mechanical _ -> Error $"entry {entry.Revision} mechanical requires delta"
-        | _, Some patch -> Ok(StructuralPlan.applyPatch rebuild docId snapshot patch)
+        | _, Some patch -> Ok(StructuralPlan.applyPatch profile.Rebuild docId snapshot patch)
         | DeltaOrReplan, None ->
             match entry.Theta with
             | Structural edit ->
-                StructuralPlan.replanStructural docId snapshot edit
-                |> Result.map (fun (_, after) -> rebuild after.Text)
+                StructuralPlan.replanStructural profile docId snapshot edit
+                |> Result.map (fun (_, after) -> profile.Rebuild after.Text)
             | Mechanical _ -> Error $"entry {entry.Revision} missing delta or theta"
 
     static member private replayCommitted
         (docId: DocId)
-        (rebuild: DocumentGraphRebuild)
+        (profile: IDocumentLanguageProfile)
         (g0: DocumentSnapshot)
         (entries: LedgerEntryDoc list)
         target
@@ -296,7 +308,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
             match remaining with
             | [] -> snapshot
             | entry :: rest ->
-                match DocumentSession.replayEntry docId rebuild snapshot entry with
+                match DocumentSession.replayEntry docId profile snapshot entry with
                 | Ok next -> loop next rest
                 | Error _ -> snapshot
 
@@ -305,13 +317,16 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
 module DocumentSession =
     let create documentId initialText rebuild =
-        DocumentSession.Create(documentId, initialText, rebuild)
+        DocumentSession.Create(documentId, initialText, RebuildLanguageProfile.create rebuild)
 
     let createNeutral documentId initialText =
-        DocumentSession.Create(documentId, initialText, DocumentGraph.emptySnapshot)
+        DocumentSession.Create(documentId, initialText, NeutralDocumentLanguageProfile())
+
+    let createWithProfile documentId initialText profile =
+        DocumentSession.Create(documentId, initialText, profile)
 
     let createWithRebuild documentId initialText rebuild =
-        DocumentSession.Create(documentId, initialText, rebuild)
+        DocumentSession.Create(documentId, initialText, RebuildLanguageProfile.create rebuild)
 
-    let createWithProviders documentId initialText rebuild completions structuralCompletions =
-        DocumentSession.CreateWithProviders(documentId, initialText, rebuild, completions, structuralCompletions)
+    let createWithProviders documentId initialText profile completions structuralCompletions =
+        DocumentSession.CreateWithProviders(documentId, initialText, profile, completions, structuralCompletions)

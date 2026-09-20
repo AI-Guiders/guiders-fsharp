@@ -14,50 +14,26 @@ module StructuralPlan =
                         Replacements = [ { DocId = docId; Old = oldText; New = newText } ] } }
 
     let planStructural
+        (profile: IDocumentLanguageProfile)
         (docId: DocId)
         (before: DocumentSnapshot)
         (edit: StructuralEdit)
         : Result<SessionPatch * DocumentSnapshot * StructuralEdit option * InverseQuality, string>
         =
-        let apply f inverse inverseQuality =
-            match f before with
-            | Error e -> Error e
-            | Ok after ->
-                let patch = textPatch docId before.Text after.Text
-                Ok(patch, after, inverse, inverseQuality)
-
-        match edit with
-        | RenameMember(nodeId, newName) ->
-            apply
-                (fun s -> DocumentGraph.renameNode s nodeId newName)
-                (Some(RenameMember(nodeId, (Map.find nodeId before.Nodes).Name)))
-                InverseQuality.Exact
-
-        | InsertBlock(anchorId, kind, sourceLine) ->
-            apply
-                (fun s -> DocumentGraph.insertBlock s anchorId kind sourceLine)
-                None
-                InverseQuality.Unspecified
-
-        | MoveMember(nodeId, targetParentId, index) ->
-            apply
-                (fun s -> DocumentGraph.moveMember s nodeId targetParentId index)
-                (Some(MoveMember(nodeId, targetParentId, index)))
-                InverseQuality.Partial
-
-        | Extract(nodeId, extractedName) ->
-            apply
-                (fun s -> DocumentGraph.extractMember s nodeId extractedName)
-                (Some(Extract(nodeId, extractedName)))
-                InverseQuality.Partial
+        match profile.PlanStructural before edit with
+        | Error e -> Error e
+        | Ok outcome ->
+            let patch = textPatch docId before.Text outcome.Snapshot.Text
+            Ok(patch, outcome.Snapshot, outcome.Inverse, outcome.InverseQuality)
 
     let replanStructural
+        (profile: IDocumentLanguageProfile)
         (docId: DocId)
         (snapshot: DocumentSnapshot)
         (edit: StructuralEdit)
         : Result<SessionPatch * DocumentSnapshot, string>
         =
-        planStructural docId snapshot edit
+        planStructural profile docId snapshot edit
         |> Result.map (fun (patch, after, _, _) -> patch, after)
 
     let applyPatch (rebuild: DocumentGraphRebuild) (docId: DocId) (snapshot: DocumentSnapshot) (patch: SessionPatch) =

@@ -21,6 +21,7 @@
     <Compile Include="LedgerTypes.fs" />
     <Compile Include="RePlannableThetaRegistry.fs" />
     <Compile Include="DocumentGraph.fs" />
+    <Compile Include="DocumentLanguageProfile.fs" />
     <Compile Include="StructuralPlan.fs" />
     <Compile Include="Completion.fs" />
     <Compile Include="DocumentSession.fs" />
