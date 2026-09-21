@@ -88,3 +88,27 @@ module DashSpecLanguageProfileTests =
     let ``rule registry assigns sequential DS codes`` () =
         Assert.Equal("DS001", DashSpecRuleRegistry.code DashSpecRuleKind.ExtraEndBlock)
         Assert.Equal("DS007", DashSpecRuleRegistry.code DashSpecRuleKind.RoundTripOutlineChanged)
+
+    [<Fact>]
+    let ``as title is stored as concept node attribute`` () =
+        let graph = DashSpecConceptGraphBuilder.buildFromText sample
+        let tab =
+            graph.Nodes
+            |> Seq.pick (fun pair ->
+                match pair.Value.Kind with
+                | DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x") -> Some pair.Value
+                | _ -> None)
+
+        Assert.Equal(Some "T", tab.Title)
+        Assert.Equal("tab x", tab.Label)
+
+    [<Fact>]
+    let ``tab with as and end tab passes block balance`` () =
+        let text =
+            "@dashboard demo\n    tab overview as \"Overview\"\n        cards\n            peak\n        end cards\n    end tab\nend dashboard\n"
+
+        let errors =
+            DashSpecRuleEngine.evaluate (DashSpecConceptGraphBuilder.buildFromText text)
+            |> List.filter (fun diagnostic -> diagnostic.Severity = "error")
+
+        Assert.Empty(errors)
