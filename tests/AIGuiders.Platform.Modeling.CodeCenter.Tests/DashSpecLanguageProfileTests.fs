@@ -69,8 +69,15 @@ module DashSpecLanguageProfileTests =
             | _ -> false)
 
     [<Fact>]
+    let ``extra end block produces DS002`` () =
+        let graph = DashSpecConceptGraphBuilder.buildFromText "end dashboard\n"
+        let diagnostics = DashSpecRuleEngine.evaluateBlockBalance graph
+
+        Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = "DS002")
+
+    [<Fact>]
     let ``unbalanced end block produces DS003`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText "@dashboard demo\nend tab\nend dashboard\n"
-        let diagnostics = DashSpecInvariantLaws.balancedBlockStructure graph
+        let diagnostics = DashSpecRuleEngine.evaluateBlockBalance graph
 
         Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = "DS003")
