@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Accepted · Partially implemented |
+| **Status** | Accepted · Implemented (Code Center plugin backends) |
 | **Date** | 2026-09-21 |
 | **Tags** | #guiders #fsharp #codecenter #federation #planet #language-profile |
 | **Related** | [GUIDERS-FSHARP-ADR-0004](./GUIDERS-FSHARP-ADR-0004-ide-session-modeling-ownership.md) · [GUIDERS-FSHARP-ADR-0005](./GUIDERS-FSHARP-ADR-0005-federation-reframe-cdp-features.md) · DASHSPEC / ADR-0067 (planet CodeCenter slice) · `IDocumentLanguageProfile` |
@@ -95,7 +95,7 @@ Planet-owned planners (e.g. `DashSpecStructuralPlanner`) use tier/AST knowledge;
 | Profile contract | `IDocumentLanguageProfile` in `DocumentLanguageProfile.fs` |
 | Neutral fallback | `NeutralDocumentLanguageProfile` → `emptySnapshot` |
 | DashSpec binding | `DashSpecCodeCenterSession.createDocumentSession` → `DashSpecDocumentLanguageProfile.instance`; WPF `DashSpecFederationDocumentSession` |
-| Central registry | **Not yet** — DashSpec Studio / tests construct planet session directly |
+| Central registry | `ICodeCenterLanguageBackend` + `CodeCenterDocumentSessionFactory.Open` (guiders-wpf); Studio uses `PluginRuntime.OpenDocument` |
 | IDE `DocumentRegistry` | owns paths / `DocId`; language routing via `LanguageId` is adjacent but not unified with CodeCenter profile SSOT |
 
 ## Non-goals
