@@ -69,15 +69,22 @@ module DashSpecLanguageProfileTests =
             | _ -> false)
 
     [<Fact>]
-    let ``extra end block produces DS002`` () =
+    let ``extra end block fires ExtraEndBlock rule`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText "end dashboard\n"
         let diagnostics = DashSpecRuleEngine.evaluateBlockBalance graph
+        let expected = DashSpecRuleRegistry.code DashSpecRuleKind.ExtraEndBlock
 
-        Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = "DS002")
+        Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = expected)
 
     [<Fact>]
-    let ``unbalanced end block produces DS003`` () =
+    let ``unbalanced end block fires MismatchedEndKeyword rule`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText "@dashboard demo\nend tab\nend dashboard\n"
         let diagnostics = DashSpecRuleEngine.evaluateBlockBalance graph
+        let expected = DashSpecRuleRegistry.code DashSpecRuleKind.MismatchedEndKeyword
 
-        Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = "DS003")
+        Assert.Contains(diagnostics, fun diagnostic -> diagnostic.Code = expected)
+
+    [<Fact>]
+    let ``rule registry assigns sequential DS codes`` () =
+        Assert.Equal("DS001", DashSpecRuleRegistry.code DashSpecRuleKind.ExtraEndBlock)
+        Assert.Equal("DS007", DashSpecRuleRegistry.code DashSpecRuleKind.RoundTripOutlineChanged)
