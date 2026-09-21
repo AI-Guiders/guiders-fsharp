@@ -2,6 +2,7 @@ namespace AIGuiders.Platform.Modeling.CodeCenter.Tests
 
 open Xunit
 open AIGuiders.Platform.Modeling.CodeCenter
+open AIGuiders.Platform.Modeling.Core.Identity
 open DashSpec.Modeling.CodeCenter
 open DashSpec.Modeling.Parse.Syntax
 
@@ -11,15 +12,15 @@ module DashSpecLanguageProfileTests =
         "@dashboard demo\n    tab x as \"T\"\n    card events_detail\n        data\n        end data\n    end card events_detail\nend dashboard\n"
 
     [<Fact>]
-    let ``concept graph uses stable ast ids and contains edges`` () =
+    let ``concept graph uses stable node ids and contains edges`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText sample
 
-        Assert.True(graph.Nodes.Count >= 4)
-        Assert.Contains(graph.Nodes, fun pair -> AstNodeId.value pair.Key > 0u)
+        Assert.True(graph.Tiers.Count >= 4)
+        Assert.Contains(graph.Tiers, fun pair -> NumericId.value (NodeId.carrier pair.Key) > 0L)
         Assert.True(graph.Edges.Length >= 3)
 
         let tab =
-            graph.Nodes
+            graph.Tiers
             |> Seq.choose (fun pair ->
                 match pair.Value.Kind with
                 | DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x") -> Some pair.Value
@@ -44,27 +45,25 @@ module DashSpecLanguageProfileTests =
         | Error diagnostics -> Assert.Fail(System.String.Join("; ", diagnostics |> List.map (fun d -> d.Message)))
 
     [<Fact>]
-    let ``federation node ids match ast ids`` () =
+    let ``federation snapshot shares ast node ids`` () =
         let snapshot, graph, _ = DashSpecProfileRebuild.rebuild sample
-        let tabConcept =
-            graph.Nodes
+        let tabTier =
+            graph.Tiers
             |> Seq.pick (fun pair ->
                 match pair.Value.Kind with
                 | DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x") -> Some pair.Value
                 | _ -> None)
 
-        let expected = DashSpecProfileRebuild.nodeIdFromAst tabConcept.AstId
-
-        Assert.True(Map.containsKey expected snapshot.Nodes)
-        Assert.Equal("T", snapshot.Nodes.[expected].Name)
+        Assert.True(Map.containsKey tabTier.Id snapshot.Nodes)
+        Assert.Equal("T", snapshot.Nodes.[tabTier.Id].Name)
 
     [<Fact>]
     let ``projection hints classify data block as form field`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText sample
-        let formNodes = DashSpecProjectionHints.formFieldNodes graph
+        let formTiers = DashSpecProjectionHints.formFieldTiers graph
 
-        Assert.Contains(formNodes, fun node ->
-            match node.Kind with
+        Assert.Contains(formTiers, fun tier ->
+            match tier.Kind with
             | DashSpecConceptKind.Block(DashSpecBlockKeyword.Data, _) -> true
             | _ -> false)
 
@@ -90,10 +89,10 @@ module DashSpecLanguageProfileTests =
         Assert.Equal("DS007", DashSpecRuleRegistry.code DashSpecRuleKind.RoundTripOutlineChanged)
 
     [<Fact>]
-    let ``as title is stored as concept node attribute`` () =
+    let ``as title is stored on tier`` () =
         let graph = DashSpecConceptGraphBuilder.buildFromText sample
         let tab =
-            graph.Nodes
+            graph.Tiers
             |> Seq.pick (fun pair ->
                 match pair.Value.Kind with
                 | DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x") -> Some pair.Value
