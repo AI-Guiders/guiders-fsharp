@@ -15,6 +15,7 @@ type MechanicalEdit =
 type StructuralEdit =
     | RenameMember of nodeId: NodeId * newName: string
     | InsertBlock of anchorId: NodeId * sourceLine: string
+    | RemoveBlock of nodeId: NodeId
     | MoveMember of nodeId: NodeId * targetParentId: NodeId * index: int
     | Extract of nodeId: NodeId * extractedName: string
 
@@ -42,6 +43,7 @@ module StructuralEdit =
         function
         | RenameMember _ -> "RenameMember"
         | InsertBlock _ -> "InsertBlock"
+        | RemoveBlock _ -> "RemoveBlock"
         | MoveMember _ -> "MoveMember"
         | Extract _ -> "Extract"
 

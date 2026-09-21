@@ -46,14 +46,19 @@ module StructuralPlan =
         | Some r -> rebuild r.New
 
     let applyMechanical (rebuild: DocumentGraphRebuild) (snapshot: DocumentSnapshot) (edit: MechanicalEdit) =
-        let text = snapshot.Text
-        let start, length = edit.RemovedSpan
-        let endExclusive = min text.Length (start + length)
+        match edit.Scope with
+        | EditScope.Point
+        | EditScope.Region when not snapshot.Nodes.IsEmpty ->
+            DocumentGraph.applyMechanicalPatch snapshot edit
+        | _ ->
+            let text = snapshot.Text
+            let start, length = edit.RemovedSpan
+            let endExclusive = min text.Length (start + length)
 
-        let newText =
-            if start < 0 || start > text.Length then
-                text
-            else
-                text.Substring(0, start) + edit.InsertedText + text.Substring(endExclusive)
+            let newText =
+                if start < 0 || start > text.Length then
+                    text
+                else
+                    text.Substring(0, start) + edit.InsertedText + text.Substring(endExclusive)
 
-        rebuild newText
+            rebuild newText

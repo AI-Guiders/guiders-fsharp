@@ -167,6 +167,45 @@ module DocumentGraph =
 
                 Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
 
+    let private shiftTokenSpans (delta: int) (position: int) (spans: SessionClassificationSpan list) =
+        spans
+        |> List.map (fun span ->
+            if span.Start >= position then
+                { span with Start = span.Start + delta }
+            else
+                span)
+
+    let private shiftFoldingRegions (delta: int) (position: int) (regions: FoldingRegion list) =
+        regions
+        |> List.map (fun region ->
+            if region.Range.Start >= position then
+                { region with
+                    Range =
+                        LineRange.create (region.Range.Start + delta) (region.Range.End + delta) }
+            elif region.Range.End > position then
+                { region with Range = LineRange.create region.Range.Start (region.Range.End + delta) }
+            else
+                region)
+
+    /// Point/region mechanical splice without planet rebuild (D25 / V15 hot path).
+    let applyMechanicalPatch (snapshot: DocumentSnapshot) (edit: MechanicalEdit) =
+        let text = snapshot.Text
+        let start, length = edit.RemovedSpan
+        let endExclusive = min text.Length (start + max 0 length)
+
+        if start < 0 || start > text.Length then
+            snapshot
+        else
+            let newText =
+                text.Substring(0, start) + edit.InsertedText + text.Substring(endExclusive)
+
+            let delta = edit.InsertedText.Length - length
+
+            { Text = newText
+              Nodes = shiftSpans delta start snapshot.Nodes
+              TokenSpans = shiftTokenSpans delta start snapshot.TokenSpans
+              FoldingRegions = shiftFoldingRegions delta start snapshot.FoldingRegions }
+
     let insertBlock (snapshot: DocumentSnapshot) (anchorId: NodeId) (sourceLine: string) =
         match Map.tryFind anchorId snapshot.Nodes with
         | None -> Error $"anchor {anchorId} not found"
@@ -195,6 +234,26 @@ module DocumentGraph =
                 |> Map.add newId newNode
 
             Ok { Text = newText; Nodes = nodes; TokenSpans = []; FoldingRegions = [] }
+
+    let removeBlock (snapshot: DocumentSnapshot) (nodeId: NodeId) =
+        match Map.tryFind nodeId snapshot.Nodes with
+        | None -> Error $"node {nodeId} not found"
+        | Some node ->
+            let removeStart = max 0 (node.Start - Environment.NewLine.Length)
+            let removeEnd = min snapshot.Text.Length (node.End + Environment.NewLine.Length)
+            let removedLen = removeEnd - removeStart
+            let newText = snapshot.Text.Substring(0, removeStart) + snapshot.Text.Substring(removeEnd)
+
+            let nodes =
+                snapshot.Nodes
+                |> Map.remove nodeId
+                |> shiftSpans (-removedLen) removeStart
+
+            Ok
+                { Text = newText
+                  Nodes = nodes
+                  TokenSpans = shiftTokenSpans (-removedLen) removeStart snapshot.TokenSpans
+                  FoldingRegions = shiftFoldingRegions (-removedLen) removeStart snapshot.FoldingRegions }
 
     let moveMember (snapshot: DocumentSnapshot) (nodeId: NodeId) (_targetParentId: NodeId) (_index: int) =
         match Map.tryFind nodeId snapshot.Nodes with

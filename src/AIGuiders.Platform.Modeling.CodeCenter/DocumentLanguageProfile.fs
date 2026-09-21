@@ -47,7 +47,24 @@ module StructuralPlanGraph =
                 (fun s -> DocumentGraph.renameNode s nodeId newName)
 
         | InsertBlock(anchorId, sourceLine) ->
-            map None InverseQuality.Unspecified (fun s -> DocumentGraph.insertBlock s anchorId sourceLine)
+            match DocumentGraph.insertBlock before anchorId sourceLine with
+            | Error e -> Error e
+            | Ok after ->
+                let inserted =
+                    after.Nodes
+                    |> Map.toList
+                    |> List.tryFind (fun (id, _) -> not (Map.containsKey id before.Nodes))
+
+                match inserted with
+                | Some(nodeId, _) ->
+                    Ok
+                        { Snapshot = after
+                          Inverse = Some(RemoveBlock nodeId)
+                          InverseQuality = InverseQuality.Exact }
+                | None -> Error "insert block did not create a node"
+
+        | RemoveBlock nodeId ->
+            map None InverseQuality.Unspecified (fun s -> DocumentGraph.removeBlock s nodeId)
 
         | MoveMember(nodeId, targetParentId, index) ->
             map

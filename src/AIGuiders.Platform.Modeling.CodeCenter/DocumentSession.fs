@@ -179,11 +179,27 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     member _.SyncFromText(newText: string) =
         let rebuilt = state.Profile.Rebuild newText
-        let partial = rebuilt.Nodes.IsEmpty && not (System.String.IsNullOrWhiteSpace newText)
+        let hadGraph = not state.Current.Nodes.IsEmpty
+
+        let graphDegraded =
+            hadGraph
+            && (rebuilt.Nodes.IsEmpty || rebuilt.Nodes.Count < state.Current.Nodes.Count)
+
+        let partial =
+            (rebuilt.Nodes.IsEmpty && not (System.String.IsNullOrWhiteSpace newText)) || graphDegraded
+
+        let current =
+            if partial && hadGraph then
+                { rebuilt with
+                    Nodes = state.Current.Nodes
+                    TokenSpans = state.Current.TokenSpans
+                    FoldingRegions = state.Current.FoldingRegions }
+            else
+                rebuilt
 
         let newState =
             { state with
-                Current = rebuilt
+                Current = current
                 Revision = state.Revision + 1
                 PartialParse = partial
                 RefreshScopes = state.RefreshScopes @ [ RefreshScope.Document ] }

@@ -122,8 +122,10 @@ module DocumentSessionConformanceTests =
     [<Fact>]
     let ``V9 partial parse survives broken syntax`` () =
         let session = ConformanceFixtures.createDemoSession()
+        let beforeNodes = session.GetDocumentNodes() |> Seq.length
         let broken = session.SyncFromText("@dashboard oops")
-        Assert.True(broken.PartialParse || broken.Text.Contains("@dashboard"))
+        Assert.True(broken.PartialParse)
+        Assert.True(broken.GetDocumentNodes() |> Seq.length >= beforeNodes)
 
     [<Fact>]
     let ``V14 RelationSpec stub applyFromRelationSpec`` () =
@@ -145,6 +147,19 @@ module DocumentSessionConformanceTests =
         | Ok(_, entry) ->
             Assert.Equal(InverseQuality.Exact, entry.InverseQuality)
             Assert.True(entry.Inverse.IsSome)
+        | Error e -> Assert.Fail e
+
+    [<Fact>]
+    let ``V8a InsertBlock inverse field is Exact`` () =
+        let session = ConformanceFixtures.createDemoSession()
+        let node = session.TryResolve({ Offset = 5; TierHint = None }).Value
+
+        match session.ApplyStructural(InsertBlock(node.NodeId.Value, "tab newTab as \"N\"")) with
+        | Ok(_, entry) ->
+            Assert.Equal(InverseQuality.Exact, entry.InverseQuality)
+            match entry.Inverse with
+            | Some(RemoveBlock _) -> Assert.True(true)
+            | _ -> Assert.Fail("expected RemoveBlock inverse")
         | Error e -> Assert.Fail e
 
     [<Fact>]
