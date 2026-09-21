@@ -37,7 +37,7 @@ Federation never parses DashSpec / GDL / F# itself. It only calls the injected p
 
 | Signal | Example | Binds to |
 |--------|---------|----------|
-| Explicit session factory | `DashSpecFederationDocumentSession` | `DashSpecDocumentLanguageProfile` (`dashspec.block`) |
+| Plugin runtime open | `CodeCenterPluginRuntime.OpenDocument` | `DashSpecDocumentLanguageProfile` (`dashspec.block`) |
 | Project / document kind in solution graph | `ProjectKind.DashSpec`, `DocumentMeta.LanguageId` | planet profile for that kind |
 | File extension + host registry | `.dash`, `.gdl`, `.fs` | registered `IDocumentLanguageProfile` or backend |
 | `doc://` logical path convention | `doc://dash/demo` | host maps URI scheme segment → profile |
@@ -94,7 +94,7 @@ Planet-owned planners (e.g. `DashSpecStructuralPlanner`) use tier/AST knowledge;
 |------|--------|
 | Profile contract | `IDocumentLanguageProfile` in `DocumentLanguageProfile.fs` |
 | Neutral fallback | `NeutralDocumentLanguageProfile` → `emptySnapshot` |
-| DashSpec binding | `DashSpecCodeCenterSession.createDocumentSession` → `DashSpecDocumentLanguageProfile.instance`; WPF `DashSpecFederationDocumentSession` |
+| DashSpec binding | `DashSpecCodeCenterLanguageBackend.CreateSession` via `DashSpec.CodeCenter.Plugin`; no direct host session types |
 | Central registry | `ICodeCenterLanguageBackend` + `CodeCenterDocumentSessionFactory.Open` (guiders-wpf); Studio uses `PluginRuntime.OpenDocument` |
 | IDE `DocumentRegistry` | owns paths / `DocId`; language routing via `LanguageId` is adjacent but not unified with CodeCenter profile SSOT |
 
