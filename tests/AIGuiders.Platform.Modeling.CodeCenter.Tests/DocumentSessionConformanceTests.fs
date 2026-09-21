@@ -183,3 +183,18 @@ module DocumentSessionConformanceTests =
             Assert.Equal("Semantic", locus.Tier)
             Assert.True(locus.NodeId.IsSome)
             Assert.True(DocumentGraph.nodeIdRoundTrip (ConformanceFixtures.rebuild session.Text) locus)
+
+    [<Fact>]
+    let ``V4e DashSpec profile advertises planet projections`` () =
+        let session = ConformanceFixtures.createDemoSession()
+        let pluginIds =
+            session.AvailableProjections()
+            |> Seq.map (fun descriptor -> descriptor.PluginId)
+            |> Set.ofSeq
+
+        Assert.Contains("core.text", pluginIds)
+        Assert.Contains("tree.outline", pluginIds)
+        Assert.Contains("dashspec.diagram", pluginIds)
+        Assert.Contains("dashspec.form", pluginIds)
+        Assert.Contains("dashspec.preview", pluginIds)
+        Assert.DoesNotContain("core.diagram", pluginIds)

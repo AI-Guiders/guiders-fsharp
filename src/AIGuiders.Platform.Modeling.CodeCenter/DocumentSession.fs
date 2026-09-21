@@ -59,7 +59,7 @@ type DocumentSession private (documentId: string, docId: DocId, gitPin: GitPin, 
 
     /// Session-advertised projections; host intersects with installed plugin catalog.
     member _.AvailableProjections() =
-        ProjectionDescriptor.defaultAvailable ()
+        state.Profile.AvailableProjections ()
         :> System.Collections.Generic.IReadOnlyList<_>
 
     member _.ApplyMechanicalEdit(edit: MechanicalEdit) : Result<DocumentSession, string> =

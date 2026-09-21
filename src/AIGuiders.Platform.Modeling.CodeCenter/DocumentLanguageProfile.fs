@@ -26,6 +26,7 @@ type IDocumentLanguageProfile =
     abstract Surface: SurfaceFamily
     abstract Rebuild: string -> DocumentSnapshot
     abstract PlanStructural: DocumentSnapshot -> StructuralEdit -> Result<StructuralPlanOutcome, string>
+    abstract AvailableProjections: unit -> ProjectionDescriptor list
 
 module StructuralPlanGraph =
     let plan (before: DocumentSnapshot) (edit: StructuralEdit) : Result<StructuralPlanOutcome, string> =
@@ -67,12 +68,16 @@ type NeutralDocumentLanguageProfile() =
         member _.Rebuild text = DocumentGraph.emptySnapshot text
         member _.PlanStructural snapshot edit = StructuralPlanGraph.plan snapshot edit
 
+        member _.AvailableProjections () = ProjectionDescriptor.defaultAvailable ()
+
 type RebuildLanguageProfile(rebuild: DocumentGraphRebuild, profileId: string, surface: SurfaceFamily) =
     interface IDocumentLanguageProfile with
         member _.ProfileRef = { ProfileId = profileId; Flavour = None }
         member _.Surface = surface
         member _.Rebuild text = rebuild text
         member _.PlanStructural snapshot edit = StructuralPlanGraph.plan snapshot edit
+
+        member _.AvailableProjections () = ProjectionDescriptor.defaultAvailable ()
 
 module RebuildLanguageProfile =
     let create rebuild =
