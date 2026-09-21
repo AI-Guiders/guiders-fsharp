@@ -15,7 +15,7 @@ module DashSpecLanguageProfileTests =
         let graph = DashSpecConceptGraphBuilder.buildFromText sample
 
         Assert.True(graph.Nodes.Count >= 4)
-        Assert.Contains(graph.Nodes, fun pair -> pair.Key > 0u)
+        Assert.Contains(graph.Nodes, fun pair -> AstNodeId.value pair.Key > 0u)
         Assert.True(graph.Edges.Length >= 3)
 
         let tab =
