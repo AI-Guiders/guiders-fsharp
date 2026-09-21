@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="ConformanceFixtures.fs" />
     <Compile Include="RePlannableThetaRegistryTests.fs" />
+    <Compile Include="DashSpecLanguageProfileTests.fs" />
     <Compile Include="DocumentSessionConformanceTests.fs" />
     <Compile Include="ReplayConformanceTests.fs" />
     <Compile Include="PerfConformanceTests.fs" />
