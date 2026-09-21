@@ -56,7 +56,7 @@ module DashSpecLanguageProfileTests =
         let expected = DashSpecProfileRebuild.nodeIdFromAst tabConcept.AstId
 
         Assert.True(Map.containsKey expected snapshot.Nodes)
-        Assert.Equal("tab x", snapshot.Nodes.[expected].Name)
+        Assert.Equal("T", snapshot.Nodes.[expected].Name)
 
     [<Fact>]
     let ``projection hints classify data block as form field`` () =
@@ -100,7 +100,7 @@ module DashSpecLanguageProfileTests =
                 | _ -> None)
 
         Assert.Equal(Some "T", tab.Title)
-        Assert.Equal("tab x", tab.Label)
+        Assert.Equal(DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x"), tab.Kind)
 
     [<Fact>]
     let ``tab with as and end tab passes block balance`` () =
