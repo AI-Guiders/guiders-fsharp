@@ -44,25 +44,31 @@ module LanguageIds =
     [<Literal>]
     let Dashspec = "dashspec"
 
-/// <summary>DashSpec planet file roots (ADR-0017).</summary>
+/// <summary>DashSpec planet file roots (ADR-0017) — SSOT for LRC + Code Center activation.</summary>
 module DashSpecPathRules =
-    let private extensions =
-        set
-            [ ".dashspec"
-              ".dashdiagram"
-              ".dashlayout"
-              ".dashpalette"
-              ".dashpresentation"
-              ".dashtransform"
-              ".dashcatalog"
-              ".dashtooltip"
-              ".dashinclude" ]
+    let extensions =
+        [| ".dash"
+           ".dashspec"
+           ".dashdiagram"
+           ".dashlayout"
+           ".dashpalette"
+           ".dashpresentation"
+           ".dashtransform"
+           ".dashcatalog"
+           ".dashtooltip"
+           ".dashinclude" |]
+
+    let private extensionSet = extensions |> Set.ofArray
 
     let isDashSpecPath (path: string) =
         if String.IsNullOrWhiteSpace path then
             false
         else
-            extensions.Contains(Path.GetExtension(path).ToLowerInvariant())
+            extensionSet.Contains(Path.GetExtension(path).ToLowerInvariant())
+
+/// <summary>Optional Code Center plugin activation catalog for LRC resolve (GUIDERS-FSHARP-ADR-0009).</summary>
+type ILanguageActivationCatalog =
+    abstract ResolveLanguageId: path: string -> string
 
 /// <summary>Extension-based language id resolution per GUIDERS-ADR-0061 §3.</summary>
 module LanguagePathRules =
