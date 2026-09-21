@@ -102,6 +102,40 @@ module DashSpecLanguageProfileTests =
         Assert.Equal(DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "x"), tab.Kind)
 
     [<Fact>]
+    let ``structural insert block rebuilds ast and tiers`` () =
+        let before = DashSpecDocumentGraph.rebuildFromText sample
+        let dashboard =
+            before.Nodes
+            |> Map.toList
+            |> List.pick (fun (_, node) ->
+                if node.Name = "@dashboard demo" then Some node else None)
+
+        match DashSpecStructuralPlanner.plan before (InsertBlock(dashboard.Id, "tab newTab as \"N\"")) with
+        | Error message -> Assert.Fail(message)
+        | Ok outcome ->
+            Assert.Contains("newTab", outcome.Snapshot.Text)
+
+            let graph, errors =
+                DashSpecSerializeRules.parseAndBuild outcome.Snapshot.Text
+
+            Assert.Empty(errors |> List.filter (fun d -> d.Severity = "error"))
+            Assert.True(graph.Tiers.Values |> Seq.exists (fun tier ->
+                match tier.Kind with
+                | DashSpecConceptKind.Block(DashSpecBlockKeyword.Tab, Some "newTab") -> true
+                | _ -> false))
+
+    [<Fact>]
+    let ``session structural insert uses ast first planner`` () =
+        let session = DashSpecCodeCenterSession.createDocumentSession "doc://demo" sample
+        let dashboard =
+            session.GetDocumentNodes()
+            |> Seq.find (fun node -> node.Name = "@dashboard demo")
+
+        match session.ApplyStructural(InsertBlock(dashboard.Id, "tab newTab as \"N\"")) with
+        | Error message -> Assert.Fail(message)
+        | Ok(session', _) -> Assert.Contains("newTab", session'.Text)
+
+    [<Fact>]
     let ``tab with as and end tab passes block balance`` () =
         let text =
             "@dashboard demo\n    tab overview as \"Overview\"\n        cards\n            peak\n        end cards\n    end tab\nend dashboard\n"

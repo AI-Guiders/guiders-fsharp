@@ -4,7 +4,7 @@ open DashSpec.Modeling.CodeCenter
 
 module ConformanceFixtures =
 
-    let sampleText = "@dashboard demo\n    tab x as \"T\"\nend dashboard\n"
+    let sampleText = "@dashboard demo\n    tab x\nend dashboard\n"
 
     let createSession documentId text =
         DashSpecCodeCenterSession.createDocumentSession documentId text
