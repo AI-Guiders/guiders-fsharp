@@ -53,6 +53,9 @@ module LanguageIds =
     [<Literal>]
     let SqlMssql = "sql.mssql"
 
+    [<Literal>]
+    let SqlSqlite = "sql.sqlite"
+
 /// <summary>DashSpec planet file roots (ADR-0017) — SSOT for LRC + Code Center activation.</summary>
 module DashSpecPathRules =
     let extensions =

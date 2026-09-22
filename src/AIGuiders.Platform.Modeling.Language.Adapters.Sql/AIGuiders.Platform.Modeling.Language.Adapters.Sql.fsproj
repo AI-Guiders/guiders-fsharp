@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AIGuiders.Platform.Modeling.Language.Adapters.Sql</RootNamespace>
+    <AssemblyName>AIGuiders.Platform.Modeling.Language.Adapters.Sql</AssemblyName>
+    <Description>SQL sql.script backends for Language Resolver Center.</Description>
+    <PackageId>AIGuiders.Platform.Modeling.Language.Adapters.Sql</PackageId>
+    <WitDatabaseRoot Condition="'$(WitDatabaseRoot)' == ''">..\..\..\witdatabase</WitDatabaseRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="SqlDialect.fs" />
+    <Compile Include="SqlInvariantLaws.fs" />
+    <Compile Include="SqlLanguageActivation.fs" />
+    <Compile Include="SqlLanguageBackend.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
+    <ProjectReference Include="$(WitDatabaseRoot)\Sources\Engine\OutWit.Database.Parser\OutWit.Database.Parser.csproj" />
+  </ItemGroup>
+</Project>

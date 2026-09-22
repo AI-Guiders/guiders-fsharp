@@ -43,6 +43,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Language/AIGuiders.Platform.Modeling.Language.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Fcs/AIGuiders.Platform.Modeling.Language.Adapters.Fcs.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Gdl/AIGuiders.Platform.Modeling.Language.Adapters.Gdl.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Language.Adapters.Sql/AIGuiders.Platform.Modeling.Language.Adapters.Sql.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace/AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.CodeCenter/AIGuiders.Platform.Modeling.CodeCenter.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet/AIGuiders.Platform.Modeling.Ide.Session.Ports.DotNet.fsproj" />
