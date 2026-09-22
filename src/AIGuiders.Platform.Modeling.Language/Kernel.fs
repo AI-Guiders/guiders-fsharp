@@ -89,4 +89,5 @@ type LanguageRequest =
       Line: int
       Column: int
       SourceText: string
-      SolutionOrProjectPath: string }
+      SolutionOrProjectPath: string
+      SessionDefaultLanguageId: string }
