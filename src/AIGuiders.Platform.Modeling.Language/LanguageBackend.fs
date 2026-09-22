@@ -44,6 +44,15 @@ module LanguageIds =
     [<Literal>]
     let Dashspec = "dashspec"
 
+    [<Literal>]
+    let Sql = "sql"
+
+    [<Literal>]
+    let SqlPostgres = "sql.postgres"
+
+    [<Literal>]
+    let SqlMssql = "sql.mssql"
+
 /// <summary>DashSpec planet file roots (ADR-0017) — SSOT for LRC + Code Center activation.</summary>
 module DashSpecPathRules =
     let extensions =
@@ -112,6 +121,8 @@ module LanguagePathRules =
                 Some LanguageIds.Delphi
             elif String.Equals(ext, ".gdl", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Gdl
+            elif String.Equals(ext, ".sql", StringComparison.OrdinalIgnoreCase) then
+                Some LanguageIds.Sql
             elif DashSpecPathRules.isDashSpecPath path then
                 Some LanguageIds.Dashspec
             else
