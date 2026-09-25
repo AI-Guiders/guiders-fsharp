@@ -56,6 +56,9 @@ module LanguageIds =
     [<Literal>]
     let SqlSqlite = "sql.sqlite"
 
+    [<Literal>]
+    let Latex = "latex"
+
 /// <summary>DashSpec planet file roots (ADR-0017) — SSOT for LRC + Code Center activation.</summary>
 module DashSpecPathRules =
     let extensions =
@@ -126,6 +129,15 @@ module LanguagePathRules =
                 Some LanguageIds.Gdl
             elif String.Equals(ext, ".sql", StringComparison.OrdinalIgnoreCase) then
                 Some LanguageIds.Sql
+            elif String.Equals(ext, ".tex", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".latex", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".ltx", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".sty", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".cls", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".bbl", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".bst", StringComparison.OrdinalIgnoreCase)
+                 || String.Equals(ext, ".bib", StringComparison.OrdinalIgnoreCase) then
+                Some LanguageIds.Latex
             elif DashSpecPathRules.isDashSpecPath path then
                 Some LanguageIds.Dashspec
             else
