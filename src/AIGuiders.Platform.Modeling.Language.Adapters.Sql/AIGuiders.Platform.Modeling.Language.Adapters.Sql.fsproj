@@ -5,8 +5,6 @@
     <AssemblyName>AIGuiders.Platform.Modeling.Language.Adapters.Sql</AssemblyName>
     <Description>SQL sql.script backends for Language Resolver Center.</Description>
     <PackageId>AIGuiders.Platform.Modeling.Language.Adapters.Sql</PackageId>
-    <WitDatabaseRoot Condition="'$(WitDatabaseRoot)' == ''">..\..\..\witdatabase</WitDatabaseRoot>
-    <UseLocalWitDatabase Condition="'$(UseLocalWitDatabase)' == ''">false</UseLocalWitDatabase>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="SqlDialect.fs" />
@@ -16,7 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIGuiders.Platform.Modeling.Language\AIGuiders.Platform.Modeling.Language.fsproj" />
-    <ProjectReference Include="$(WitDatabaseRoot)\Sources\Engine\OutWit.Database.Parser\OutWit.Database.Parser.csproj" Condition="'$(UseLocalWitDatabase)' == 'true'" />
-    <PackageReference Include="OutWit.Database.Parser" Condition="'$(UseLocalWitDatabase)' != 'true'" />
+    <PackageReference Include="OutWit.Database.Parser" />
   </ItemGroup>
 </Project>
