@@ -66,8 +66,16 @@ module BracketRelationWire =
             |> Option.orElse (axisValue wire "L2" |> Option.bind tryParseInt)
             |> Option.orElse lineEndFromAxis
 
+        let textAxis =
+            axisValue wire "Text"
+            |> Option.orElse (axisValue wire "Needle")
+            |> Option.orElse (axisValue wire "Content")
+
+        let typeAxis = axisValue wire "Type"
+
         let container =
-            CodeEditWireEncoding.appendHints [] scopeKind scopeIndex lineStart lineEnd
+            let hinted = CodeEditWireEncoding.appendHints [] scopeKind scopeIndex lineStart lineEnd
+            CodeEditWireEncoding.appendEditorHints hinted typeAxis textAxis
 
         CodeTarget.Symbol(
             DocumentRef.File file,
@@ -105,8 +113,18 @@ module BracketRelationWire =
                         let hasScope = axisValue wire "Scope" |> Option.isSome
                         let hasLine = axisValue wire "Line" |> Option.isSome
                         let hasScopeIndex = axisValue wire "ScopeIndex" |> Option.isSome
+                        let hasType = axisValue wire "Type" |> Option.isSome
 
-                        if not hasScope && not hasLine && not hasScopeIndex then
+                        let hasText =
+                            axisValue wire "Text"
+                            |> Option.orElse (axisValue wire "Needle")
+                            |> Option.orElse (axisValue wire "Content")
+                            |> Option.isSome
+
+                        if hasType || hasText then
+                            RelationSpec.CodeEdit(codeEditMemberTarget (LogicalPath.Create file) "" wire)
+                            |> Some
+                        elif not hasScope && not hasLine && not hasScopeIndex then
                             None
                         else
                             RelationSpec.CodeEdit(codeEditMemberTarget (LogicalPath.Create file) "" wire)

@@ -6,6 +6,8 @@ open System
 module CodeEditWireEncoding =
     let [<Literal>] LinePrefix = "@line:"
     let [<Literal>] ScopePrefix = "@scope:"
+    let [<Literal>] TypePrefix = "@type:"
+    let [<Literal>] TextPrefix = "@text:"
 
     let private tryParseInt (raw: string) =
         match Int32.TryParse raw with
@@ -36,6 +38,19 @@ module CodeEditWireEncoding =
         | Some sk when not (String.IsNullOrWhiteSpace sk) ->
             let idx = scopeIndex |> Option.defaultValue 1
             hints <- $"{ScopePrefix}{sk.Trim().ToLowerInvariant()}:{idx}" :: hints
+        | _ -> ()
+
+        hints @ container
+
+    let appendEditorHints (container: string list) (typeName: string option) (textNeedle: string option) =
+        let mutable hints = []
+
+        match typeName with
+        | Some t when not (String.IsNullOrWhiteSpace t) -> hints <- $"{TypePrefix}{t.Trim()}" :: hints
+        | _ -> ()
+
+        match textNeedle with
+        | Some n when not (String.IsNullOrWhiteSpace n) -> hints <- $"{TextPrefix}{n.Trim()}" :: hints
         | _ -> ()
 
         hints @ container
@@ -74,8 +89,26 @@ module CodeEditWireEncoding =
                     | Some idx when idx > 0 -> Some(kind, idx)
                     | _ -> Some(kind, 1))
 
+    let tryDecodeType (container: string list) =
+        container
+        |> List.tryPick (fun entry ->
+            if entry.StartsWith(TypePrefix, StringComparison.Ordinal) then
+                Some(entry.Substring TypePrefix.Length)
+            else
+                None)
+
+    let tryDecodeText (container: string list) =
+        container
+        |> List.tryPick (fun entry ->
+            if entry.StartsWith(TextPrefix, StringComparison.Ordinal) then
+                Some(entry.Substring TextPrefix.Length)
+            else
+                None)
+
     let stripHints (container: string list) =
         container
         |> List.filter (fun entry ->
             not (entry.StartsWith(LinePrefix, StringComparison.Ordinal))
-            && not (entry.StartsWith(ScopePrefix, StringComparison.Ordinal)))
+            && not (entry.StartsWith(ScopePrefix, StringComparison.Ordinal))
+            && not (entry.StartsWith(TypePrefix, StringComparison.Ordinal))
+            && not (entry.StartsWith(TextPrefix, StringComparison.Ordinal)))
