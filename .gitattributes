@@ -37,3 +37,8 @@
 *.zip binary
 *.dll binary
 *.exe binary
+
+* text=auto eol=lf
+*.slnx text eol=crlf
+*.pdb binary
+*.nupkg binary
