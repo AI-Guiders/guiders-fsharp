@@ -1,0 +1,15 @@
+<Project>
+
+  <!-- NuGet-facing readme convention: a project with NUGET.md next to its
+       project file ships that file as the package README (PackageReadmeFile).
+       Projects without NUGET.md keep the repo root README (Directory.Build.props). -->
+
+  <PropertyGroup Condition="Exists('$(MSBuildProjectDirectory)/NUGET.md')">
+    <PackageReadmeFile>NUGET.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)/NUGET.md')">
+    <None Include="NUGET.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
