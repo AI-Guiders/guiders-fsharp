@@ -61,17 +61,9 @@ module LanguageIds =
 
 /// <summary>DashSpec planet file roots (ADR-0017) — SSOT for LRC + Code Center activation.</summary>
 module DashSpecPathRules =
-    let extensions =
-        [| ".dash"
-           ".dashspec"
-           ".dashdiagram"
-           ".dashlayout"
-           ".dashpalette"
-           ".dashpresentation"
-           ".dashtransform"
-           ".dashcatalog"
-           ".dashtooltip"
-           ".dashinclude" |]
+    // The living spec language is `.ds` (tab / dashboard / diagram / flow / … unit files);
+    // the legacy `.dash*` family is retired.
+    let extensions = [| ".ds" |]
 
     let private extensionSet = extensions |> Set.ofArray
 
