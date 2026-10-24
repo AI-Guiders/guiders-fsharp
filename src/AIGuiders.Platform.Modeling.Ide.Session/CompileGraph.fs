@@ -43,7 +43,8 @@ module CompileGraph =
     let units (g: CompileGraph) : CompilationUnitId list =
         match g.Topology with
         | OrderedUnits xs -> xs
-        | ExplicitEdges _ -> []
+        | ExplicitEdges edges ->
+            edges |> List.collect (fun e -> [ e.From; e.To ]) |> List.distinct
 
     let private explicitDescendants (edges: EmitDependency list) (roots: CompilationUnitId list) =
         let byFrom = edges |> List.groupBy (fun e -> e.From) |> Map.ofList
@@ -97,17 +98,25 @@ type EmitPlan =
 [<RequireQualifiedAccess>]
 module ArtifactCache =
 
-    /// <summary>hash(inputs(u)): frozen unit contents + the invocation inputs that shape its IL (project key). Deterministic sha256 — same inputs, same key (§7.4 H).</summary>
+    /// <summary>
+    /// hash(inputs(u)): frozen unit contents + the invocation inputs that shape its IL (project key).
+    /// Deterministic sha256 — same inputs, same key (§7.4 H). Components are length-prefixed and
+    /// UTF-16LE encoded: unpaired surrogates survive distinctly (UTF8 folds them to U+FFFD and
+    /// collides — caught by property "H unitKey separates inputs").
+    /// </summary>
     let unitKey (projectId: ProjectId) (unit: CompilationUnitId) (unitContents: string) (invocationKey: string) : string =
         use sha = System.Security.Cryptography.SHA256.Create()
+        // length-prefixed UTF-16LE framing: injective over all .NET strings
+        let component (x: string) =
+            let bytes = Encoding.Unicode.GetBytes (if isNull x then "" else x)
+            Array.append (BitConverter.GetBytes bytes.Length) bytes
         let payload =
-            String.Concat(
-                ProjectId.value projectId, "\u0000",
-                unit, "\u0000",
-                invocationKey, "\u0000",
-                unitContents
-            )
-        sha.ComputeHash(Encoding.UTF8.GetBytes payload)
+            [| component (ProjectId.value projectId)
+               component unit
+               component invocationKey
+               component unitContents |]
+            |> Array.concat
+        sha.ComputeHash payload
         |> Array.map (fun b -> b.ToString("x2"))
         |> String.concat ""
 

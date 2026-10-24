@@ -6,6 +6,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
+    <PackageReference Include="FsCheck" />
+    <PackageReference Include="FsCheck.Xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +35,7 @@
     <Compile Include="BuildDiagnosticOpsTests.fs" />
     <Compile Include="OpenBuildGoldenTests.fs" />
     <Compile Include="SolutionProviderRegistryTests.fs" />
-    <Compile Include="CompileGraphTests.fs" />
+    <Compile Include="CompileGraphProperties.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CommandPlane\AIGuiders.Platform.Modeling.CommandPlane.fsproj" />

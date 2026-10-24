@@ -76,7 +76,7 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 
 | Ветка | Суть | Сейчас |
 |-------|------|--------|
-| **GuidersBuild** | \( \Gamma_\pi + \mathcal{H} \), incremental; emit via **Roslyn/FCS** drivers | **model v0 shipped** (`CompileGraph`/`ArtifactCache`/`EmitPlanner` + `BuildDriver` attr, conformance IB1/SN1–SN4/BS2); drivers/jobs — ports, Phase 2–4 |
+| **GuidersBuild** | \( \Gamma_\pi + \mathcal{H} \), incremental; emit via **Roslyn/FCS** drivers | **model v0 shipped** (`CompileGraph`/`ArtifactCache`/`EmitPlanner` + `BuildDriver` attr, property-based conformance IB1/SN1–SN4/BS2/monotone + chain-oracle via FsCheck — PBT caught a real unitKey UTF8-surrogate collision on run one); drivers/jobs — ports, Phase 2–4 |
 | **GDL → IL** | declare-time GDL как frontend напрямую в ECMA-335; язык-агностичный interchange | **отдельная идея / fork**; capture: [ANUI GDL/IL rethink](../../../../../../../agent-notes/knowledge/work/projects/door-to-singularity/ai-native-ui/note-anui-gdl-il-rethink-v0.md) |
 | **Свой frontend** | полный compiler с нуля | только если GDL/Planet станет продуктом, не платформой |
 
