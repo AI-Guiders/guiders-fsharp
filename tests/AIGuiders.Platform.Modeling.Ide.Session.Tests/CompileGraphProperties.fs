@@ -1,6 +1,7 @@
 namespace AIGuiders.Platform.Modeling.Ide.Session.Tests
 
 open FsCheck
+open FsCheck.FSharp
 open FsCheck.Xunit
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.Ide.Session
