@@ -21,11 +21,14 @@ type CompilerServicesEnsureResult =
     | Failed of reason: string
 
 module CompilerServicesMaterialization =
+    // Separator-insensitive canonical compare: registry keys are LogicalPath ('/'),
+    // callers may pass platform paths ('\') — Path.GetFullPath keeps both forms
+    // apart on Linux, so normalize separators ourselves (model is OS-agnostic).
     let private normalizePath (path: string) =
         if String.IsNullOrWhiteSpace path then
             ""
         else
-            Path.GetFullPath path
+            path.Replace('\\', '/').TrimEnd('/')
 
     let tryResolveProjectId (registry: DocumentRegistry) (filePath: string) =
         let full = normalizePath filePath
