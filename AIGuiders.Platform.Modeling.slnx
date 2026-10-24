@@ -31,6 +31,7 @@
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog/AIGuiders.Platform.Modeling.Gdl.Parse.Catalog.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.Config/AIGuiders.Platform.Modeling.Gdl.Parse.Config.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession/AIGuiders.Platform.Modeling.Gdl.Parse.IdeSession.fsproj" />
+    <Project Path="src/AIGuiders.Platform.Modeling.Ide.Session/AIGuiders.Platform.Modeling.Ide.Session.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.IdeSession.GateCatalog/AIGuiders.Platform.Modeling.IdeSession.GateCatalog.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic/AIGuiders.Platform.Modeling.Gdl.Parse.CockpitLogic.fsproj" />
     <Project Path="src/AIGuiders.Platform.Modeling.Notations.Bracket/AIGuiders.Platform.Modeling.Notations.Bracket.fsproj" />

@@ -26,6 +26,13 @@ jobs:
           repository: AI-Guiders/guiders-dotnet-platform
           path: federation/guiders-platform
 
+      # Sibling checkout for Ports.DotNet (ProjectReference ../../../guiders-core,
+      # package dep AIGuiders.DotNetWorkspace.Core) and platform-parity tests.
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-core
+          path: federation/guiders-core
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
