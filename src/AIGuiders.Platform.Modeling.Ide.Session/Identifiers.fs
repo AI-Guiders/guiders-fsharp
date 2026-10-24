@@ -13,3 +13,6 @@ module ProjectId =
     let fromLogical path = CoreProjectId.create path
     let path (ProjectId p) = p
     let value (ProjectId p) = p.Value
+
+/// <summary>Monotone session revision r (math §2.8) — base identifier; CompileGraph needs it before snapshots.</summary>
+type SessionRevision = int64

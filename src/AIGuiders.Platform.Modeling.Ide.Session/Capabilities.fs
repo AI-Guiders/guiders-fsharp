@@ -45,11 +45,14 @@ module CapabilityCatalog =
               Scope = Solution
               AdaptiveRules =
                 [ WhenAlreadyWarm InProcess
-                  WhenFullSolutionScan OutOfProcess ] } }
+                  WhenFullSolutionScan OutOfProcess ]
+              BuildDriver = None } }
 
     let buildTool () =
         { Kind = Build
-          Attributes = CapabilityAttributes.defaults SubprocessTool CompileTime }
+          Attributes =
+            CapabilityAttributes.defaults SubprocessTool CompileTime
+            |> fun a -> { a with BuildDriver = Some MsBuildInterop } }
 
     let testDiscovery () =
         { Kind = TestDiscovery

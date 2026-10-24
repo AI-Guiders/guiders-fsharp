@@ -35,6 +35,7 @@
     <Compile Include="GraphPatch.fs" />
     <Compile Include="RefactorPlan.fs" />
     <Compile Include="MaterializedState.fs" />
+    <Compile Include="CompileGraph.fs" />
     <Compile Include="FrozenSnapshot.fs" />
     <Compile Include="WorkspaceView.fs" />
     <Compile Include="RevisionLedger.fs" />

@@ -3,8 +3,6 @@ namespace AIGuiders.Platform.Modeling.Ide.Session
 open AIGuiders.Platform.Modeling.Core.Identity
 open AIGuiders.Platform.Modeling.LanguageIntelligence.Relations
 
-type SessionRevision = int64
-
 type FreezeMode =
     | Local of ProjectId
     | ProjClosure of ProjectId

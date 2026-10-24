@@ -29,6 +29,10 @@
 | RF1–RF8, ST1–ST5 | `HoareChecker`, `StyleConformance`, `Conformance` (GS1–GS6) |
 | \( \Lambda \), Timeline | `RevisionLedger` (append v0); Timeline **Phase 3** |
 | CDP dogfood | `cdp_ide_session_scene`, `cdp_session.federation`, `cdp_health.federation` |
+| \( \Gamma_\pi,\ E_\pi \) | `CompileGraph` (`UnitTopology`: OrderedUnits/ExplicitEdges, `EmitDependency`) — §7.4 v0 |
+| \( \mathcal{H} \) | `ArtifactCache` / `CachedArtifact` + `ArtifactCache.unitKey` (sha256 @ frozen inputs) |
+| \( U' \) (IB1, SN1–SN4) | `CompileGraph.minimalRebuild` + `EmitPlanner.plan` (NoEmit when \( U'=\emptyset \)) |
+| \( lpha.\mathsf{buildDriver} \) (BS2) | `BuildDriver` + `CapabilityAttributes.BuildDriver` (catalog default: `MsBuildInterop`) |
 
 ---
 
@@ -72,7 +76,7 @@ E_{\mathsf{req}} = \{ (\mathsf{Build}, \mathsf{CompilerServices}) \}
 
 | Ветка | Суть | Сейчас |
 |-------|------|--------|
-| **GuidersBuild** | \( \Gamma_\pi + \mathcal{H} \), incremental; emit via **Roslyn/FCS** drivers | Phase 2–4 orchestrator |
+| **GuidersBuild** | \( \Gamma_\pi + \mathcal{H} \), incremental; emit via **Roslyn/FCS** drivers | **model v0 shipped** (`CompileGraph`/`ArtifactCache`/`EmitPlanner` + `BuildDriver` attr, conformance IB1/SN1–SN4/BS2); drivers/jobs — ports, Phase 2–4 |
 | **GDL → IL** | declare-time GDL как frontend напрямую в ECMA-335; язык-агностичный interchange | **отдельная идея / fork**; capture: [ANUI GDL/IL rethink](../../../../../../../agent-notes/knowledge/work/projects/door-to-singularity/ai-native-ui/note-anui-gdl-il-rethink-v0.md) |
 | **Свой frontend** | полный compiler с нуля | только если GDL/Planet станет продуктом, не платформой |
 

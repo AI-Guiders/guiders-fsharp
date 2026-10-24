@@ -33,6 +33,7 @@
     <Compile Include="BuildDiagnosticOpsTests.fs" />
     <Compile Include="OpenBuildGoldenTests.fs" />
     <Compile Include="SolutionProviderRegistryTests.fs" />
+    <Compile Include="CompileGraphTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.CommandPlane\AIGuiders.Platform.Modeling.CommandPlane.fsproj" />
