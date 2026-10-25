@@ -7,9 +7,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FsCheck" />
+    <PackageReference Include="FsCheck.Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NotationsCoreConformanceTests.fs" />
+    <Compile Include="NotationsCoreProperties.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIGuiders.Platform.Modeling.Notations.Core\AIGuiders.Platform.Modeling.Notations.Core.fsproj" />
