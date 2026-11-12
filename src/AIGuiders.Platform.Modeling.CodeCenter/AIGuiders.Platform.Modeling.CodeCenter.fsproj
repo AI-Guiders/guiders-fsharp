@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.CodeCenter</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.CodeCenter</AssemblyName>
     <Description>Federation Code Center document session SSOT — structural edits, Λ_doc ledger, replay undo.</Description>

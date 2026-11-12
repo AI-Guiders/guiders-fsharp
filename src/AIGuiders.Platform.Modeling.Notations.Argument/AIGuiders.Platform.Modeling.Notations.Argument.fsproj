@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Notations.Argument</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Notations.Argument</AssemblyName>
     <Description>Neutral argument slot schema and normalized invocation args (GUIDERS-ADR-0021).</Description>

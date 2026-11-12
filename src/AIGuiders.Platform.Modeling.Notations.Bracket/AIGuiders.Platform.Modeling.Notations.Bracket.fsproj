@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Notations.Bracket</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Notations.Bracket</AssemblyName>
     <Description>Bracket notation profile IR — axis shapes, wire normalization.</Description>

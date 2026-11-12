@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Rules</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Rules</AssemblyName>
     <Description>Headless cockpit rule evaluation — traceable rule id + matched when.</Description>

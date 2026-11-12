@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.CommandPlane</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.CommandPlane</AssemblyName>
     <Description>CommandPlane M-shapes — prefix-arm match algebra, constructor definitions, locale date parse (F# SSOT, ADR-0003 §4.6, GUIDERS-ADR-0037/0038).</Description>

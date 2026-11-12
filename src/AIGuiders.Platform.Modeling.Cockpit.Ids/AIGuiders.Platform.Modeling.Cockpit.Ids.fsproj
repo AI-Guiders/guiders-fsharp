@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Cockpit.Ids</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Cockpit.Ids</AssemblyName>
     <Description>Ids palette hit shape — one IDS feature hit for the search seam (F# SSOT, CIDE ADR 0079).</Description>

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Ide.Session.Ports.Workspace</AssemblyName>
     <Description>md/json/toml/yaml document tree + navigation links → WorkspaceGraph (physical layer port).</Description>

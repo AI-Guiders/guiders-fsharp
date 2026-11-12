@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Authors>AI Guiders</Authors>
@@ -13,7 +13,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);MSB3277;NU1504;FS3261;FS0025;FS0104</NoWarn>
+    <NoWarn>$(NoWarn);MSB3277;NU1504;NU1608;FS3261;FS0025;FS0104</NoWarn>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj'">

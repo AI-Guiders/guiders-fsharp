@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>AIGuiders.Platform.Modeling.Gdl.Presentation</RootNamespace>
     <AssemblyName>AIGuiders.Platform.Modeling.Gdl.Presentation</AssemblyName>
     <Description>GDL presentation IR — F# mirror of Platform IR.Presentation + TopologyNotation.</Description>
